@@ -1,0 +1,69 @@
+
+services:
+
+  btsplay-laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: laravel-app
+    container_name: btsplay-laravel
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network
+    depends_on:
+      - btsplay-mysql
+
+  btsplay-nginx:
+    image: nginx:alpine
+    container_name: btsplay-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+  btsplay-mysql:
+    image: mysql:5.7
+    container_name: btsplay-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+      
+  btsplay-phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    container_name: btsplay-phpmyadmin
+    environment:
+      PMA_HOST: btsplay-mysql
+    ports:
+      - "8001:80"
+    depends_on:
+      - btsplay-mysql
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
