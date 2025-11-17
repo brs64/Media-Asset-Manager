@@ -13,8 +13,8 @@ services:
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
-      - .:/var/www
-      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - .:/var/www:z
+      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
     networks:
       - app-network
     depends_on:
@@ -27,8 +27,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www
-      - ./docker-compose/nginx:/etc/nginx/conf.d/
+      - .:/var/www:z
+      - ./docker-compose/nginx:/etc/nginx/conf.d/:z
     networks:
       - app-network
 
@@ -44,7 +44,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - dbdata:/var/lib/mysql
+      - dbdata:/var/lib/mysql:z
     networks:
       - app-network
       
