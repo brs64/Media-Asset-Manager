@@ -23,8 +23,21 @@ class EleveSeeder extends Seeder
             ['nom' => 'David', 'prenom' => 'Chloé'],
         ];
 
-        foreach ($eleves as $eleve) {
-            \App\Models\Eleve::create($eleve);
+        foreach ($eleves as $eleveData) {
+            // Créer d'abord le compte utilisateur (parent)
+            $email = strtolower($eleveData['prenom'] . '.' . $eleveData['nom']) . '@mediamanager.fr';
+            $user = \App\Models\User::create([
+                'name' => $eleveData['prenom'] . ' ' . $eleveData['nom'],
+                'email' => $email,
+                'password' => bcrypt('password'),
+            ]);
+
+            // Créer le profil élève (enfant) lié à l'utilisateur
+            \App\Models\Eleve::create([
+                'user_id' => $user->id,
+                'nom' => $eleveData['nom'],
+                'prenom' => $eleveData['prenom'],
+            ]);
         }
     }
 }

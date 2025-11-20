@@ -35,7 +35,7 @@ class Media extends Model
     ];
 
     /**
-     * Un média appartient à un projet
+     * Un média appartient à un projet (nullable - peut être orphelin)
      */
     public function projet(): BelongsTo
     {
@@ -43,7 +43,7 @@ class Media extends Model
     }
 
     /**
-     * Un média a un professeur référent
+     * Un média a un professeur référent (nullable)
      */
     public function professeur(): BelongsTo
     {

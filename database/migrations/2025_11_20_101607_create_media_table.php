@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('URI_NAS_ARCH')->nullable();
             $table->string('URI_NAS_PAD')->nullable();
             $table->string('URI_NAS_MPEG')->nullable();
-            $table->foreignId('projet_id')->constrained('projets')->onDelete('cascade');
-            $table->foreignId('professeur_id')->constrained('professeurs')->onDelete('cascade');
+            $table->foreignId('projet_id')->nullable()->constrained('projets')->onDelete('set null');
+            $table->foreignId('professeur_id')->nullable()->constrained('professeurs')->onDelete('set null');
             $table->timestamps();
         });
     }

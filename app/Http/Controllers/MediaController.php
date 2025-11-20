@@ -57,8 +57,8 @@ class MediaController extends Controller
             'URI_NAS_ARCH' => 'nullable|string',
             'URI_NAS_PAD' => 'nullable|string',
             'URI_NAS_MPEG' => 'nullable|string',
-            'projet_id' => 'required|exists:projets,id',
-            'professeur_id' => 'required|exists:professeurs,id',
+            'projet_id' => 'nullable|exists:projets,id',
+            'professeur_id' => 'nullable|exists:professeurs,id',
             'eleves' => 'nullable|array',
             'eleves.*' => 'exists:eleves,id',
             'roles' => 'nullable|array',
@@ -134,8 +134,8 @@ class MediaController extends Controller
             'URI_NAS_ARCH' => 'nullable|string',
             'URI_NAS_PAD' => 'nullable|string',
             'URI_NAS_MPEG' => 'nullable|string',
-            'projet_id' => 'required|exists:projets,id',
-            'professeur_id' => 'required|exists:professeurs,id',
+            'projet_id' => 'nullable|exists:projets,id',
+            'professeur_id' => 'nullable|exists:professeurs,id',
         ]);
 
         $media->update($validated);

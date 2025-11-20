@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Media;
 
 class HomeController extends Controller
 {
@@ -11,14 +12,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
-    }
+        // Récupérer les derniers médias pour l'accueil
+        $medias = Media::with(['projet', 'professeur'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
 
-    /**
-     * Affiche la page de connexion/compte
-     */
-    public function compte()
-    {
-        return view('compte');
+        return view('home', compact('medias'));
     }
 }

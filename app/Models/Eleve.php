@@ -11,6 +11,7 @@ class Eleve extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'nom',
         'prenom',
     ];
@@ -32,5 +33,13 @@ class Eleve extends Model
     public function participations()
     {
         return $this->hasMany(Participation::class);
+    }
+
+    /**
+     * Relation vers le compte utilisateur de l'élève (parent)
+     */
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 }

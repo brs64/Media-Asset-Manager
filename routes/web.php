@@ -1,25 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MediaController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Support\Facades\Route;
 
-// Page d'accueil
+// Page d'accueil publique
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Authentification
-Route::get('/compte', [UserController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [UserController::class, 'login'])->name('login.post');
-Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+// Routes protégées par authentification (Breeze)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard (redirige vers home)
+    Route::get('/dashboard', function () {
+        return redirect()->route('home');
+    })->name('dashboard');
 
-// Routes protégées par authentification
-Route::middleware(['auth'])->group(function () {
-    // Profil utilisateur
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+    // Profil utilisateur (Breeze)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Gestion des médias
     Route::resource('media', MediaController::class);
@@ -30,8 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
 });
 
-// Routes admin
-Route::prefix('admin')->group(function () {
+// Routes admin (uniquement pour les professeurs)
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
 
     // Gestion des professeurs
@@ -49,3 +50,6 @@ Route::prefix('admin')->group(function () {
     Route::post('/projets', [AdminController::class, 'createProjet'])->name('admin.projets.create');
     Route::delete('/projets/{id}', [AdminController::class, 'deleteProjet'])->name('admin.projets.delete');
 });
+
+// Routes d'authentification Breeze
+require __DIR__.'/auth.php';

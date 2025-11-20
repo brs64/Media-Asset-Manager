@@ -11,14 +11,10 @@ class Professeur extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'nom',
         'prenom',
         'identifiant',
-        'mot_de_passe',
-    ];
-
-    protected $hidden = [
-        'mot_de_passe',
     ];
 
     /**
@@ -27,5 +23,13 @@ class Professeur extends Model
     public function media(): HasMany
     {
         return $this->hasMany(Media::class, 'professeur_id');
+    }
+
+    /**
+     * Relation vers le compte utilisateur du professeur (parent)
+     */
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 }
