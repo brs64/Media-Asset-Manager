@@ -15,8 +15,6 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
-    networks:
-      - app-network
     depends_on:
       - btsplay-mysql
 
@@ -29,8 +27,6 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/nginx:/etc/nginx/conf.d/:z
-    networks:
-      - app-network
 
   btsplay-mysql:
     image: mysql:5.7
@@ -45,8 +41,6 @@ services:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql:z
-    networks:
-      - app-network
       
   btsplay-phpmyadmin:
     image: phpmyadmin:latest
