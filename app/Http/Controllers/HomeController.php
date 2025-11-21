@@ -13,7 +13,7 @@ class HomeController extends Controller
     public function index()
     {
         // Récupérer les derniers médias pour l'accueil
-        $medias = Media::with(['projet', 'professeur'])
+        $medias = Media::with(['projets'])
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();

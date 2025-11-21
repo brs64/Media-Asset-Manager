@@ -12,7 +12,10 @@ class Media extends Model
 {
     use HasFactory;
 
+    protected $table = 'medias';
+
     protected $fillable = [
+        'id',
         'promotion',
         'type',
         'theme',
@@ -25,7 +28,6 @@ class Media extends Model
         'URI_NAS_ARCH',
         'URI_NAS_PAD',
         'URI_NAS_MPEG',
-        'projet_id',
         'professeur_id',
     ];
 
@@ -35,11 +37,12 @@ class Media extends Model
     ];
 
     /**
-     * Un média appartient à un projet (nullable - peut être orphelin)
+     * Un média peut appartenir à plusieurs projets
      */
-    public function projet(): BelongsTo
+    public function projets(): BelongsToMany
     {
-        return $this->belongsTo(Projet::class);
+        return $this->belongsToMany(Projet::class, 'media_projet')
+            ->withTimestamps();
     }
 
     /**

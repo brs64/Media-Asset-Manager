@@ -23,7 +23,7 @@ class MediaService
     public function getMediaInfos(int $idMedia): ?array
     {
         $media = Media::with([
-            'projet',
+            'projets',
             'professeur',
             'participations.eleve',
             'participations.role'
@@ -62,16 +62,16 @@ class MediaService
                 $media->professeur_id = $professeur->id;
             }
 
-            // Mise à jour du projet
-            if ($projet) {
-                $projetModel = $this->trouverOuCreerProjet($projet);
-                $media->projet_id = $projetModel->id;
-            }
-
             // Mise à jour des autres champs
             $media->promotion = $promotion;
             $media->description = $description;
             $media->save();
+
+            // Mise à jour du projet (many-to-many via pivot)
+            if ($projet) {
+                $projetModel = $this->trouverOuCreerProjet($projet);
+                $media->projets()->sync([$projetModel->id]);
+            }
 
             // Mise à jour des participations (rôles)
             $this->mettreAJourParticipations($idMedia, $roles);
@@ -140,7 +140,7 @@ class MediaService
      */
     public function getDerniersMedias(int $limite = 20): array
     {
-        return Media::with(['projet', 'professeur'])
+        return Media::with(['projets', 'professeur'])
             ->orderBy('updated_at', 'desc')
             ->limit($limite)
             ->get()
@@ -152,14 +152,16 @@ class MediaService
      */
     public function rechercherMedias(array $filtres): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $query = Media::query()->with(['projet', 'professeur', 'participations.eleve', 'participations.role']);
+        $query = Media::query()->with(['projets', 'professeur', 'participations.eleve', 'participations.role']);
 
         if (!empty($filtres['titre'])) {
             $query->where('mtd_tech_titre', 'like', '%' . $filtres['titre'] . '%');
         }
 
         if (!empty($filtres['projet_id'])) {
-            $query->where('projet_id', $filtres['projet_id']);
+            $query->whereHas('projets', function ($q) use ($filtres) {
+                $q->where('projets.id', $filtres['projet_id']);
+            });
         }
 
         if (!empty($filtres['professeur_id'])) {
@@ -190,12 +192,28 @@ class MediaService
     {
         $parties = explode(' ', trim($nomComplet));
         $prenom = array_pop($parties);
-        $nom = implode(' ', $parties);
+        $nom = implode(' ', $parties) ?: $prenom;
 
-        return Professeur::firstOrCreate(
-            ['nom' => $nom, 'prenom' => $prenom],
-            ['identifiant' => strtolower($nom[0] . '.' . $prenom), 'mot_de_passe' => bcrypt('password')]
+        // Chercher un professeur existant
+        $professeur = Professeur::where('nom', $nom)->where('prenom', $prenom)->first();
+
+        if ($professeur) {
+            return $professeur;
+        }
+
+        // Creer le User associe
+        $email = strtolower(substr($prenom, 0, 1) . '.' . $nom) . '@mediamanager.fr';
+        $user = \App\Models\User::firstOrCreate(
+            ['email' => $email],
+            ['name' => $prenom . ' ' . $nom, 'password' => bcrypt('password')]
         );
+
+        // Creer le Professeur
+        return Professeur::create([
+            'user_id' => $user->id,
+            'nom' => $nom,
+            'prenom' => $prenom,
+        ]);
     }
 
     /**

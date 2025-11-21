@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ProfesseurSeeder::class,
             EleveSeeder::class,
             RoleSeeder::class,
+            MediaSeeder::class,
         ]);
     }
 }

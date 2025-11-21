@@ -34,7 +34,6 @@ class EleveSeeder extends Seeder
 
             // Créer le profil élève (enfant) lié à l'utilisateur
             \App\Models\Eleve::create([
-                'user_id' => $user->id,
                 'nom' => $eleveData['nom'],
                 'prenom' => $eleveData['prenom'],
             ]);

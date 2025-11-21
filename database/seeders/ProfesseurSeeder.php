@@ -13,28 +13,18 @@ class ProfesseurSeeder extends Seeder
     public function run(): void
     {
         $professeurs = [
-            [
-                'nom' => 'Dupont',
-                'prenom' => 'Jean',
-                'identifiant' => 'j.dupont',
-            ],
-            [
-                'nom' => 'Martin',
-                'prenom' => 'Sophie',
-                'identifiant' => 's.martin',
-            ],
-            [
-                'nom' => 'Bernard',
-                'prenom' => 'Pierre',
-                'identifiant' => 'p.bernard',
-            ],
+            ['nom' => 'Dupont', 'prenom' => 'Jean'],
+            ['nom' => 'Martin', 'prenom' => 'Sophie'],
+            ['nom' => 'Bernard', 'prenom' => 'Pierre'],
         ];
 
         foreach ($professeurs as $profData) {
+            $email = strtolower(substr($profData['prenom'], 0, 1) . '.' . $profData['nom']) . '@mediamanager.fr';
+
             // Créer d'abord le compte utilisateur (parent)
             $user = \App\Models\User::create([
                 'name' => $profData['prenom'] . ' ' . $profData['nom'],
-                'email' => $profData['identifiant'] . '@mediamanager.fr',
+                'email' => $email,
                 'password' => bcrypt('password'),
             ]);
 
@@ -43,7 +33,6 @@ class ProfesseurSeeder extends Seeder
                 'user_id' => $user->id,
                 'nom' => $profData['nom'],
                 'prenom' => $profData['prenom'],
-                'identifiant' => $profData['identifiant'],
             ]);
         }
     }

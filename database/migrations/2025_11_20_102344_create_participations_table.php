@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('participations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('eleve_id')->constrained('eleves')->onDelete('cascade');
-            $table->foreignId('media_id')->constrained('media')->onDelete('cascade');
+            $table->foreignId('media_id')->constrained('medias')->onDelete('cascade');
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->timestamps();
 

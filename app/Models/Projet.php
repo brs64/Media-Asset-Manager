@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Projet extends Model
 {
@@ -15,10 +15,11 @@ class Projet extends Model
     ];
 
     /**
-     * Un projet a plusieurs médias
+     * Un projet peut avoir plusieurs medias
      */
-    public function media(): HasMany
+    public function medias(): BelongsToMany
     {
-        return $this->hasMany(Media::class, 'projet_id');
+        return $this->belongsToMany(Media::class, 'media_projet')
+            ->withTimestamps();
     }
 }

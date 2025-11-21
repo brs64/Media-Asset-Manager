@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('media', function (Blueprint $table) {
+        Schema::create('medias', function (Blueprint $table) {
             $table->id();
             $table->string('promotion')->nullable();
             $table->string('type')->nullable();
@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('URI_NAS_ARCH')->nullable();
             $table->string('URI_NAS_PAD')->nullable();
             $table->string('URI_NAS_MPEG')->nullable();
-            $table->foreignId('projet_id')->nullable()->constrained('projets')->onDelete('set null');
             $table->foreignId('professeur_id')->nullable()->constrained('professeurs')->onDelete('set null');
             $table->timestamps();
         });
@@ -36,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('media');
+        Schema::dropIfExists('medias');
     }
 };

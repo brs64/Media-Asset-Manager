@@ -14,7 +14,6 @@ class Professeur extends Model
         'user_id',
         'nom',
         'prenom',
-        'identifiant',
     ];
 
     /**

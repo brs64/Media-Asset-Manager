@@ -11,26 +11,20 @@
 
 @section('content')
 
-    {{-- ATTENTION : Le bloc PHP initial doit être retiré. Les variables $tabVideos et $tabDernierProjet 
-        DOIVENT être passées à la vue par ton Contrôleur. --}}
-
-    {{-- Inclusion du menu Arborescence (anciennement menuArbo.php) --}}
-    @include('menuArbo')
+    {{-- @include('menuArbo') --}}
 
     <div class="container">
         <div class="sliderVideo">
             <h2>Vos vidéos</h2>
             <div class="swiperVideo">
                 <div class="swiper-wrapper">
-                    @foreach ($tabVideos as $video)
+                    @foreach ($medias as $media)
                         <div class='swiper-slide'>
-                            {{-- Utilisation de route() pour les liens, en gardant l'id $video['id'] --}}
-                            <a href="{{ route('video.show', ['v' => $video['id']]) }}">
+                            <a href="{{ route('medias.show', $media->id) }}">
                                 <div class='miniature'>
-                                    <img src="{{ asset($video['cheminMiniatureComplet']) }}" alt='Miniature de la vidéo' class='imageMiniature'/>
+                                    <img src="{{ asset($media->cheminMiniatureComplet) }}" alt='Miniature de la vidéo' class='imageMiniature'/>
                                 </div>
-                                <h3>{{ $video['titre'] }}</h3>
-                                <h4>{{ $video['titreVideo'] }}</h4>
+                                <h3>{{ $media->mtd_tech_titre }}</h3>
                             </a>
                         </div>
                     @endforeach
@@ -39,7 +33,7 @@
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
         </div>
-        
+
         {{-- Logique pour afficher le slider du dernier projet --}}
         @if (!empty($tabDernierProjet))
             <div class="sliderVideoProjet">
@@ -48,7 +42,7 @@
                 <div class="swiper-wrapper">
                     @foreach ($tabDernierProjet as $video)
                         <div class='swiper-slide'>
-                            <a href="{{ route('video.show', ['v' => $video['id']]) }}">
+                            <a href="{{ route('medias.show', ['v' => $video['id']]) }}">
                                 <div class='miniature'>
                                     <img src="{{ asset($video['cheminMiniatureComplet']) }}" alt='Miniature de la vidéo' class='imageMiniature'/>
                                 </div>

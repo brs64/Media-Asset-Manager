@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Route;
 // Page d'accueil publique
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Gestion des médias
+Route::resource('medias', MediaController::class);
+
 // Routes protégées par authentification (Breeze)
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard (redirige vers home)
@@ -21,9 +24,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Gestion des médias
-    Route::resource('media', MediaController::class);
 
     // Recherche
     Route::get('/recherche', [SearchController::class, 'index'])->name('search');
