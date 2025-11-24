@@ -1,0 +1,98 @@
+.popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid black;
+    z-index: 20;
+    padding: 20px;
+    background: #FFF;
+    border-radius: 25px;
+    min-width: 500px;
+    min-height: 180px;
+
+    display: none; /* Pour cacher la popup au chargement de la page */
+}
+
+.popup h1{
+    text-align: center;
+    margin: 0;
+    margin-top: 20px;
+}
+
+.popup hr{
+    margin-bottom: 30px;
+}
+
+.popup p{
+    font-weight: 300;
+}
+
+.popup p strong{
+    font-weight: 600;
+}
+
+.popup .btns{
+    display: flex;
+}
+
+.popup .btn2,
+.popup .btn3,
+.popup .btn4{
+    display: None;
+}
+
+.popup button{
+    background: #f09520;
+    font-weight: 700;
+    width: 100px;
+    padding: 10px;
+    display: block;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    height: auto;
+    margin: 0 auto;
+}
+
+.popup button:hover,
+.popup button:focus{
+    background: #c72027;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.voile-popup{
+    position: fixed;
+    top: 5px;
+    right: 5px;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    opacity: 0.7;
+    z-index: 15;
+
+    display: none; /* Pour cacher la popup au chargement de la page */
+}
+
+.popup button.cross{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #000;
+    padding: 0px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.popup button.cross:hover,
+.popup button.cross:focus{
+    background: #f09520;
+    color: #FFF;
+}

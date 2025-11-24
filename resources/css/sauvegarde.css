@@ -1,0 +1,93 @@
+#container-saveLog{
+    display: flex;
+    flex-direction: row;
+}
+
+#container-sauvegarde{
+    max-width: 800px;
+    align-items: center;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    overflow: hidden;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+h1, h2{
+    text-align: center;
+}
+
+.sauvegardeInputs {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #444;
+    background-color: #fff;
+    transition: border-color 0.3s;
+}
+
+.sauvegardeInputs:focus{
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.btn-sauvegarde-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+}
+
+
+.log-container {
+    color: white;
+    border-radius: 4px;
+    padding: 15px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.log-line {
+    padding: 4px 0;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.log-title {
+    color: white;
+    padding: 10px;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 0;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 30px 0;
+
+}
+
+
+

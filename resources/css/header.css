@@ -1,0 +1,138 @@
+/* --- Header --- */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 12;
+    background: #2C3E50 !important;
+    padding: 0;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2C3E50;
+    margin : 0 !important;
+
+    height: 100%;
+    padding-right: 3%;
+    padding-left: 3%;
+}
+
+/* --- Logo --- */
+.logo-bts img {
+    height: 42px;
+}
+
+/* --- Barre de recherche --- */
+.recherche {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 25px;
+    width: 50%;
+}
+.iconeSousMenu {
+    width: 25px;
+}
+
+.recherche input {
+    border: none;
+    outline: none;
+    padding: 8px;
+    padding-left: 15px;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 20px 0 0 20px;
+}
+
+.recherche button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10%;
+    height: 100%;
+    background-color: #f09520 ;
+    border-radius: inherit;
+    transition: all 0.2s ease;
+}
+
+.recherche button:hover {
+    color: #BFBFBF;
+}
+
+.logo-search img {
+    width: 25px;
+    padding: 5px;
+}
+
+/* --- Compte utilisateur --- */
+.compte {
+    position: relative;
+}
+
+.compte a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.compte a:hover {
+    background: #4A627D;
+    transform: scale(1);
+}
+
+.logo-compte img {
+    width: 30px;
+}
+
+/* --- Sous-menu du compte --- */
+.compte .sousMenu {
+    position: absolute;
+    right: 0;
+    width: max-content;
+    background: white;
+    border-radius: 10px;
+    border: #203242 solid 1px;
+    overflow: hidden !important;
+    display: none; 
+    top: 100%;
+    right: -15%;
+}
+
+.compte .sousMenu a {
+    border-radius: 0px;
+    padding: 10px;
+    font-weight: 200 !important ;
+    color: #203242;
+    scale: 1 !important ;
+    transition: none;
+}
+
+.compte .sousMenu a:hover {
+    background: #f0f0f0;
+    scale: 1 !important ;
+    font-weight: 200 !important ;
+    transition: none;
+}
+
+
+/* --- Ajustement du body pour compenser le header fixe --- */
+
+body {
+    margin-top: 90px;
+}
