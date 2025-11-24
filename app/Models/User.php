@@ -45,4 +45,44 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relation vers le profil professeur (si l'utilisateur est un professeur)
+     */
+    public function professeur()
+    {
+        return $this->hasOne(Professeur::class);
+    }
+
+    /**
+     * Relation vers le profil élève (si l'utilisateur est un élève)
+     */
+    public function eleve()
+    {
+        return $this->hasOne(Eleve::class);
+    }
+
+    /**
+     * Vérifie si l'utilisateur est un professeur
+     */
+    public function isProfesseur(): bool
+    {
+        return $this->professeur()->exists();
+    }
+
+    /**
+     * Vérifie si l'utilisateur est un élève
+     */
+    public function isEleve(): bool
+    {
+        return $this->eleve()->exists();
+    }
+
+    /**
+     * Obtient le profil (professeur ou élève) de l'utilisateur
+     */
+    public function getProfile()
+    {
+        return $this->professeur ?? $this->eleve;
+    }
 }
