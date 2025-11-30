@@ -18,6 +18,16 @@
                 </div>
             </div>
 
+            <!-- Search Bar -->
+            <form class="inline-flex items-center justify-center" action="{{ route('search') }}" method="GET">
+                <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
+                <button type="submit">
+                    <div class="logo-search">
+                        <img src="{{ asset('public/images/recherche.png') }}" alt="Rechercher">
+                    </div>
+                </button>
+            </form>
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
@@ -52,11 +62,7 @@
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">{{ __('Log In') }}</a>
 
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="ms-4 text-sm text-gray-700 hover:text-gray-900">{{ __('Register') }}</a>
-                    @endif
                 @endauth
             </div>
 

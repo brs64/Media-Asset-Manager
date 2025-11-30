@@ -4,8 +4,8 @@
 
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/menuArbo.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/home.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/menuArbo.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/home.css') }}" rel="stylesheet">
     <link href="{{ asset('ressources/lib/Swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 @endpush
 
