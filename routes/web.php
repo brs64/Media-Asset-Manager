@@ -17,6 +17,10 @@ Route::get('/thumbnails/{mediaId}', [ThumbnailController::class, 'show'])->name(
 // Gestion des médias
 Route::resource('medias', MediaController::class);
 
+// Recherche
+Route::get('/recherche', [SearchController::class, 'index'])->name('search');
+Route::get('/search', [SearchController::class, 'search'])->name('search.results');
+
 // Routes protégées par authentification (Breeze)
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard (redirige vers home)
@@ -29,9 +33,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Recherche
-    Route::get('/recherche', [SearchController::class, 'index'])->name('search');
-    Route::get('/search', [SearchController::class, 'search'])->name('search.results');
     Route::get('/api/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
 });
 

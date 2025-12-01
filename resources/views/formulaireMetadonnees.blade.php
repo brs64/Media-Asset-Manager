@@ -12,17 +12,23 @@
 
 <div class="form-container">
     {{-- Le action doit pointer vers ta route de mise à jour --}}
-    <form method="post" action="{{ route('video.update', ['v' => $idVideo]) }}" class="metadata-form" id="metadataForm">
+    <form method="post" action="{{ isset($media) ? route('video.update', ['v' => $media->id]) : route('media.store') }}" class="metadata-form" id="metadataForm">
         @csrf
-        @method('PUT') {{-- Utilisation de la méthode HTTP PUT/PATCH pour la mise à jour --}}
+        @if(isset($media))
+            @method('PUT') {{-- Utilisation de la méthode HTTP PUT/PATCH pour la mise à jour --}}
+        @endif
 
         <div class="form-columns">
             <div class="form-column-left">
-                <div class="thumbnail-container">
-                    <img src="{{ $cheminMiniatureComplet }}" alt="Miniature de la vidéo" class="thumbnail-image">
-                </div>
-                <h2 class="video-filename">{{ $nomFichier }}</h2>
-                <h2 class="video-title">{{ $titreVideo }}</h2>
+                @isset($media)
+                    <div class="thumbnail-container">
+                        <img src="{{ route('thumbnails.show', $media->id) }}" alt="Miniature de la vidéo" class="thumbnail-image">
+                    </div>
+                    <h2 class="video-filename">{{ $nomFichier ?? $media->mtd_tech_titre }}</h2>
+                    <h2 class="video-title">{{ $titreVideo ?? $media->mtd_tech_titre }}</h2>
+                @else
+                    <h2 class="video-filename">Nouveau média</h2>
+                @endisset
 
                 <div class="low-column-left">
                     <table class="video-info-table">
@@ -49,7 +55,9 @@
             <div class="form-column-right">
                 <h2 class="team-title">Formulaire métadonnées</h2>
                 <input type="hidden" name="action" value="ModifierMetadonnees">
-                <input type="hidden" name="idVideo" value="{{ $idVideo }}">
+                @isset($media)
+                    <input type="hidden" name="idVideo" value="{{ $media->id }}">
+                @endisset
 
                 <div class="form-field">
                     <label for="profReferent" class="form-label">Professeur référent</label>
@@ -111,7 +119,11 @@
 
         <div class="form-buttons-container">
             {{-- Lien de retour vers la page video --}}
-            <a href="{{ route('video.show', ['v' => $idVideo]) }}" class="form-button">Retour</a>
+            @isset($media)
+                <a href="{{ route('video.show', ['v' => $media->id]) }}" class="form-button">Retour</a>
+            @else
+                <a href="{{ route('home') }}" class="form-button">Retour</a>
+            @endisset
 
             <div class="bouton-droit">
                 <button type="button" id="add-role" class="form-button">Ajouter un rôle</button>
