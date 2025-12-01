@@ -90,7 +90,7 @@ class SearchController extends Controller
     }
 
     /**
-     * API pour autocomplete
+     * API for autocomplete
      */
     public function autocomplete(Request $request)
     {

@@ -48,7 +48,7 @@
                         <div class="video-card group">
                             <a href="{{ route('medias.show', ['v' => $video['id']]) }}" class="block">
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                    <img src="{{ asset($video['cheminMiniatureComplet']) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video'/>
+                                    <img src="{{ route('thumbnails.show', $video['id']) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video' loading='lazy'/>
                                 </div>
                                 <h3 class="mt-2 text-lg font-semibold">{{ $video['titre'] }}</h3>
                                 <h4 class="text-sm text-gray-600">{{ $video['titreVideo'] }}</h4>

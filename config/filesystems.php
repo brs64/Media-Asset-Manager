@@ -60,6 +60,30 @@ return [
             'report' => false,
         ],
 
+        'ftp_pad' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_PAD_HOST', 'btsplay-ftp-pad'),
+            'username' => env('FTP_PAD_USER', 'ftpuser'),
+            'password' => env('FTP_PAD_PASS', 'ftppass'),
+            'port' => (int) env('FTP_PAD_PORT', 21),
+            'root' => env('FTP_PAD_ROOT') ?: '',
+            'passive' => true,
+            'ssl' => false,
+            'timeout' => 30,
+        ],
+
+        'ftp_mpeg' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_MPEG_HOST', 'btsplay-ftp-mpeg'),
+            'username' => env('FTP_MPEG_USER', 'ftpuser'),
+            'password' => env('FTP_MPEG_PASS', 'ftppass'),
+            'port' => (int) env('FTP_MPEG_PORT', 21),
+            'root' => env('FTP_MPEG_ROOT') ?: '',
+            'passive' => true,
+            'ssl' => false,
+            'timeout' => 30,
+        ],
+
     ],
 
     /*

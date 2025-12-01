@@ -20,8 +20,8 @@ class MediaController extends Controller
      */
     public function index()
     {
-        // Liste tous les médias avec pagination via le service
-        $medias = $this->mediaService->rechercherMedias(request()->all());
+        // List all media with pagination via service
+        $medias = $this->mediaService->searchMedia(request()->all());
 
         return view('media.index', compact('medias'));
     }
@@ -50,10 +50,6 @@ class MediaController extends Controller
             'type' => 'nullable|string',
             'theme' => 'nullable|string',
             'description' => 'nullable|string',
-            'mtd_tech_fps' => 'nullable|string',
-            'mtd_tech_resolution' => 'nullable|string',
-            'mtd_tech_duree' => 'nullable|string',
-            'mtd_tech_format' => 'nullable|string',
             'URI_NAS_ARCH' => 'nullable|string',
             'URI_NAS_PAD' => 'nullable|string',
             'URI_NAS_MPEG' => 'nullable|string',
@@ -91,13 +87,13 @@ class MediaController extends Controller
      */
     public function show(string $id)
     {
-        $mediaInfos = $this->mediaService->getMediaInfos($id);
+        $mediaInfo = $this->mediaService->getMediaInfo($id);
 
-        if (!$mediaInfos) {
-            abort(404, 'Média introuvable');
+        if (!$mediaInfo) {
+            abort(404, 'Media not found');
         }
 
-        return view('video', $mediaInfos);
+        return view('video', $mediaInfo);
     }
 
     /**
@@ -127,10 +123,6 @@ class MediaController extends Controller
             'type' => 'nullable|string',
             'theme' => 'nullable|string',
             'description' => 'nullable|string',
-            'mtd_tech_fps' => 'nullable|string',
-            'mtd_tech_resolution' => 'nullable|string',
-            'mtd_tech_duree' => 'nullable|string',
-            'mtd_tech_format' => 'nullable|string',
             'URI_NAS_ARCH' => 'nullable|string',
             'URI_NAS_PAD' => 'nullable|string',
             'URI_NAS_MPEG' => 'nullable|string',
@@ -167,14 +159,14 @@ class MediaController extends Controller
      */
     public function destroy(string $id)
     {
-        $success = $this->mediaService->supprimerMedia($id);
+        $success = $this->mediaService->deleteMedia($id);
 
         if ($success) {
             return redirect()->route('media.index')
-                ->with('success', 'Média supprimé avec succès!');
+                ->with('success', 'Media deleted successfully!');
         }
 
         return redirect()->route('media.index')
-            ->withErrors('Erreur lors de la suppression du média');
+            ->withErrors('Error deleting media');
     }
 }

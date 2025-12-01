@@ -5,10 +5,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ThumbnailController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Miniatures
+Route::get('/thumbnails/{mediaId}', [ThumbnailController::class, 'show'])->name('thumbnails.show');
 
 // Gestion des médias
 Route::resource('medias', MediaController::class);
