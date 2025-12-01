@@ -22,7 +22,7 @@
                         <div class='swiper-slide'>
                             <a href="{{ route('medias.show', $media->id) }}">
                                 <div class='miniature'>
-                                    <img src="{{ asset($media->cheminMiniatureComplet) }}" alt='Miniature de la vidéo' class='imageMiniature'/>
+                                    <img src="{{ route('thumbnails.show', $media->id) }}" alt='Miniature de la vidéo' class='imageMiniature' loading='lazy'/>
                                 </div>
                                 <h3>{{ $media->mtd_tech_titre }}</h3>
                             </a>
@@ -44,7 +44,7 @@
                         <div class='swiper-slide'>
                             <a href="{{ route('medias.show', ['v' => $video['id']]) }}">
                                 <div class='miniature'>
-                                    <img src="{{ asset($video['cheminMiniatureComplet']) }}" alt='Miniature de la vidéo' class='imageMiniature'/>
+                                    <img src="{{ route('thumbnails.show', $video['id']) }}" alt='Miniature de la vidéo' class='imageMiniature' loading='lazy'/>
                                 </div>
                                 <h3>{{ $video['titre'] }}</h3>
                                 <h4>{{ $video['titreVideo'] }}</h4>

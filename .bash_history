@@ -7,3 +7,7 @@ apt in npm
 apt install npm
 su - root bash
 exit
+php artisan queue:work
+ll
+lll
+exit

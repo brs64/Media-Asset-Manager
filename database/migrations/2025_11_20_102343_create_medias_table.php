@@ -18,10 +18,6 @@ return new class extends Migration
             $table->string('theme')->nullable();
             $table->text('description')->nullable();
             $table->string('mtd_tech_titre')->nullable();
-            $table->string('mtd_tech_fps')->nullable();
-            $table->string('mtd_tech_resolution')->nullable();
-            $table->string('mtd_tech_duree')->nullable();
-            $table->string('mtd_tech_format')->nullable();
             $table->string('URI_NAS_ARCH')->nullable();
             $table->string('URI_NAS_PAD')->nullable();
             $table->string('URI_NAS_MPEG')->nullable();
