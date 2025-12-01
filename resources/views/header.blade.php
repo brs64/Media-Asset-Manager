@@ -9,7 +9,7 @@
         {{-- Utilisation de route() pour les liens --}}
         <a href="{{ route('home') }}">
             <div class="logo-bts">
-                <img src="{{ asset('ressources/Images/logo_BTS_Play.png') }}" alt="logo">
+                <img src="{{ asset('/images/logo_BTS_Play.png') }}" alt="logo">
             </div>
         </a>
 
@@ -17,7 +17,7 @@
             <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
             <button type="submit">
                 <div class="logo-search">
-                    <img src="{{ asset('ressources/Images/recherche.png') }}" alt="Rechercher">
+                    <img src="{{ asset('/images/recherche.png') }}" alt="Rechercher">
                 </div>
             </button>
         </form>
@@ -28,14 +28,14 @@
                 <a href="{{ route('compte') }}">                 
                     Se connecter
                     <div class="logo-compte">
-                        <img src="{{ asset('ressources/Images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
             @else
                 <a class="btnSousMenu" onclick="affichageSousMenu()">
                     {{ session('loginUser') }}
                     <div class="logo-compte">
-                        <img src="{{ asset('ressources/Images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
                 <div class="sousMenu">
@@ -46,7 +46,7 @@
                     @endphp
                     
                     <a href="{{ route('pageAdministration') }}">
-                        <img class='iconeSousMenu' src='{{ asset('ressources/Images/Parametre.png') }}'>    
+                        <img class='iconeSousMenu' src='{{ asset('/images/Parametre.png') }}'>    
                         Paramétrer
                     </a>
                     
@@ -56,13 +56,13 @@
                     @endphp
                     
                     <a href="{{ asset('docs/html/index.html') }}">
-                        <img class='iconeSousMenu' src='{{ asset('ressources/Images/documentation.png') }}'>    
+                        <img class='iconeSousMenu' src='{{ asset('/images/documentation.png') }}'>    
                         Documentation
                     </a>
                     @php } } @endphp
 
                     <a href="{{ route('logout') }}" >
-                        <img class='iconeSousMenu'src='{{ asset('ressources/Images/logout.png') }}'>
+                        <img class='iconeSousMenu'src='{{ asset('/images/logout.png') }}'>
                         Se déconnecter
                     </a>
 

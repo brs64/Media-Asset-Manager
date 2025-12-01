@@ -13,11 +13,12 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- This allows child views to inject custom CSS here -->
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
-
             <!-- Page Heading -->
             @include('partials.header')
 
@@ -30,5 +31,7 @@
                 @endif
             </main>
         </div>
+        <!-- This allows child views to inject custom JS here -->
+        @stack('scripts')
     </body>
 </html>

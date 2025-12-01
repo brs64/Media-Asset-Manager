@@ -9,7 +9,7 @@
         {{-- Utilisation de route() pour les liens --}}
         <a href="{{ route('home') }}">
             <div class="logo-bts">
-                <img src="{{ asset('public/images/logo_BTS_Play.png') }}" alt="logo">
+                <img src="{{ asset('/images/logo_BTS_Play.png') }}" alt="logo">
             </div>
         </a>
 
@@ -17,7 +17,7 @@
             <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
             <button type="submit">
                 <div class="logo-search">
-                    <img src="{{ asset('public/images/recherche.png') }}" alt="Rechercher">
+                    <img src="{{ asset('/images/recherche.png') }}" alt="Rechercher">
                 </div>
             </button>
         </form>
@@ -28,14 +28,14 @@
                 <a href="{{ route('login') }}">
                     Se connecter
                     <div class="logo-compte">
-                        <img src="{{ asset('public/images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
             @else
                 <a class="btnSousMenu" onclick="affichageSousMenu()">
                     {{ session('loginUser') }}
                     <div class="logo-compte">
-                        <img src="{{ asset('public/images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
                 <div class="sousMenu">
@@ -46,7 +46,7 @@
                     @endphp
                     
                     <a href="{{ route('admin.dashboard') }}">
-                        <img class='iconeSousMenu' src='{{ asset('public/images/Parametre.png') }}'>
+                        <img class='iconeSousMenu' src='{{ asset('/images/Parametre.png') }}'>
                         Paramétrer
                     </a>
                     
@@ -56,13 +56,13 @@
                     @endphp
                     
                     <a href="{{ asset('docs/html/index.html') }}">
-                        <img class='iconeSousMenu' src='{{ asset('public/images/documentation.png') }}'>
+                        <img class='iconeSousMenu' src='{{ asset('/images/documentation.png') }}'>
                         Documentation
                     </a>
                     @php } } @endphp
 
                     <a href="{{ route('logout') }}" >
-                        <img class='iconeSousMenu'src='{{ asset('public/images/logout.png') }}'>
+                        <img class='iconeSousMenu'src='{{ asset('/images/logout.png') }}'>
                         Se déconnecter
                     </a>
 

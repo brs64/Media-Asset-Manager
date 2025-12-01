@@ -9,7 +9,15 @@
 }
 
 .sliderVideo{
+    margin-top: 50px;
     padding-bottom: 30px;
+}
+
+.sliderVideo h2{
+    margin-left: 20px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: left;
 }
 
 .sliderVideoProjet{

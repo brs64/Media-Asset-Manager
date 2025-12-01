@@ -6,150 +6,124 @@
     background: var(--mainSombre);
     position: fixed;
     height: 100vh;
-    width: 40%;
-    left: -40%;
+    width: 400px; /* Changed from 40% to fixed width for better UX on large screens */
+    left: -400px; /* Match the width */
     top: 0;
-    transition: all 0.2s ease-in-out;
-    z-index: 11;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50; /* Higher Z-index to be above everything */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.3);
 }
 
+/* Open State */
 .main-menuArbo.ouvert{
-    left: 0%;
+    left: 0;
 }
 
 .menuArbo{
-    margin-top: 90px;
+    margin-top: 20px;
     height: 100%;
-    overflow:auto;
+    overflow: auto;
+    padding-bottom: 60px; /* Space for radio buttons */
 }
 
 .main-menuArbo .dossiers{
-    max-height: calc(100% - 150px);
     height: 100%;
 }
 
 .menuArbo div{
-    padding-left: 40px;
+    padding-left: 20px;
 }
 
-.main-menuArbo a:hover,
-.main-menuArbo a:focus{
-    transform: none;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
+/* The Toggle Button */
 .main-menuArbo button{
     position: absolute;
-    right: -45px;
-    top: calc(50% + 45px);
-    transform: translateY(-50%);
+    right: -45px; /* Sticks out to the right */
+    top: 120px;   /* Adjusted vertical position */
+    width: 45px;
+    height: 50px;
     font-size: 50px;
     background: var(--mainSombre);
-    border: 1px solid var(--mainSombre);
+    border: none;
     color: #FFF;
-    border-radius: 0 15px 15px 0;
+    border-radius: 0 8px 8px 0;
     display: flex;
-    padding: 10px 5px;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    box-shadow: 4px 2px 5px rgba(0,0,0,0.2);
 }
 
 .main-menuArbo button svg{
-    width: 35px;
-    height: 35px;
-    transition: all 0.5s ease;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
 }
 
 .main-menuArbo.ouvert button svg{
     transform: rotate(180deg);
 }
 
+/* File/Folder Icons */
 .dossier, .video a, .video{
     color: #FFF;
     margin: 10px 0;
-}
-
-.main-menuArbo .video.inaccessible a,
-.main-menuArbo .fichier.inaccessible{
-    color: #8f8f8f;
+    display: block;
+    text-decoration: none;
 }
 
 .main-menuArbo .dossier{
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
+/* Updated Image Paths for Laravel Public Folder */
 .main-menuArbo .dossier::before{
     content: " ";
     display: inline-block;
-    width: 25px;
-    height: 21px;
-    background-image: url("../Images/closed-file.png");
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url("/images/closed-file.png"); /* Absolute path */
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .main-menuArbo .dossier.ouvert::before{
-    background-image: url("../Images/open-file.png");
+    background-image: url("/images/open-file.png");
 }
 
-.main-menuArbo .PAD,
-.main-menuArbo .ARCH{
-    display: none;
-}
-
+/* Radio Buttons at Bottom */
 .main-menuArbo .radio{
     position: absolute;
     bottom: 0;
     width: 100%;
     display: flex;
     justify-content: space-around;
+    align-items: center;
     height: 50px;
+    background: rgba(0,0,0,0.2);
     color: #FFF;
-    padding-top: 10px;
-    border-top: 1px solid #FFF;
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
-
-.main-menuArbo input[type="radio"]{
-    appearance: none;
-    font: inherit;
-    color: currentColor;
-    width: 1em;
-    height: 1em;
-    border: 0.15em solid currentColor;
-    border-radius: 100%;
-    transform: translateY(2px);
-}
-
-input[type="radio"]::before{
-    content: "";
-    display: block;
-    width: 0.5em;
-    height: 0.5em;
-    margin: 2px;    
-    box-shadow: inset 1em 1em #FFF;
-    border-radius: 100%;
-    transform: scale(0);
-    transition: 120ms transform ease-in-out;
-}
-
-input[type="radio"]:checked::before {
-    transform: scale(1);
-  }
 
 .voile{
     opacity: 0;
     background-color: #000;
     z-index: -1;
-    position: absolute;
+    position: fixed; /* Fixed to cover screen */
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    transition: all 0.2s ease;
+    transition: opacity 0.3s ease, z-index 0s 0.3s; /* Delay z-index hiding */
+    pointer-events: none;
 }
 
 .voile.ouvert{
-    z-index: 10;
-    opacity: 0.6;
+    z-index: 40; /* Below menu, above content */
+    opacity: 0.5;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, z-index 0s;
 }
