@@ -35,12 +35,12 @@
                 <div class="container-button">
                     @auth
                         {{-- Bouton Modifier --}}
-                        <button id="boutonModif" title="Modifier vidéo" class="btnVideo" onclick="window.location.href='{{ route('media.edit', $idMedia) }}';">
+                        <a href="{{ route('media.edit', $idMedia) }}" id="boutonModif" title="Modifier vidéo" class="btnVideo">
                             <div class="logo-btnvideo">
                                 <img src="{{ asset('ressources/Images/modifier_video.png') }}" alt="">
                             </div>
                             <p>Modifier</p>
-                        </button>
+                        </a>
 
                         {{-- Bouton Supprimer --}}
                         <form action="{{ route('media.destroy', $idMedia) }}" method="POST" style="display: inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">

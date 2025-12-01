@@ -24,7 +24,7 @@
                         <a href="{{ route('medias.show', $media->id) }}" class="block">
                             {{-- Ajout de w-full pour que l'image prenne toute la largeur de la colonne --}}
                             <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                <img src="{{ asset($media->cheminMiniatureComplet) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video'/>
+                                <img src="{{ route('thumbnails.show', $media->id) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video'/>
                             </div>
                             <h3 class="mt-2 text-lg font-semibold text-gray-800 group-hover:text-blue-600">{{ $media->mtd_tech_titre }}</h3>
                         </a>
