@@ -15,8 +15,34 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
+    networks:
+      - app-network
     depends_on:
       - btsplay-mysql
+      - btsplay-ftp-pad
+      - btsplay-ftp-mpeg
+
+  btsplay-queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: btsplay-queue
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --timeout=180 --sleep=3 --max-jobs=1000
+    environment:
+      SERVICE_NAME: queue
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - .:/var/www:z
+      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
+    networks:
+      - app-network
+    depends_on:
+      - btsplay-mysql
+      - btsplay-laravel
+      - btsplay-ftp-pad
+      - btsplay-ftp-mpeg
 
   btsplay-nginx:
     image: nginx:alpine
@@ -27,6 +53,8 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/nginx:/etc/nginx/conf.d/:z
+    networks:
+      - app-network
 
   btsplay-mysql:
     image: mysql:5.7
@@ -41,7 +69,9 @@ services:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql:z
-      
+    networks:
+      - app-network
+
   btsplay-phpmyadmin:
     image: phpmyadmin:latest
     restart: unless-stopped
@@ -50,8 +80,44 @@ services:
       PMA_HOST: btsplay-mysql
     ports:
       - "8001:80"
+    networks:
+      - app-network
     depends_on:
       - btsplay-mysql
+
+  btsplay-ftp-pad:
+    image: stilliard/pure-ftpd:latest
+    container_name: btsplay-ftp-pad
+    restart: unless-stopped
+    environment:
+      PUBLICHOST: btsplay-ftp-pad
+      FTP_USER_NAME: ftpuser
+      FTP_USER_PASS: ftppass
+      FTP_USER_HOME: /home/ftpuser
+    ports:
+      - "21001:21"
+      - "30000-30009:30000-30009"
+    volumes:
+      - ftp-pad-data:/home/ftpuser:z
+    networks:
+      - app-network
+
+  btsplay-ftp-mpeg:
+    image: stilliard/pure-ftpd:latest
+    container_name: btsplay-ftp-mpeg
+    restart: unless-stopped
+    environment:
+      PUBLICHOST: btsplay-ftp-mpeg
+      FTP_USER_NAME: ftpuser
+      FTP_USER_PASS: ftppass
+      FTP_USER_HOME: /home/ftpuser
+    ports:
+      - "21002:21"
+      - "30010-30019:30000-30009"
+    volumes:
+      - ftp-mpeg-data:/home/ftpuser:z
+    networks:
+      - app-network
 
 networks:
   app-network:
@@ -59,4 +125,8 @@ networks:
 
 volumes:
   dbdata:
+    driver: local
+  ftp-pad-data:
+    driver: local
+  ftp-mpeg-data:
     driver: local

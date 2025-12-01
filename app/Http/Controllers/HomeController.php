@@ -12,12 +12,14 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Récupérer les derniers médias pour l'accueil
         $medias = Media::with(['projets'])
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
-        return view('home', compact('medias'));
+        // TODO: Implémenter la logique du dernier projet
+        $tabDernierProjet = [];
+
+        return view('home', compact('medias', 'tabDernierProjet'));
     }
 }

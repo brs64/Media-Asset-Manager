@@ -16,7 +16,7 @@ class SearchController extends Controller
     }
 
     /**
-     * Affiche la page de recherche
+     * Display search page
      */
     public function index()
     {
@@ -27,12 +27,12 @@ class SearchController extends Controller
     }
 
     /**
-     * Effectue la recherche
+     * Perform search
      */
     public function search(Request $request)
     {
-        // Utiliser le service pour la recherche
-        $filtres = [
+        // Use service for search
+        $filters = [
             'titre' => $request->mtd_tech_titre,
             'projet_id' => $request->projet_id,
             'type' => $request->type,
@@ -42,9 +42,9 @@ class SearchController extends Controller
             'description' => $request->description,
         ];
 
-        $medias = $this->mediaService->rechercherMedias($filtres);
+        $medias = $this->mediaService->searchMedia($filters);
 
-        // Charger les données pour les filtres
+        // Load data for filters
         $projets = \App\Models\Projet::all();
         $professeurs = \App\Models\Professeur::all();
 
@@ -52,7 +52,7 @@ class SearchController extends Controller
     }
 
     /**
-     * API pour autocomplete
+     * API for autocomplete
      */
     public function autocomplete(Request $request)
     {

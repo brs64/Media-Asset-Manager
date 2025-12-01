@@ -21,10 +21,6 @@ class Media extends Model
         'theme',
         'description',
         'mtd_tech_titre',
-        'mtd_tech_fps',
-        'mtd_tech_resolution',
-        'mtd_tech_duree',
-        'mtd_tech_format',
         'URI_NAS_ARCH',
         'URI_NAS_PAD',
         'URI_NAS_MPEG',
@@ -36,27 +32,17 @@ class Media extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Un média peut appartenir à plusieurs projets
-     */
     public function projets(): BelongsToMany
     {
         return $this->belongsToMany(Projet::class, 'media_projet')
             ->withTimestamps();
     }
 
-    /**
-     * Un média a un professeur référent (nullable)
-     */
     public function professeur(): BelongsTo
     {
         return $this->belongsTo(Professeur::class);
     }
 
-    /**
-     * Un média a plusieurs élèves participants
-     * Relation many-to-many via la table participations
-     */
     public function eleves(): BelongsToMany
     {
         return $this->belongsToMany(Eleve::class, 'participations', 'media_id', 'eleve_id')
@@ -64,9 +50,6 @@ class Media extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Les participations de ce média
-     */
     public function participations(): HasMany
     {
         return $this->hasMany(Participation::class);
