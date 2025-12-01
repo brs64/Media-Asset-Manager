@@ -62,7 +62,7 @@ class SearchController extends Controller
 
         // 2. Appel du Service pour récupérer les médias
         // Le service renvoie déjà un objet Paginator, parfait pour la vue
-        $medias = $this->mediaService->rechercherMedias($filtres);
+        $medias = $this->mediaService->searchMedia($filtres);
 
         // On s'assure que les paramètres de recherche restent dans l'URL lors de la pagination
         $medias->appends($request->all());
