@@ -19,12 +19,9 @@ class ProfesseurSeeder extends Seeder
         ];
 
         foreach ($professeurs as $profData) {
-            $email = strtolower(substr($profData['prenom'], 0, 1) . '.' . $profData['nom']) . '@mediamanager.fr';
-
             // Créer d'abord le compte utilisateur (parent)
             $user = \App\Models\User::create([
                 'name' => $profData['prenom'] . ' ' . $profData['nom'],
-                'email' => $email,
                 'password' => bcrypt('password'),
             ]);
 

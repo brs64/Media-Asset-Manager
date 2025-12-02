@@ -35,7 +35,7 @@
                 <div class="container-button">
                     @auth
                         {{-- Bouton Modifier --}}
-                        <a href="{{ route('media.edit', $idMedia) }}" id="boutonModif" title="Modifier vidéo" class="btnVideo">
+                        <a href="{{ route('medias.edit', $idMedia) }}" id="boutonModif" title="Modifier vidéo" class="btnVideo">
                             <div class="logo-btnvideo">
                                 <img src="{{ asset('ressources/Images/modifier_video.png') }}" alt="">
                             </div>
@@ -43,7 +43,7 @@
                         </a>
 
                         {{-- Bouton Supprimer --}}
-                        <form action="{{ route('media.destroy', $idMedia) }}" method="POST" style="display: inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">
+                        <form action="{{ route('medias.destroy', $idMedia) }}" method="POST" style="display: inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" title="Supprimer vidéo" class="btnVideo" id="btnSuppr">
