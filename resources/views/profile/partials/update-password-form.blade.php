@@ -21,10 +21,6 @@
         </p>
     </div>
 
-    <div class="flex items-center gap-4">
-        <button onclick="{{ route('home') }}">Retour</button>
-    </div>
-
     <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('put')
