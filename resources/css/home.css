@@ -1,0 +1,86 @@
+:root{
+    overflow-y :scroll;
+}
+
+.sliderVideo, .sliderVideoProjet{
+    /* overflow-x: hidden; */
+    position: relative;
+    height: 100%;
+}
+
+.sliderVideo{
+    margin-top: 100px;
+    padding-bottom: 30px;
+}
+
+.sliderVideo h2{
+    margin-left: 20px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: left;
+}
+
+.sliderVideoProjet{
+    border-top: 1px solid #CCC;
+    overflow-y: hidden;
+}
+
+a:hover{
+    transform: scale(1.03);
+}
+
+.miniature{
+    background: grey;
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    aspect-ratio: 16 / 9;
+}
+
+.swiper-slide a{
+    display: block;
+    padding: 0 10px;
+}
+
+.swiper-slide a:hover .miniature{
+    border-radius: 0;
+    opacity: 0.8;
+}
+
+.swiper-button-next,
+.swiper-button-prev{
+    background: #fff7;
+    width: 35px !important;
+    border: 1px solid #000;
+    height: 35px !important;
+    display: flex;
+    border-radius: 40%;
+    transition: all 0.2s ease;
+    
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after{
+    display: block;
+    font-size: 1.5em !important;
+    color: #000;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover{
+    transform: scale(1.1);
+}
+
+h3, h4{
+    margin: 0;
+}
+
+h3{
+    margin-bottom: 10px;
+}
+
+h4{
+    font-weight: 300;
+}

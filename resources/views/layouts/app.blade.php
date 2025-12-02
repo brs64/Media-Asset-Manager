@@ -13,25 +13,14 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- This allows child views to inject custom CSS here -->
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
-
             <!-- Page Heading -->
-            @hasSection('header')
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        @yield('header')
-                    </div>
-                </header>
-            @elseif(isset($header))
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
+            @include('partials.header')
 
             <!-- Page Content -->
             <main>
@@ -42,5 +31,7 @@
                 @endif
             </main>
         </div>
+        <!-- This allows child views to inject custom JS here -->
+        @stack('scripts')
     </body>
 </html>

@@ -4,28 +4,23 @@ namespace App\Services;
 
 use App\Models\Media;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class MediaThumbnailService
 {
     protected string $ffmpegPath;
+    protected string $ffprobePath;
     protected string $thumbnailsPath;
-    protected string $cachePath;
     protected int $defaultWidth = 320;
     protected string $thumbnailSuffix = '_miniature.jpg';
 
     public function __construct()
     {
         $this->ffmpegPath = config('media.ffmpeg_path', '/usr/bin/ffmpeg');
+        $this->ffprobePath = config('media.ffprobe_path', '/usr/bin/ffprobe');
         $this->thumbnailsPath = storage_path('app/public/thumbnails');
-        $this->cachePath = storage_path('app/media_cache');
 
         if (!is_dir($this->thumbnailsPath)) {
             mkdir($this->thumbnailsPath, 0755, true);
-        }
-
-        if (!is_dir($this->cachePath)) {
-            mkdir($this->cachePath, 0755, true);
         }
     }
 
@@ -45,16 +40,19 @@ class MediaThumbnailService
             return $thumbnailPath;
         }
 
-        $localVideoPath = $this->getOrDownloadVideo($media, $remoteVideoPath);
-        if (!$localVideoPath) {
+        // Build FTP URL
+        $ftpUrl = $this->buildFtpUrl($media, $remoteVideoPath);
+        if (!$ftpUrl) {
+            Log::warning("Unable to build FTP URL for media #{$media->id}");
             return null;
         }
 
-        // Get actual video duration
-        $duration = $this->getVideoDuration($localVideoPath);
+        // Get video duration directly from FTP
+        $duration = $this->getVideoDuration($ftpUrl);
         $timecode = $duration ? $this->calculateTimecode($duration) : 5;
 
-        $success = $this->executeFfmpeg($localVideoPath, $thumbnailPath, $timecode);
+        // Generate thumbnail directly from FTP
+        $success = $this->executeFfmpeg($ftpUrl, $thumbnailPath, $timecode);
 
         if ($success) {
             Log::info("Thumbnail generated for media #{$media->id}");
@@ -65,70 +63,29 @@ class MediaThumbnailService
         return null;
     }
 
-    protected function getOrDownloadVideo(Media $media, string $remoteVideoPath): ?string
+    protected function buildFtpUrl(Media $media, string $remoteVideoPath): ?string
     {
-        $extension = pathinfo($remoteVideoPath, PATHINFO_EXTENSION);
-        $cachedPath = $this->cachePath . '/' . $media->id . '.' . $extension;
-
-        if (file_exists($cachedPath)) {
-            Log::info("Using cached video for media #{$media->id}");
-            return $cachedPath;
+        // Determine FTP disk
+        $ftpDisk = null;
+        if ($media->URI_NAS_MPEG) {
+            $ftpDisk = 'ftp_mpeg';
+        } elseif ($media->URI_NAS_PAD) {
+            $ftpDisk = 'ftp_pad';
         }
 
-        $ftpDisk = $this->determineFtpDisk($media);
         if (!$ftpDisk) {
-            Log::warning("Unable to determine FTP disk for media #{$media->id}");
             return null;
         }
 
-        return $this->downloadFromFtp($ftpDisk, $remoteVideoPath, $media->id, $cachedPath);
-    }
-
-    protected function determineFtpDisk(Media $media): ?string
-    {
-        if ($media->URI_NAS_MPEG) return 'ftp_mpeg';
-        if ($media->URI_NAS_PAD) return 'ftp_pad';
-        return null;
-    }
-
-    protected function downloadFromFtp(string $disk, string $remotePath, int $mediaId, string $cachedPath): ?string
-    {
-        try {
-            if (!Storage::disk($disk)->exists($remotePath)) {
-                Log::warning("File not found on FTP {$disk}: {$remotePath} for media #{$mediaId}");
-                return null;
-            }
-
-            Log::info("Downloading from FTP {$disk} for media #{$mediaId}");
-
-            $content = Storage::disk($disk)->get($remotePath);
-            file_put_contents($cachedPath, $content);
-
-            Log::info("Video cached for media #{$mediaId}");
-            return $cachedPath;
-        } catch (\Exception $e) {
-            Log::error("FTP download error for media #{$mediaId}: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    public function clearCache(?int $mediaId = null): void
-    {
-        if ($mediaId) {
-            $pattern = $this->cachePath . '/' . $mediaId . '.*';
-            foreach (glob($pattern) as $file) {
-                unlink($file);
-            }
-            Log::info("Video cache cleared for media #{$mediaId}");
-        } else {
-            $files = glob($this->cachePath . '/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    unlink($file);
-                }
-            }
-            Log::info("Entire video cache cleared");
-        }
+        // Build FTP URL
+        $config = config("filesystems.disks.{$ftpDisk}");
+        return sprintf(
+            'ftp://%s:%s@%s/%s',
+            $config['username'],
+            $config['password'],
+            $config['host'],
+            ltrim($remoteVideoPath, '/')
+        );
     }
 
     public function deleteThumbnail(Media $media): bool
@@ -172,13 +129,14 @@ class MediaThumbnailService
         return $stats;
     }
 
-    protected function executeFfmpeg(string $videoPath, string $outputPath, int $timecode): bool
+    protected function executeFfmpeg(string $videoUrl, string $outputPath, int $timecode): bool
     {
+        // Put -ss before -i for fast seeking - only downloads single frame from FTP
         $command = sprintf(
-            '%s -y -i %s -ss %d -vframes 1 -vf "scale=%d:-1" -q:v 3 -strict unofficial -update 1 %s 2>&1',
+            '%s -y -ss %d -i %s -vframes 1 -vf "scale=%d:-1" -q:v 3 %s 2>&1',
             escapeshellcmd($this->ffmpegPath),
-            escapeshellarg($videoPath),
             $timecode,
+            escapeshellarg($videoUrl),
             $this->defaultWidth,
             escapeshellarg($outputPath)
         );
@@ -193,19 +151,33 @@ class MediaThumbnailService
         return file_exists($outputPath);
     }
 
-    protected function getVideoDuration(string $videoPath): ?string
+    protected function getVideoDuration(string $videoUrl): ?string
     {
+        // Use ffprobe to get duration directly from FTP without downloading
         $command = sprintf(
-            '%s -i %s 2>&1',
-            escapeshellcmd($this->ffmpegPath),
-            escapeshellarg($videoPath)
+            '%s -v quiet -print_format json -show_format %s 2>&1',
+            escapeshellcmd($this->ffprobePath),
+            escapeshellarg($videoUrl)
         );
 
-        exec($command, $output);
-        $outputStr = implode("\n", $output);
+        exec($command, $output, $returnVar);
 
-        if (preg_match('/Duration: (\d{2}:\d{2}:\d{2}\.\d{2})/', $outputStr, $matches)) {
-            return $matches[1];
+        if ($returnVar !== 0) {
+            Log::warning("FFprobe failed to get duration: " . implode("\n", $output));
+            return null;
+        }
+
+        $json = implode("\n", $output);
+        $data = json_decode($json, true);
+
+        if (isset($data['format']['duration'])) {
+            $seconds = (float)$data['format']['duration'];
+            $hours = (int)floor($seconds / 3600);
+            $minutes = (int)floor(($seconds % 3600) / 60);
+            $secs = (int)floor($seconds % 60);
+            $centisecs = (int)floor(($seconds - floor($seconds)) * 100);
+
+            return sprintf('%02d:%02d:%02d.%02d', $hours, $minutes, $secs, $centisecs);
         }
 
         return null;

@@ -1,7 +1,7 @@
 {{-- ATTENTION : Le <head> et <body> ont été retirés et DOIVENT être dans layouts/app.blade.php --}}
 
 @push('styles')
-    <link href="{{ asset('ressources/Style/header.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/header.css') }}" rel="stylesheet">
 @endpush
 
 <header>
@@ -9,15 +9,15 @@
         {{-- Utilisation de route() pour les liens --}}
         <a href="{{ route('home') }}">
             <div class="logo-bts">
-                <img src="{{ asset('ressources/Images/logo_BTS_Play.png') }}" alt="logo">
+                <img src="{{ asset('/images/logo_BTS_Play.png') }}" alt="logo">
             </div>
         </a>
 
-        <form class="recherche" action="{{ route('recherche') }}" method="GET">
+        <form class="recherche" action="{{ route('search') }}" method="GET">
             <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
             <button type="submit">
                 <div class="logo-search">
-                    <img src="{{ asset('ressources/Images/recherche.png') }}" alt="Rechercher">
+                    <img src="{{ asset('/images/recherche.png') }}" alt="Rechercher">
                 </div>
             </button>
         </form>
@@ -25,17 +25,17 @@
         <div class="compte">
             {{-- Traduction des conditions PHP en directives Blade --}}
             @if(!session('loginUser'))
-                <a href="{{ route('compte') }}">                 
+                <a href="{{ route('login') }}">
                     Se connecter
                     <div class="logo-compte">
-                        <img src="{{ asset('ressources/Images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
             @else
                 <a class="btnSousMenu" onclick="affichageSousMenu()">
                     {{ session('loginUser') }}
                     <div class="logo-compte">
-                        <img src="{{ asset('ressources/Images/account.png') }}" alt="Compte">
+                        <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
                 <div class="sousMenu">
@@ -45,8 +45,8 @@
                     if(controleurVerifierAcces(ACCES_ADMINISTRATION)){
                     @endphp
                     
-                    <a href="{{ route('pageAdministration') }}">
-                        <img class='iconeSousMenu' src='{{ asset('ressources/Images/Parametre.png') }}'>    
+                    <a href="{{ route('admin.dashboard') }}">
+                        <img class='iconeSousMenu' src='{{ asset('/images/Parametre.png') }}'>
                         Paramétrer
                     </a>
                     
@@ -56,13 +56,13 @@
                     @endphp
                     
                     <a href="{{ asset('docs/html/index.html') }}">
-                        <img class='iconeSousMenu' src='{{ asset('ressources/Images/documentation.png') }}'>    
+                        <img class='iconeSousMenu' src='{{ asset('/images/documentation.png') }}'>
                         Documentation
                     </a>
                     @php } } @endphp
 
                     <a href="{{ route('logout') }}" >
-                        <img class='iconeSousMenu'src='{{ asset('ressources/Images/logout.png') }}'>
+                        <img class='iconeSousMenu'src='{{ asset('/images/logout.png') }}'>
                         Se déconnecter
                     </a>
 
