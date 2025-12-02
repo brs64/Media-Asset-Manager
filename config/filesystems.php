@@ -84,6 +84,13 @@ return [
             'timeout' => 30,
         ],
 
+        'external_local' => [
+        'driver' => 'local',
+        'root' => env('FILESYSTEM_LOCAL_PATH'),
+        'visibility' => 'private', // Or public, depending on needs
+        'throw' => false,
+        ],
+
     ],
 
     /*
