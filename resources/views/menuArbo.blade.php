@@ -1,70 +1,108 @@
 <div class="main-menuArbo">
     <div class="dossiers">
         
-        <!-- LOCAL STORAGE -->
-        <div class="menuArbo local">
-            {{-- TODO: Décommenter une fois que la fonction est disponible
-            @php echo controleurArborescence($directory_local ?? '', 'ESPACE_LOCAL'); @endphp
-            --}}
-            <p style="color:white; padding: 20px;">(Contenu Local - À implémenter)</p>
+        <div class="menuArbo local" id="tree-local">
+            <h3 class="text-white p-2 font-bold bg-gray-800">Espace Local</h3>
+            <div class="tree-container">
+                {{-- DEBUG: Uncomment the line below to see exactly what Laravel sees --}}
+                {{-- @dump($localTree) --}}
+
+                @if(isset($localTree) && count($localTree) > 0)
+                    @include('explorer.tree-item', ['items' => $localTree])
+                @else
+                    <p class="text-white p-4 italic text-sm">Dossier vide ou chemin incorrect.</p>
+                @endif
+            </div>
         </div>
 
-        <!-- NAS PAD -->
-        {{-- TODO: Remplacer par des variables passées depuis le controller --}}
-        @if (defined('NAS_PAD') && false) 
-            <div class="menuArbo PAD">
-                @php echo controleurArborescence("", NAS_PAD); @endphp
+        <div class="menuArbo PAD hidden" id="tree-pad">
+            <h3 class="text-white p-2 font-bold bg-blue-900">NAS PAD</h3>
+            <div class="tree-container">
+                @if(isset($nasPadTree) && count($nasPadTree) > 0)
+                    @include('explorer.tree-item', ['items' => $nasPadTree])
+                @else
+                    <p class="text-white p-4 italic text-sm">Non connecté ou vide.</p>
+                @endif
             </div>
-        @endif
+        </div>
 
-        <!-- NAS ARCH -->
-        @if (defined('NAS_ARCH') && false)
-            <div class="menuArbo ARCH">
-                @php echo controleurArborescence("", NAS_ARCH); @endphp
+        <div class="menuArbo ARCH hidden" id="tree-arch">
+            <h3 class="text-white p-2 font-bold bg-green-900">NAS ARCH</h3>
+            <div class="tree-container">
+                @if(isset($nasArchTree) && count($nasArchTree) > 0)
+                    @include('explorer.tree-item', ['items' => $nasArchTree])
+                @else
+                    <p class="text-white p-4 italic text-sm">Non connecté ou vide.</p>
+                @endif
             </div>
-        @endif
+        </div>
     </div>
 
-    <!-- TABS / RADIO BUTTONS -->
-    <div class="radio">
-        <label>
-            Stockage local
-            <input type="radio" name="a" id="local" checked>
+    <div class="radio flex gap-2 p-2">
+        <label class="cursor-pointer text-white">
+            <input type="radio" name="source_choix" value="local" checked onclick="changerSource('local')">
+            Stockage Local
         </label>
 
-        {{-- Mockup statique pour le design --}}
-        <label>
+        <label class="cursor-pointer text-white">
+            <input type="radio" name="source_choix" value="pad" onclick="changerSource('pad')">
             NAS PAD
-            <input type="radio" name="a" id="PAD">
         </label>
+        
+        {{-- Optional: Uncomment if you want the button for ARCH --}}
+        {{-- 
+        <label class="cursor-pointer text-white">
+            <input type="radio" name="source_choix" value="arch" onclick="changerSource('arch')">
+            NAS ARCH
+        </label> 
+        --}}
     </div>
 
-    <!-- TOGGLE BUTTON -->
-    <button onclick="toggleMenuArbo()">
-        <svg fill="currentColor" viewBox="0 0 16 16">
+    <button onclick="toggleMenuArbo()" class="absolute top-2 right-[-30px] bg-gray-800 text-white p-2 rounded-r">
+        <svg fill="currentColor" viewBox="0 0 16 16" width="20" height="20">
             <path fill-rule="evenodd" d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
         </svg>
     </button>
 </div>
 
-<!-- OVERLAY (Click to close) -->
 <div class="voile" onclick="toggleMenuArbo()"></div>
 
 @push('scripts')
 <script>
-    // Fonction globale pour le bouton onclick
+    // OPEN/CLOSE MENU
     window.toggleMenuArbo = function() {
-        const menu = document.querySelector('.main-menuArbo');
-        const voile = document.querySelector('.voile');
-        
-        menu.classList.toggle('ouvert');
-        voile.classList.toggle('ouvert');
+        document.querySelector('.main-menuArbo').classList.toggle('ouvert');
+        document.querySelector('.voile').classList.toggle('ouvert');
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Placeholder pour vos anciennes fonctions JS
-        if(typeof gestion_click_dossier === 'function') gestion_click_dossier();
-        if(typeof gestionOngletsArborescence === 'function') gestionOngletsArborescence();
-    });    
+    // OPEN/CLOSE FOLDERS (Recursive)
+    window.toggleFolder = function(element) {
+        let childrenContainer = element.nextElementSibling;
+        if(childrenContainer) {
+            childrenContainer.classList.toggle('hidden');
+        }
+    };
+
+    // SWITCH TABS (Local vs PAD vs ARCH)
+    window.changerSource = function(source) {
+        // 1. Define all possible IDs
+        const ids = ['tree-local', 'tree-pad', 'tree-arch'];
+
+        // 2. Hide ALL of them safely
+        ids.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('hidden');
+            }
+        });
+        
+        // 3. Show only the selected one safely
+        const target = document.getElementById('tree-' + source);
+        if (target) {
+            target.classList.remove('hidden');
+        } else {
+            console.warn("Target tab not found: " + source);
+        }
+    }
 </script>
 @endpush
