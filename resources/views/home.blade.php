@@ -46,7 +46,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($tabDernierProjet as $video)
                         <div class="video-card group">
-                            <a href="{{ route('medias.show', ['v' => $video['id']]) }}" class="block">
+                            <a href="{{ route('medias.show', $media->id) }}" class="block">
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
                                     <img src="{{ route('thumbnails.show', $video['id']) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video' loading='lazy'/>
                                 </div>
