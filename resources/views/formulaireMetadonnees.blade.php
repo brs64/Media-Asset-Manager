@@ -12,7 +12,7 @@
 
 <div class="form-container">
     {{-- Le action doit pointer vers ta route de mise à jour --}}
-    <form method="post" action="{{ isset($media) ? route('video.update', ['v' => $media->id]) : route('media.store') }}" class="metadata-form" id="metadataForm">
+    <form method="post" action="{{ isset($media) ? route('medias.update', $media->id) : route('medias.store') }}" class="metadata-form" id="metadataForm">
         @csrf
         @if(isset($media))
             @method('PUT') {{-- Utilisation de la méthode HTTP PUT/PATCH pour la mise à jour --}}
@@ -120,7 +120,7 @@
         <div class="form-buttons-container">
             {{-- Lien de retour vers la page video --}}
             @isset($media)
-                <a href="{{ route('video.show', ['v' => $media->id]) }}" class="form-button">Retour</a>
+                <a href="{{ route('medias.show', $media->id) }}" class="form-button">Retour</a>
             @else
                 <a href="{{ route('home') }}" class="form-button">Retour</a>
             @endisset

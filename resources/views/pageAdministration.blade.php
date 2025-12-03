@@ -152,8 +152,8 @@
                                 {{-- Affichage des dernières vidéos transférées --}}
                                 @foreach ($tabDernieresVideos as $video)
                                     <tr>
-                                        <td><a href="{{ route('video.show', ['v' => $video['id']]) }}">{{ $video['date_creation'] }}</a></td>
-                                        <td><a href="{{ route('video.show', ['v' => $video['id']]) }}">{{ $video['mtd_tech_titre'] }}</a></td>
+                                        <td><a href="{{ route('medias.show', $video['id']) }}">{{ $video['date_creation'] }}</a></td>
+                                        <td><a href="{{ route('medias.show', $video['id']) }}">{{ $video['mtd_tech_titre'] }}</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>

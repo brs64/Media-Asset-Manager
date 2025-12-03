@@ -23,7 +23,7 @@ class MediaController extends Controller
         // List all media with pagination via service
         $medias = $this->mediaService->searchMedia(request()->all());
 
-        return view('media.index', compact('medias'));
+        return view('home', compact('medias'));
     }
 
     /**
@@ -78,7 +78,7 @@ class MediaController extends Controller
             }
         }
 
-        return redirect()->route('media.show', $media->id)
+        return redirect()->route('medias.show', $media->id)
             ->with('success', 'Média ajouté avec succès!');
     }
 
@@ -101,13 +101,22 @@ class MediaController extends Controller
      */
     public function edit(string $id)
     {
-        $media = \App\Models\Media::with('participations')->findOrFail($id);
-        $projets = \App\Models\Projet::all();
-        $professeurs = \App\Models\Professeur::all();
-        $eleves = \App\Models\Eleve::all();
-        $roles = \App\Models\Role::all();
+        // Get complete media info from service (includes mtdTech, mtdEdito, mtdRoles, etc.)
+        $mediaInfo = $this->mediaService->getMediaInfo($id);
 
-        return view('media.edit', compact('media', 'projets', 'professeurs', 'eleves', 'roles'));
+        if (!$mediaInfo) {
+            abort(404, 'Media not found');
+        }
+
+        // Get additional data for form dropdowns
+        $listeProfesseurs = \App\Models\Professeur::all()->map(function($prof) {
+            return $prof->prenom . ' ' . $prof->nom;
+        })->toArray();
+
+        // Merge media info with form data
+        return view('formulaireMetadonnees', array_merge($mediaInfo, [
+            'listeProfesseurs' => $listeProfesseurs,
+        ]));
     }
 
     /**
@@ -150,7 +159,7 @@ class MediaController extends Controller
             }
         }
 
-        return redirect()->route('media.show', $media->id)
+        return redirect()->route('medias.show', $media->id)
             ->with('success', 'Média modifié avec succès!');
     }
 
@@ -162,11 +171,11 @@ class MediaController extends Controller
         $success = $this->mediaService->deleteMedia($id);
 
         if ($success) {
-            return redirect()->route('media.index')
+            return redirect()->route('medias.index')
                 ->with('success', 'Media deleted successfully!');
         }
 
-        return redirect()->route('media.index')
+        return redirect()->route('medias.index')
             ->withErrors('Error deleting media');
     }
 }
