@@ -12,7 +12,7 @@
         a été retiré. Toutes ces variables DOIVENT être passées à la vue par ton Contrôleur. --}}
 
     {{-- Inclusion du menu Arborescence et de la Popup --}}
-    {{-- @include('menuArbo') --}}
+    @include('menuArbo')
     @include('popup')
 
     <div class="contenu">
