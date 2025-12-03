@@ -37,7 +37,7 @@
             --}}
             <a href="{{ route('stream.file', ['disk' => $item['disk'] ?? 'external_local', 'path' => $item['path']]) }}" 
                target="_blank"
-               class="video-link block text-blue-400 hover:text-blue-200 hover:underline flex items-center gap-2">
+               class="video-link text-blue-400 hover:text-blue-200 hover:underline flex items-center gap-2">
                 <span class="icon">🎬</span> 
                 <span>{{ $item['name'] }}</span>
             </a>
