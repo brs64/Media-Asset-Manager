@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link href="{{ asset('ressources/Style/formulaire.css') }}" rel="stylesheet">
+    @vite(['resources/css/formulaire.css'])
     <link rel="stylesheet" href="{{ asset('ressources/lib/Tagify/tagify.css') }}">
 @endpush
 

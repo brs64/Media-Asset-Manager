@@ -2,9 +2,7 @@
 
 {{-- Suppression des balises HTML structurelles et inclusion des styles et scripts --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/pageAdministration.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/transfert.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/sauvegarde.css') }}" rel="stylesheet">
+    @vite(['resources/css/pageAdministration.css', 'resources/css/transfert.css', 'resources/css/sauvegarde.css'])
     <link href="{{ asset('ressources/lib/Swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 @endpush
 

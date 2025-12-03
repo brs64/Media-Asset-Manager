@@ -2,7 +2,7 @@
 
 @push('styles')
     {{-- On garde le CSS pour le formulaire de filtrage (haut de page) --}}
-    <link href="{{ asset('ressources/Style/recherche.css') }}" rel="stylesheet">
+    @vite(['resources/css/recherche.css'])
     <link rel="stylesheet" href="{{ asset('ressources/lib/Tagify/tagify.css') }}">
 @endpush
 

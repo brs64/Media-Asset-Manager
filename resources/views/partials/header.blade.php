@@ -1,7 +1,7 @@
 {{-- ATTENTION : Le <head> et <body> ont été retirés et DOIVENT être dans layouts/app.blade.php --}}
 
 @push('styles')
-    <link href="{{ asset('resources/css/header.css') }}" rel="stylesheet">
+    @vite(['resources/css/header.css'])
 @endpush
 
 <header>

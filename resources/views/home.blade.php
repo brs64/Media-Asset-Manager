@@ -4,8 +4,7 @@
 
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
-    <link href="{{ asset('resources/css/menuArbo.css') }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/home.css') }}" rel="stylesheet">
+    @vite(['resources/css/menuArbo.css', 'resources/css/home.css'])
 @endpush
 
 @section('content')
