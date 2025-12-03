@@ -33,7 +33,6 @@ class HomeController extends Controller
                    'projet' => $dernierProjet->nom, // ou $dernierProjet->titre
                    'titre' => $media->mtd_tech_titre,
                    'titreVideo' => $media->mtd_tech_titre, // Ou une autre colonne si nécessaire
-                   'cheminMiniatureComplet' => $media->cheminMiniatureComplet,
                ];
            }
        }

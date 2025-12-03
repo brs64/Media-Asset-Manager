@@ -1,6 +1,6 @@
 {{-- Ajout du style spécifique à la popup --}}
 @push('styles')
-<link href="{{ asset('ressources/Style/popup.css') }}" rel="stylesheet">
+@vite(['resources/css/popup.css'])
 @endpush
 
 <div class="popup">

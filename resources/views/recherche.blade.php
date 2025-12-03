@@ -2,7 +2,7 @@
 
 @push('styles')
     {{-- On garde le CSS pour le formulaire de filtrage (haut de page) --}}
-    <link href="{{ asset('ressources/Style/recherche.css') }}" rel="stylesheet">
+    @vite(['resources/css/recherche.css'])
     <link rel="stylesheet" href="{{ asset('ressources/lib/Tagify/tagify.css') }}">
 @endpush
 
@@ -71,9 +71,8 @@
                                 
                                 {{-- Miniature --}}
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                    {{-- Utilisation de l'attribut calculé standardisé comme sur la Home --}}
-                                    <img src="{{ asset($media->cheminMiniatureComplet ?? $media['cheminMiniatureComplet']) }}" 
-                                         alt="{{ $media->mtd_tech_titre ?? $media['mtd_tech_titre'] }}" 
+                                    <img src="{{ route('thumbnails.show', $media->id ?? $media['id']) }}"
+                                         alt="{{ $media->mtd_tech_titre ?? $media['mtd_tech_titre'] }}"
                                          class='imageMiniature w-full h-auto object-cover aspect-video'/>
                                     
                                     {{-- Overlay Play Icon (Optionnel pour le style) --}}

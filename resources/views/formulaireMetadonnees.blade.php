@@ -1,121 +1,165 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link href="{{ asset('ressources/Style/formulaire.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('ressources/lib/Tagify/tagify.css') }}">
+    @vite(['resources/css/formulaire.css'])
 @endpush
 
 @section('content')
 
-{{-- ATTENTION : Le bloc PHP initial a été retiré. Toutes les variables (idVideo, nomFichier, listeProfesseurs, etc.) 
-    DOIVENT être passées à la vue par ton Contrôleur. --}}
-
 <div class="form-container">
-    {{-- Le action doit pointer vers ta route de mise à jour --}}
-    <form method="post" action="{{ route('video.update', ['v' => $idVideo]) }}" class="metadata-form" id="metadataForm">
+    <form method="POST" action="{{ isset($media) ? route('medias.update', $media->id) : route('medias.store') }}" class="metadata-form">
         @csrf
-        @method('PUT') {{-- Utilisation de la méthode HTTP PUT/PATCH pour la mise à jour --}}
+        @if(isset($media))
+            @method('PUT')
+        @endif
 
-        <div class="form-columns">
-            <div class="form-column-left">
-                <div class="thumbnail-container">
-                    <img src="{{ $cheminMiniatureComplet }}" alt="Miniature de la vidéo" class="thumbnail-image">
-                </div>
-                <h2 class="video-filename">{{ $nomFichier }}</h2>
-                <h2 class="video-title">{{ $titreVideo }}</h2>
-
-                <div class="low-column-left">
-                    <table class="video-info-table">
-                        <tr>
-                            <th>Durée</th>
-                            <td>{{ $mtdTech['mtd_tech_duree'] }}</td>
-                        </tr>
-                        <tr>
-                            <th>Images par seconde</th>
-                            <td>{{ $mtdTech['mtd_tech_fps'] }}</td>
-                        </tr>
-                        <tr>
-                            <th>Résolution</th>
-                            <td>{{ $mtdTech['mtd_tech_resolution'] }}</td>
-                        </tr>
-                        <tr>
-                            <th>Format</th>
-                            <td>{{ $mtdTech['mtd_tech_format'] }}</td>
-                        </tr>
-                    </table>
-                </div>
+        {{-- Display validation errors --}}
+        @if($errors->any())
+            <div style="background: #fee; border: 1px solid #f00; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                <strong>Erreurs:</strong>
+                <ul style="margin: 5px 0 0 20px;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
 
-            <div class="form-column-right">
-                <h2 class="team-title">Formulaire métadonnées</h2>
-                <input type="hidden" name="action" value="ModifierMetadonnees">
-                <input type="hidden" name="idVideo" value="{{ $idVideo }}">
+        {{-- Thumbnail Section (top) --}}
+        @isset($media)
+            <div class="thumbnail-container" style="max-width: 600px; margin: 0 auto 30px;">
+                <img src="{{ route('thumbnails.show', $media->id) }}" alt="Miniature" class="thumbnail-image">
+            </div>
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 1.5em;">{{ $media->mtd_tech_titre }}</h2>
+        @else
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 1.5em;">Nouveau média</h2>
+        @endisset
 
+        {{-- Form Fields (below) --}}
+        <div style="width: 100%; max-width: 900px; margin: 0 auto; padding: 0 20px;">
+            <div style="width: 100%; display: flex; flex-direction: column;">
+                <h2 class="team-title">Métadonnées du média</h2>
+
+                {{-- Titre --}}
                 <div class="form-field">
-                    <label for="profReferent" class="form-label">Professeur référent</label>
-                    <select id="profReferent" name="profReferent" class="form-select">
-                        {{-- Option sélectionnée par défaut (valeur actuelle) --}}
-                        <option value="{{ $mtdEdito['professeur'] }}">
-                            {{ $mtdEdito['professeur'] }}
-                        </option>
-                        
-                        @php
-                        // Tri alphabétique de la liste des professeurs
-                        sort($listeProfesseurs, SORT_LOCALE_STRING);
-                        @endphp
+                    <label for="mtd_tech_titre" class="form-label">Titre *</label>
+                    <input type="text" id="mtd_tech_titre" name="mtd_tech_titre" class="form-input" required
+                           value="{{ old('mtd_tech_titre', $media->mtd_tech_titre ?? '') }}">
+                </div>
 
-                        @foreach ($listeProfesseurs as $prof)
-                            <option value="{{ $prof }}">
-                                {{ $prof }}
+                {{-- Professeur référent --}}
+                <div class="form-field">
+                    <label for="professeur_id" class="form-label">Professeur référent</label>
+                    <select id="professeur_id" name="professeur_id" class="form-select">
+                        <option value="">-- Aucun --</option>
+                        @foreach($professeurs as $prof)
+                            <option value="{{ $prof->id }}"
+                                {{ old('professeur_id', $media->professeur_id ?? '') == $prof->id ? 'selected' : '' }}>
+                                {{ $prof->nom }} {{ $prof->prenom }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
+                {{-- Projets --}}
+                <div class="form-field">
+                    <label class="form-label">Projets</label>
+                    <div id="projets-container">
+                        @php
+                            $oldProjetIds = old('projet_ids', []);
+                            if (isset($media) && empty($oldProjetIds)) {
+                                $oldProjetIds = $media->projets->pluck('id')->toArray();
+                            }
+                        @endphp
 
+                        @forelse($oldProjetIds as $index => $projetId)
+                            <div class="projet-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                <select name="projet_ids[]" class="form-select" style="flex: 1;">
+                                    <option value="">-- Sélectionner un projet --</option>
+                                    @foreach($projets as $projet)
+                                        <option value="{{ $projet->id }}" {{ $projetId == $projet->id ? 'selected' : '' }}>
+                                            {{ $projet->libelle }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="remove-projet" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+                            </div>
+                        @empty
+                            {{-- Empty state --}}
+                        @endforelse
+                    </div>
+                    <button type="button" id="add-projet" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter un projet</button>
+                </div>
+
+                {{-- Description --}}
                 <div class="form-field">
                     <label for="description" class="form-label">Description</label>
-                    <textarea id="description" name="description" maxlength="800" pattern="^(?! ).*(?<! )$" title="Ne commencez ni ne terminez par un espace"
-                      class="form-input">{{ $description }}</textarea>
+                    <textarea id="description" name="description" class="form-input" rows="4">{{ old('description', $media->description ?? '') }}</textarea>
                 </div>
 
+                {{-- Promotion --}}
                 <div class="form-field">
                     <label for="promotion" class="form-label">Promotion</label>
-                    <input type="text" id="promotion" maxlength="50" name="promotion" pattern="^(?! ).*(?<! )$" title="Ne commencez ni ne terminez par un espace"
-                  value="{{ $promotion }}" class="form-input">
+                    <input type="text" id="promotion" name="promotion" class="form-input"
+                           value="{{ old('promotion', $media->promotion ?? '') }}">
                 </div>
 
+                {{-- Participations --}}
                 <div class="form-field">
-                    <label for="projet" class="form-label">Projet</label>
-                    <input type="text" id="projet" maxlength="50" name="projet" pattern="^(?! ).*(?<! )$" title="Ne commencez ni ne terminez par un espace"
-                  value="{{ $mtdEdito['projet'] }}" class="form-input">
-                </div>
+                    <label class="form-label">Participations (Élèves & Rôles)</label>
+                    <div id="participations-container">
+                        @php
+                            $oldParticipations = old('participations', []);
+                            if (isset($media) && empty($oldParticipations)) {
+                                $oldParticipations = $media->participations->map(fn($p) => [
+                                    'eleve_id' => $p->eleve_id,
+                                    'role_id' => $p->role_id
+                                ])->toArray();
+                            }
+                        @endphp
 
-                <div id="roles-container">
-                    @if($mtdRoles != null)
-                        @foreach ($mtdRoles as $role => $values)
-                            @php
-                                $formattedId = strtolower(str_replace(' ', '_', $role));
-                            @endphp
-                            <div class="form-field role-field"> 
-                                <label for="{{ $formattedId }}" class="form-label">{{ $role }}</label>
-                                <div class="role-inputs">
-                                    <input type="text" id="{{ $formattedId }}" maxlength="50" name="roles[{{ $role }}]" value="{{ $values }}" class="role-input">
-                                </div>
+                        @forelse($oldParticipations as $index => $participation)
+                            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                <select name="participations[{{ $index }}][eleve_id]" class="form-select" style="flex: 1;" required>
+                                    <option value="">-- Élève --</option>
+                                    @foreach($eleves as $eleve)
+                                        <option value="{{ $eleve->id }}" {{ $participation['eleve_id'] == $eleve->id ? 'selected' : '' }}>
+                                            {{ $eleve->nom }} {{ $eleve->prenom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
+                                    <option value="">-- Rôle --</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}" {{ $participation['role_id'] == $role->id ? 'selected' : '' }}>
+                                            {{ $role->libelle }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
                             </div>
-                        @endforeach
-                    @endif
+                        @empty
+                            {{-- Empty state --}}
+                        @endforelse
+                    </div>
+                    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
                 </div>
-            </div>
-        </div>
 
+            </div>{{-- Close flex column --}}
+        </div>{{-- Close form wrapper --}}
+
+        {{-- Buttons --}}
         <div class="form-buttons-container">
-            {{-- Lien de retour vers la page video --}}
-            <a href="{{ route('video.show', ['v' => $idVideo]) }}" class="form-button">Retour</a>
+            @isset($media)
+                <a href="{{ route('medias.show', $media->id) }}" class="form-button form-button-secondary">Retour</a>
+            @else
+                <a href="{{ route('home') }}" class="form-button form-button-secondary">Retour</a>
+            @endisset
 
             <div class="bouton-droit">
-                <button type="button" id="add-role" class="form-button">Ajouter un rôle</button>
-                <button type="submit" class="form-button">Confirmer</button>
+                <button type="submit" class="form-button">Enregistrer</button>
             </div>
         </div>
     </form>
@@ -124,8 +168,75 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('ressources/lib/Tagify/tagify.js') }}"></script>
-    <script>
-        initFormMetadonnees();
-    </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data for dynamic generation
+    const projets = @json($projets);
+    const eleves = @json($eleves);
+    const roles = @json($roles);
+
+    // ==== PROJETS ====
+    const projetsContainer = document.getElementById('projets-container');
+    const addProjetButton = document.getElementById('add-projet');
+
+    addProjetButton.addEventListener('click', function() {
+        const item = document.createElement('div');
+        item.className = 'projet-item';
+        item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+
+        item.innerHTML = `
+            <select name="projet_ids[]" class="form-select" style="flex: 1;">
+                <option value="">-- Sélectionner un projet --</option>
+                ${projets.map(p => `<option value="${p.id}">${p.libelle}</option>`).join('')}
+            </select>
+            <button type="button" class="remove-projet" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+        `;
+
+        projetsContainer.appendChild(item);
+    });
+
+    // Remove projet (delegated event)
+    projetsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-projet')) {
+            e.target.closest('.projet-item').remove();
+        }
+    });
+
+    // ==== PARTICIPATIONS ====
+    const participationsContainer = document.getElementById('participations-container');
+    const addParticipationButton = document.getElementById('add-participation');
+
+    let participationIndex = {{ count($oldParticipations ?? []) }};
+
+    addParticipationButton.addEventListener('click', function() {
+        const item = document.createElement('div');
+        item.className = 'participation-item';
+        item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+
+        item.innerHTML = `
+            <select name="participations[${participationIndex}][eleve_id]" class="form-select" style="flex: 1;" required>
+                <option value="">-- Élève --</option>
+                ${eleves.map(e => `<option value="${e.id}">${e.nom} ${e.prenom}</option>`).join('')}
+            </select>
+
+            <select name="participations[${participationIndex}][role_id]" class="form-select" style="flex: 1;" required>
+                <option value="">-- Rôle --</option>
+                ${roles.map(r => `<option value="${r.id}">${r.libelle}</option>`).join('')}
+            </select>
+
+            <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+        `;
+
+        participationsContainer.appendChild(item);
+        participationIndex++;
+    });
+
+    // Remove participation (delegated event)
+    participationsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-participation')) {
+            e.target.closest('.participation-item').remove();
+        }
+    });
+});
+</script>
 @endpush

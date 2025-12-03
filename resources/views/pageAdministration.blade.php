@@ -2,9 +2,7 @@
 
 {{-- Suppression des balises HTML structurelles et inclusion des styles et scripts --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/pageAdministration.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/transfert.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/sauvegarde.css') }}" rel="stylesheet">
+    @vite(['resources/css/pageAdministration.css', 'resources/css/transfert.css', 'resources/css/sauvegarde.css'])
     <link href="{{ asset('ressources/lib/Swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 @endpush
 
@@ -154,8 +152,8 @@
                                 {{-- Affichage des dernières vidéos transférées --}}
                                 @foreach ($tabDernieresVideos as $video)
                                     <tr>
-                                        <td><a href="{{ route('video.show', ['v' => $video['id']]) }}">{{ $video['date_creation'] }}</a></td>
-                                        <td><a href="{{ route('video.show', ['v' => $video['id']]) }}">{{ $video['mtd_tech_titre'] }}</a></td>
+                                        <td><a href="{{ route('medias.show', $video['id']) }}">{{ $video['date_creation'] }}</a></td>
+                                        <td><a href="{{ route('medias.show', $video['id']) }}">{{ $video['mtd_tech_titre'] }}</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>

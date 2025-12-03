@@ -8,6 +8,8 @@
 .phpunit.result.cache
 .npm
 .config
+.local
+.cache
 /.fleet
 /.idea
 /.nova

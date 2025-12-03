@@ -1,7 +1,7 @@
 {{-- ATTENTION : Le <head> et <body> ont été retirés et DOIVENT être dans layouts/app.blade.php --}}
 
 @push('styles')
-    <link href="{{ asset('resources/css/header.css') }}" rel="stylesheet">
+    @vite(['resources/css/header.css'])
 @endpush
 
 <header>
@@ -24,7 +24,7 @@
         
         <div class="compte">
             {{-- Traduction des conditions PHP en directives Blade --}}
-            @if(!session('loginUser'))
+            @if(!\Auth::check())
                 <a href="{{ route('login') }}">
                     Se connecter
                     <div class="logo-compte">
@@ -32,34 +32,23 @@
                     </div>
                 </a>
             @else
-                <a class="btnSousMenu" onclick="affichageSousMenu()">
-                    {{ session('loginUser') }}
+                <a class="btnSousMenu" href="{{ route('profile.edit') }}">
+                    {{ \Auth::user()->name }}
                     <div class="logo-compte">
                         <img src="{{ asset('/images/account.png') }}" alt="Compte">
                     </div>
                 </a>
                 <div class="sousMenu">
 
-                    @php
-                    // Nous conservons les fonctions/constantes comme ACCES_ADMINISTRATION
-                    if(controleurVerifierAcces(ACCES_ADMINISTRATION)){
-                    @endphp
-                    
                     <a href="{{ route('admin.dashboard') }}">
                         <img class='iconeSousMenu' src='{{ asset('/images/Parametre.png') }}'>
                         Paramétrer
                     </a>
-                    
-                    @php
-                    // Nous devons traduire la vérification de file_exists en utilisant public_path()
-                    if(session('role') == ROLE_ADMINISTRATEUR && file_exists(public_path('docs/html/index.html'))){
-                    @endphp
-                    
+
                     <a href="{{ asset('docs/html/index.html') }}">
                         <img class='iconeSousMenu' src='{{ asset('/images/documentation.png') }}'>
                         Documentation
                     </a>
-                    @php } } @endphp
 
                     <a href="{{ route('logout') }}" >
                         <img class='iconeSousMenu'src='{{ asset('/images/logout.png') }}'>
@@ -72,11 +61,6 @@
     </div>
 </header>
 
-{{-- Déplacement du script d'initialisation dans le stack 'scripts' --}}
 @push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    affichageSousMenu();
-});
-</script>
+
 @endpush

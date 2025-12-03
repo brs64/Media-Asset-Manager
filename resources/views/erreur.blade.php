@@ -2,7 +2,7 @@
 
 {{-- Ajout des styles spécifiques à cette page d'erreur --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/transfert.css') }}" rel="stylesheet">
+    @vite(['resources/css/transfert.css'])
 @endpush
 
 @section('content')

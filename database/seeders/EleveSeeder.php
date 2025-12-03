@@ -25,10 +25,8 @@ class EleveSeeder extends Seeder
 
         foreach ($eleves as $eleveData) {
             // Créer d'abord le compte utilisateur (parent)
-            $email = strtolower($eleveData['prenom'] . '.' . $eleveData['nom']) . '@mediamanager.fr';
             $user = \App\Models\User::create([
                 'name' => $eleveData['prenom'] . ' ' . $eleveData['nom'],
-                'email' => $email,
                 'password' => bcrypt('password'),
             ]);
 

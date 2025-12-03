@@ -30,17 +30,22 @@
 
         {{-- CASE: VIDEO --}}
         @elseif ($item['type'] === 'video')
-            {{-- 
+            {{--
                CHANGES:
                1. Added href to the 'stream.file' route.
                2. 'text-blue-400': Lighter blue so it is readable on dark background.
+               TODO: stream.file route not yet implemented
             --}}
-            <a href="{{ route('stream.file', ['disk' => $item['disk'] ?? 'external_local', 'path' => $item['path']]) }}" 
+            {{-- <a href="{{ route('stream.file', ['disk' => $item['disk'] ?? 'external_local', 'path' => $item['path']]) }}"
                target="_blank"
                class="video-link text-blue-400 hover:text-blue-200 hover:underline flex items-center gap-2">
-                <span class="icon">🎬</span> 
+                <span class="icon">🎬</span>
                 <span>{{ $item['name'] }}</span>
-            </a>
+            </a> --}}
+            <div class="video-link text-blue-400 flex items-center gap-2">
+                <span class="icon">🎬</span>
+                <span>{{ $item['name'] }}</span>
+            </div>
 
         {{-- CASE: FILE --}}
         @else

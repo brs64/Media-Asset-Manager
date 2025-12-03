@@ -4,8 +4,7 @@
 
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
-    <link href="{{ asset('resources/css/menuArbo.css') }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/home.css') }}" rel="stylesheet">
+    @vite(['resources/css/menuArbo.css', 'resources/css/home.css'])
 @endpush
 
 @section('content')
@@ -14,7 +13,7 @@
 
     <div class="container mx-auto px-4">
         <div class="sliderVideo my-8">
-            <h2 class="text-2xl font-bold mb-6">Vos vidéos</h2>
+            <h2 class="text-2xl font-bold mb-6">Dernières vidéos</h2>
             
             {{-- Remplacement du Slider par une Grille Tailwind --}}
             {{-- grid-cols-1 (mobile) -> grid-cols-4 (desktop) --}}
@@ -46,7 +45,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($tabDernierProjet as $video)
                         <div class="video-card group">
-                            <a href="{{ route('medias.show', ['v' => $video['id']]) }}" class="block">
+                            <a href="{{ route('medias.show', $media->id) }}" class="block">
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
                                     <img src="{{ route('thumbnails.show', $video['id']) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video' loading='lazy'/>
                                 </div>

@@ -2,7 +2,7 @@
 
 {{-- On ajoute le CSS spécifique à cette page (compte.css) --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/compte.css') }}" rel="stylesheet">
+    @vite(['resources/css/compte.css'])
 @endpush
 
 @section('content')
