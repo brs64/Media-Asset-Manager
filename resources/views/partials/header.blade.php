@@ -61,11 +61,6 @@
     </div>
 </header>
 
-{{-- Déplacement du script d'initialisation dans le stack 'scripts' --}}
 @push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    affichageSousMenu();
-});
-</script>
+
 @endpush

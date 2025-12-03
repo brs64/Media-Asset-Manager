@@ -13,7 +13,7 @@
 
     <div class="container mx-auto px-4">
         <div class="sliderVideo my-8">
-            <h2 class="text-2xl font-bold mb-6">Vos vidéos</h2>
+            <h2 class="text-2xl font-bold mb-6">Dernières vidéos</h2>
             
             {{-- Remplacement du Slider par une Grille Tailwind --}}
             {{-- grid-cols-1 (mobile) -> grid-cols-4 (desktop) --}}
