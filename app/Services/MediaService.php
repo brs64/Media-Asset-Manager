@@ -193,39 +193,69 @@ class MediaService
     }
 
     /**
-     * Search media with filters
+     * Search media with filters (Title, Description, Project Name)
      */
     public function searchMedia(array $filtres): \Illuminate\Pagination\LengthAwarePaginator
     {
+        //dd($filtres); 
         $query = Media::query()->with(['projets', 'professeur', 'participations.eleve', 'participations.role']);
 
+        // --- 1. GLOBAL SEARCH BAR (Input name="description") ---
+        // This acts as a "General Search" across Title, Description, AND Project Name
+        if (!empty($filtres['description'])) {
+            $term = '%' . $filtres['description'] . '%';
+
+            // We group these conditions in a closure: (A OR B OR C)
+            $query->where(function($q) use ($term) {
+                
+                // A. Search in Title
+                $q->where('mtd_tech_titre', 'like', $term)
+                
+                // B. Search in Description
+                  ->orWhere('description', 'like', $term)
+                  
+                // C. Search in Related Project Name
+                // This checks the 'projets' table via the relationship
+                  ->orWhereHas('projets', function ($queryProjet) use ($term) {
+                      // Note: I assumed the column is 'libelle'. 
+                      // If your column in the projets table is 'intitule' or 'nom', change it here.
+                      $queryProjet->where('libelle', 'like', $term);
+                  });
+            });
+        }
+
+        // --- 2. SPECIFIC DROPDOWN FILTERS (Strict AND conditions) ---
+
+        // Specific Title Filter (if used separately)
         if (!empty($filtres['titre'])) {
             $query->where('mtd_tech_titre', 'like', '%' . $filtres['titre'] . '%');
         }
 
+        // Project Dropdown Filter (Exact Match)
         if (!empty($filtres['projet_id'])) {
+            // Using whereHas ensures it works for Many-to-Many relationships
             $query->whereHas('projets', function ($q) use ($filtres) {
                 $q->where('projets.id', $filtres['projet_id']);
             });
         }
 
+        // Professor Dropdown Filter
         if (!empty($filtres['professeur_id'])) {
             $query->where('professeur_id', $filtres['professeur_id']);
         }
 
+        // Promotion Filter
         if (!empty($filtres['promotion'])) {
             $query->where('promotion', 'like', '%' . $filtres['promotion'] . '%');
         }
 
-        if (!empty($filtres['description'])) {
-            $query->where('description', 'like', '%' . $filtres['description'] . '%');
-        }
-
+        // Type Filter
         if (!empty($filtres['type'])) {
             $query->where('type', 'like', '%' . $filtres['type'] . '%');
         }
 
-        return $query->paginate(20);
+        // Return results paginated
+        return $query->orderBy('created_at', 'desc')->paginate(20);
     }
 
     // --- Private utility methods ---

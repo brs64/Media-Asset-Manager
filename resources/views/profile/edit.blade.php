@@ -5,12 +5,16 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+    <div class="min-h-screen flex flex-col justify-center items-center pt-24 pb-12 bg-gray-100">
+        
+        <div class="w-full max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            
+            <div class="p-8 bg-white shadow sm:rounded-lg">
+                
+                <div class="max-w-xl mx-auto">
                     @include('profile.partials.update-password-form')
                 </div>
+
             </div>
         </div>
     </div>

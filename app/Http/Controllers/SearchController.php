@@ -26,6 +26,12 @@ class SearchController extends Controller
         // 1. Préparation des filtres pour le Service
         $filtres = [];
 
+        $searchTerm = $request->input('description') ?? $request->input('motCle');
+
+        if ($searchTerm) {
+            $filtres['description'] = $searchTerm;
+        }
+
         // Filtre : Description
         if ($request->filled('description')) {
             $filtres['description'] = $request->description;
@@ -68,7 +74,7 @@ class SearchController extends Controller
         $medias->appends($request->all());
 
         // 3. Charger les listes pour les menus déroulants
-        $listeProjet = Projet::orderBy('intitule')->get();
+        $listeProjet = Projet::orderBy('libelle')->get();
         $listeProf = Professeur::orderBy('nom')->get();
 
         // 4. Récupérer les valeurs actuelles pour pré-remplir le formulaire

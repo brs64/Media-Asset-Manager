@@ -4,7 +4,6 @@
         <div class="menuArbo local" id="tree-local">
             <h3 class="text-white p-2 font-bold bg-gray-800">Espace Local</h3>
             <div class="tree-container">
-                {{-- DEBUG: Uncomment the line below to see exactly what Laravel sees --}}
                 {{-- @dump($localTree) --}}
 
                 @if(isset($localTree) && count($localTree) > 0)

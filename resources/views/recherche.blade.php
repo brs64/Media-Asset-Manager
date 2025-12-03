@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    {{-- On garde le CSS pour le formulaire de filtrage (haut de page) --}}
-    @vite(['resources/css/recherche.css'])
+    @vite(['resources/css/recherche.css', 'resources/css/home.css'])
     <link rel="stylesheet" href="{{ asset('ressources/lib/Tagify/tagify.css') }}">
 @endpush
 
@@ -11,35 +10,38 @@
     <div class="container mx-auto px-4 my-8">
         
         {{-- --- SECTION FILTRES --- --}}
-        {{-- J'ai gardé votre structure de formulaire existante pour ne pas casser le JS --}}
         <div class="filtrage bg-white p-4 rounded-lg shadow mb-6">
-            <form action="{{ route('recherche') }}" method="get">
+            <form action="{{ route('search') }}" method="get">
                 <input placeholder="Rechercher dans la description" type="text" name="description" class="description w-full p-2 border border-gray-300 rounded mb-4" 
                        value="{{ $description ?? '' }}">
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 selects">
-                    <select name="prof" class="w-full p-2 border border-gray-300 rounded">
-                        <option value="" disabled selected>Professeur référent</option>
-                        @foreach ($listeProf as $profItem)
-                            <option value="{{ $profItem["professeurReferent"] }}" 
-                                    {{ ($prof ?? '') == $profItem["professeurReferent"] ? 'selected' : '' }}>
-                                {{ $profItem["nom"] }} {{ $profItem["prenom"] }}
-                            </option>
-                        @endforeach
-                    </select>
-                    
-                    <select name="projet" class="w-full p-2 border border-gray-300 rounded">
-                        <option value="" disabled selected>Projet</option>
-                        @foreach ($listeProjet as $projetItem)
-                            <option value="{{ $projetItem["intitule"] }}"
-                                    {{ ($projet ?? '') == $projetItem["intitule"] ? 'selected' : '' }}>
-                                {{ $projetItem["intitule"] }}
-                            </option>
-                        @endforeach
-                    </select>
-                    
-                    <input type="text" placeholder="Promotion" name="promotion" value="{{ $promotion ?? '' }}" class="w-full p-2 border border-gray-300 rounded">
-                </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            @foreach($medias as $media)
+                                <div class="video-card group">
+                                    <a href="{{ route('medias.show', $media->id) }}" class="block">
+                                        
+                                        {{-- Miniature --}}
+                                        <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
+                                            <img src="{{ route('thumbnails.show', $media->id) }}"
+                                                alt="{{ $media->mtd_tech_titre }}"
+                                                class='imageMiniature w-full h-auto object-cover aspect-video'/>
+                                        </div>
+
+                                        <div class="mt-2">
+                                            <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600">
+                                                {{ $media->mtd_tech_titre }}
+                                            </h3>
+                                            
+                                            @if($media->description)
+                                                <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                                                    {{ $media->description }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
                 
                 <div class="flex gap-4">
                     <button type="button" id="add-role" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition">
@@ -66,29 +68,28 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach($medias as $media)
                         <div class="video-card group">
-                            {{-- Note: Assurez-vous que $media est bien un objet. Si c'est un tableau, utilisez $media['id'] --}}
-                            <a href="{{ route('medias.show', $media->id ?? $media['id']) }}" class="block h-full">
+                            {{-- Corrected: $media is an Object, so we use ->id --}}
+                            <a href="{{ route('medias.show', $media->id) }}" class="block h-full">
                                 
                                 {{-- Miniature --}}
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                    <img src="{{ route('thumbnails.show', $media->id ?? $media['id']) }}"
-                                         alt="{{ $media->mtd_tech_titre ?? $media['mtd_tech_titre'] }}"
+                                    <img src="{{ route('thumbnails.show', $media->id) }}"
+                                         alt="{{ $media->mtd_tech_titre }}"
                                          class='imageMiniature w-full h-auto object-cover aspect-video'/>
                                     
-                                    {{-- Overlay Play Icon (Optionnel pour le style) --}}
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                                        {{-- Vous pouvez ajouter une icône play ici si vous voulez --}}
+                                    {{-- Overlay --}}
+                                    <div class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                                     </div>
                                 </div>
 
                                 {{-- Infos --}}
                                 <div class="mt-3">
                                     <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 leading-tight">
-                                        {{ $media->mtd_tech_titre ?? $media['mtd_tech_titre'] }}
+                                        {{ $media->mtd_tech_titre }}
                                     </h3>
-                                    @if(isset($media['description']) || isset($media->description))
+                                    @if($media->description)
                                         <p class="text-sm text-gray-600 mt-1 line-clamp-2">
-                                            {{ $media->description ?? $media['description'] }}
+                                            {{ $media->description }}
                                         </p>
                                     @endif
                                 </div>
