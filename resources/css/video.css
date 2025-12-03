@@ -10,16 +10,13 @@ button {
 
 
 .contenu {
-    padding-left: 3%;
-    padding-right: 3%;
-    padding-top: 1%;
+    padding: 100px 3% 20px 3%;
     background-color: white;
     display: flex;
     flex-direction: row;
-    margin-top: 60px;
-    margin-bottom: 60px;
     gap: 3%;
-
+    min-height: 100vh; 
+    box-sizing: border-box;
 }
 
 .container_principal{
@@ -123,9 +120,7 @@ button {
     flex-direction: row;
     justify-content: start;
     width: calc(100% - 20px);
-    padding: 10px;
-    padding-top:0 ;
-    padding-bottom:0;
+    padding: 10px 15px;
     margin-top: 10px;
     border: solid 1px;
     border-radius: 15px;
