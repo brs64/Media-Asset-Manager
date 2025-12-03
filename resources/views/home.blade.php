@@ -4,8 +4,7 @@
 
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
-    <link href="{{ asset('resources/css/menuArbo.css') }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/home.css') }}" rel="stylesheet">
+    @vite(['resources/css/menuArbo.css', 'resources/css/home.css'])
 @endpush
 
 @section('content')
@@ -14,7 +13,7 @@
 
     <div class="container mx-auto px-4">
         <div class="sliderVideo my-8">
-            <h2 class="text-2xl font-bold mb-6">Vos vidéos</h2>
+            <h2 class="text-2xl font-bold mb-6">Dernières vidéos</h2>
             
             {{-- Remplacement du Slider par une Grille Tailwind --}}
             {{-- grid-cols-1 (mobile) -> grid-cols-4 (desktop) --}}

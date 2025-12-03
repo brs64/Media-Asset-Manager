@@ -2,8 +2,7 @@
 
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
-    <link href="{{ asset('ressources/Style/video.css') }}" rel="stylesheet">
-    <link href="{{ asset('ressources/Style/menuArbo.css') }}" rel="stylesheet">
+    @vite(['resources/css/video.css', 'resources/css/menuArbo.css'])
     <link rel="stylesheet" href="{{ asset('ressources/lib/Plyr/plyr.css') }}" />
 @endpush
 
@@ -28,8 +27,7 @@
             <div class="info_video">
 
                 <div class ="titre_nom">
-                    <h1 class="titre">{{ $nomFichier }}</h1>
-                    <h2>{{ $titreVideo }}</h2>
+                    <h1 class="titre">{{ $titreVideo }}</h1>
                 </div>
 
                 <div class="container-button">
@@ -39,18 +37,18 @@
                             <div class="logo-btnvideo">
                                 <img src="{{ asset('ressources/Images/modifier_video.png') }}" alt="">
                             </div>
-                            <p>Modifier</p>
+                            <span>Modifier</span>
                         </a>
 
                         {{-- Bouton Supprimer --}}
-                        <form action="{{ route('medias.destroy', $idMedia) }}" method="POST" style="display: inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">
+                        <form action="{{ route('medias.destroy', $idMedia) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" title="Supprimer vidéo" class="btnVideo" id="btnSuppr">
                                 <div class="logo-btnvideo">
                                     <img src="{{ asset('ressources/Images/poubelle-de-recyclage.png') }}" alt="">
                                 </div>
-                                <p>Supprimer</p>
+                                <span>Supprimer</span>
                             </button>
                         </form>
                     @endauth
@@ -68,72 +66,81 @@
             
         </div>
 
-        <div class="metadata_detaillee">
-            <table>
-                {{-- Métadonnées éditoriales --}}
-                <tr>
-                    <td><strong>Projet</strong></td>
-                    <td>{{ $mtdEdito["projet"] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Promotion</strong></td>
-                    <td>{{ $promotion }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Professeur référent</strong></td>
-                    <td>{{ $mtdEdito["professeur"] }}</td>
-                </tr>
+        {{-- Metadata container for right column --}}
+        <div class="metadata-container">
+            {{-- Métadonnées éditoriales --}}
+            <div class="metadata_detaillee">
+                <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations générales</h3>
+                <table>
+                    <tr>
+                        <td><strong>Projets</strong></td>
+                        <td>{{ $mtdEdito["projet"] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Promotion</strong></td>
+                        <td>{{ $promotion }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Professeur référent</strong></td>
+                        <td>{{ $mtdEdito["professeur"] }}</td>
+                    </tr>
 
-                {{-- Métadonnées techniques (extraites en temps réel) --}}
-                <tr>
-                    <td><strong>Durée</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_duree"] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Résolution</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_resolution"] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Images par seconde</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_fps"] }} fps</td>
-                </tr>
-                <tr>
-                    <td><strong>Codec vidéo</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_format"] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Taille</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_taille"] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Bitrate</strong></td>
-                    <td>{{ $mtdTech["mtd_tech_bitrate"] }}</td>
-                </tr>
+                    {{-- Rôles --}}
+                    @if($mtdRoles && count($mtdRoles) > 0)
+                        @foreach ($mtdRoles as $role => $values)
+                            <tr>
+                                <td><strong>{{ $role }}</strong></td>
+                                <td>{{ $values }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
+                </table>
+            </div>
 
-                {{-- URIs --}}
-                <tr>
-                    <td><strong>URI NAS PAD</strong></td>
-                    <td>{{ $URIS['URI_NAS_PAD'] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>URI NAS MPEG</strong></td>
-                    <td>{{ $URIS['URI_NAS_MPEG'] }}</td>
-                </tr>
-                <tr>
-                    <td><strong>URI NAS ARCH</strong></td>
-                    <td>{{ $URIS['URI_NAS_ARCH'] }}</td>
-                </tr>
+            {{-- Métadonnées techniques --}}
+            <div class="metadata_detaillee" style="margin-top: 30px;">
+                <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations techniques</h3>
+                <table>
+                    <tr>
+                        <td><strong>Durée</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_duree"] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Résolution</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_resolution"] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Images par seconde</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_fps"] }} fps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Codec vidéo</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_format"] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Taille</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_taille"] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bitrate</strong></td>
+                        <td>{{ $mtdTech["mtd_tech_bitrate"] }}</td>
+                    </tr>
 
-                {{-- Rôles --}}
-                @if($mtdRoles && count($mtdRoles) > 0)
-                    @foreach ($mtdRoles as $role => $values)
-                        <tr>
-                            <td><strong>{{ $role }}</strong></td>
-                            <td>{{ $values }}</td>
-                        </tr>
-                    @endforeach
-                @endif
-            </table>
+                    {{-- URIs --}}
+                    <tr>
+                        <td><strong>URI NAS PAD</strong></td>
+                        <td>{{ $URIS['URI_NAS_PAD'] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>URI NAS MPEG</strong></td>
+                        <td>{{ $URIS['URI_NAS_MPEG'] }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>URI NAS ARCH</strong></td>
+                        <td>{{ $URIS['URI_NAS_ARCH'] }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 
