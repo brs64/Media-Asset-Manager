@@ -36,25 +36,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
 });
 
-// Routes admin (uniquement pour les professeurs)
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+    // Routes admin (uniquement pour les professeurs)
 
-    // Gestion des professeurs
-    Route::get('/professeurs', [AdminController::class, 'professeurs'])->name('admin.professeurs');
-    Route::post('/professeurs', [AdminController::class, 'createProfesseur'])->name('admin.professeurs.create');
-    Route::delete('/professeurs/{id}', [AdminController::class, 'deleteProfesseur'])->name('admin.professeurs.delete');
-
-    // Gestion des élèves
-    Route::get('/eleves', [AdminController::class, 'eleves'])->name('admin.eleves');
-    Route::post('/eleves', [AdminController::class, 'createEleve'])->name('admin.eleves.create');
-    Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('admin.eleves.delete');
-
-    // Gestion des projets
-    Route::get('/projets', [AdminController::class, 'projets'])->name('admin.projets');
-    Route::post('/projets', [AdminController::class, 'createProjet'])->name('admin.projets.create');
-    Route::delete('/projets/{id}', [AdminController::class, 'deleteProjet'])->name('admin.projets.delete');
-});
+    Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+        
+        // --- 1. The Main Dashboard (Loads ALL Tabs) ---
+        Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+        // --- 2. Settings Update 
+        Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+        // --- 3. Actions (Create/Delete) ---
+        // Professeurs Actions
+        Route::post('/professeurs', [AdminController::class, 'createProfesseur'])->name('admin.professeurs.create');
+        Route::delete('/professeurs/{id}', [AdminController::class, 'deleteProfesseur'])->name('admin.professeurs.delete');
+        // Admins Actions
+        Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('admin.backup.run');
+        Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('admin.backup.save');
+        Route::post('/reconciliation', [AdminController::class, 'runReconciliation'])->name('admin.reconciliation.run');
+        Route::get('/logs/download', [AdminController::class, 'downloadLogs'])->name('admin.logs.download');
+        // Eleves Actions
+        Route::post('/eleves', [AdminController::class, 'createEleve'])->name('admin.eleves.create');
+        Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('admin.eleves.delete');
+        // Projets Actions
+        Route::post('/projets', [AdminController::class, 'createProjet'])->name('admin.projets.create');
+        Route::delete('/projets/{id}', [AdminController::class, 'deleteProjet'])->name('admin.projets.delete');
+    });
 
 // Routes d'authentification Breeze
 require __DIR__.'/auth.php';

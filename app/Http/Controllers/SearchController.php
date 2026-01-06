@@ -44,7 +44,6 @@ class SearchController extends Controller
 
         // Filtre : Projet (Conversion Nom -> ID)
         if ($request->filled('projet')) {
-            // Votre vue envoie l'intitulé (string), le service veut l'ID
             $projetModel = Projet::where('intitule', $request->projet)->first();
             if ($projetModel) {
                 $filtres['projet_id'] = $projetModel->id;
@@ -53,13 +52,7 @@ class SearchController extends Controller
 
         // Filtre : Professeur (Conversion Référent -> ID)
         if ($request->filled('prof')) {
-            // Votre vue envoie 'professeurReferent', le service veut 'professeur_id'
-            // Je suppose que 'professeurReferent' est une colonne unique dans la table profs ou users
-            // Adaptez 'professeurReferent' ci-dessous au nom réel de la colonne dans votre BDD
             $profModel = Professeur::where('professeurReferent', $request->prof)->first(); 
-            
-            // Si jamais 'professeurReferent' n'existe pas et que c'est juste le nom :
-            // $profModel = Professeur::where('nom', $request->prof)->first();
 
             if ($profModel) {
                 $filtres['professeur_id'] = $profModel->id;
