@@ -25,7 +25,7 @@
 
 
 
-## déploiement local de l'environnement de developpement
+## Déploiement local de l'environnement de developpement
 Cette partie vise à installer l'environnement de développement complet sur un poste personnel :
 
 **Prérequis**
@@ -59,7 +59,7 @@ Cette partie vise à installer l'environnement de développement complet sur un 
   docker exec -it btsplay-laravel bash
 ```
 
-- installer toutes les dépendances du projet
+- Installer toutes les dépendances du projet
 
 ```bash
   composer install
