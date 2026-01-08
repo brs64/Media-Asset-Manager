@@ -44,29 +44,106 @@ class FfastransService
      */
     public function submitJob(string $sourceFile, string $workflowId, array $variables = [])
     {
-        $endpoint = "{$this->baseUrl}/api/json/v2/jobs";
+        // GET CONFIG
+        $localRoot  = config('services.ffastrans.path_local'); 
+        $remoteRoot = config('services.ffastrans.path_remote');
 
-        // FFAStrans API payload structure
+        // 2. TRANSLATE PATH
+        $finalPath = $sourceFile;
+
+        if ($localRoot && $remoteRoot) {
+            // Check if the source file starts with the local root
+            if (str_starts_with($sourceFile, $localRoot)) {
+                // Remove the local root from the start
+                $relativePath = substr($sourceFile, strlen($localRoot));
+                
+                // Ensure remote root doesn't end with slash and relative doesn't start with slash
+                $remoteRoot = rtrim($remoteRoot, '\\/');
+                $relativePath = ltrim($relativePath, '/\\');
+                
+                // Combine them
+                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $relativePath;
+            }
+        }
+
+        // FORCE WINDOWS BACKSLASHES (Critical for FFAStrans)
+        // This turns "/path/to/file" into "\path\to\file"
+        $finalPath = str_replace('/', '\\', $finalPath);
+
+        // SUBMIT
+        $endpoint = "{$this->baseUrl}/api/json/v2/jobs";
+        
         $payload = [
             'workflow' => $workflowId,
-            'input' => $sourceFile,
+            'input' => $finalPath,
             'variables' => $variables
         ];
 
         try {
             $response = $this->client()->post($endpoint, $payload);
-
+            
             if ($response->failed()) {
-                Log::error('FFAStrans Submit Error', ['body' => $response->body()]);
-                throw new Exception("Failed to submit job to FFAStrans: " . $response->status());
+                 Log::error('FFAStrans Submit Error', ['body' => $response->body()]);
+                 throw new Exception("Failed to submit job: " . $response->status());
             }
-
             return $response->json();
-
+            
         } catch (Exception $e) {
-            Log::error('FFAStrans Connection Error: ' . $e->getMessage());
+            Log::error('FFAStrans Exception: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    public function getFullStatusList()
+    {
+        // Get Active Jobs
+        try {
+            $activeResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/jobs");
+            $activeJobs = $activeResponse->successful() ? ($activeResponse->json()['jobs'] ?? []) : [];
+        } catch (Exception $e) {
+            $activeJobs = [];
+        }
+
+        // Get History (Last 50)
+        try {
+            $historyResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/history?start=0&count=50");
+            $historyJobs = $historyResponse->successful() ? ($historyResponse->json()['history'] ?? []) : [];
+        } catch (Exception $e) {
+            $historyJobs = [];
+        }
+
+        $allJobs = [];
+
+        // Map Active
+        foreach ($activeJobs as $job) {
+            $allJobs[] = [
+                'id' => $job['job_id'] ?? $job['guid'],
+                'filename' => basename($job['input'] ?? 'Fichier Inconnu'),
+                'status' => $job['state'] ?? 'En cours',
+                'progress' => $job['progress'] ?? 0,
+                'date' => $job['submit_time'] ?? date('Y-m-d H:i:s'),
+                'is_finished' => false
+            ];
+        }
+
+        // Map History
+        foreach ($historyJobs as $job) {
+            $allJobs[] = [
+                'id' => $job['job_id'] ?? $job['guid'],
+                'filename' => basename($job['source'] ?? 'Fichier Inconnu'),
+                'status' => $job['result'] ?? 'Terminé',
+                'progress' => 100,
+                'date' => $job['end_time'] ?? date('Y-m-d H:i:s'),
+                'is_finished' => true
+            ];
+        }
+
+        // Sort by Date DESC
+        usort($allJobs, function ($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+
+        return $allJobs;
     }
 
     /**
@@ -77,7 +154,6 @@ class FfastransService
      */
     public function getJobStatus(string $jobId)
     {
-        // Note: Endpoint format may vary slightly depending on FFAStrans API version
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
 
         $response = $this->client()->get($endpoint);
@@ -91,7 +167,7 @@ class FfastransService
 
     /**
      * Retrieve list of all available workflows.
-     * Useful for populating a dropdown in your admin panel.
+     * Useful for populating a dropdown in admin panel.
      *
      * @return array
      */
@@ -119,5 +195,27 @@ class FfastransService
         $response = $this->client()->get($endpoint);
         
         return $response->json();
+    }
+
+    /**
+     * Request FFAStrans to cancel/abort a specific job.
+     *
+     * @param string $jobId
+     * @return bool True if successful
+     */
+    public function cancelJob(string $jobId)
+    {
+        $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
+
+        try {
+            $response = $this->client()->delete($endpoint);
+            
+            // 200 OK or 204 No Content means success
+            return $response->successful();
+
+        } catch (Exception $e) {
+            Log::error("Failed to cancel FFAStrans job {$jobId}: " . $e->getMessage());
+            return false;
+        }
     }
 }
