@@ -6,6 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThumbnailController;
+use App\Http\Controllers\StreamController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique
@@ -13,6 +14,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Miniatures
 Route::get('/thumbnails/{mediaId}', [ThumbnailController::class, 'show'])->name('thumbnails.show');
+
+// Streaming vidéo
+Route::get('/stream/{mediaId}', [StreamController::class, 'stream'])->name('stream.video');
+Route::get('/stream/{mediaId}/segment/{segment}', [StreamController::class, 'segment'])->name('stream.segment');
 
 // Gestion des médias
 Route::resource('medias', MediaController::class);

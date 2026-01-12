@@ -45,7 +45,7 @@ class MediaService
             'promotion' => $media->promotion ?? '',
 
             // Chemins
-            'cheminVideoComplet' => '', // TODO: implement streaming
+            'cheminVideoComplet' => route('stream.video', $media->id),
             'cheminMiniatureComplet' => route('thumbnails.show', $media->id),
             'cheminCompletNAS_ARCH' => $media->URI_NAS_ARCH,
             'cheminCompletNAS_PAD' => $media->URI_NAS_PAD,

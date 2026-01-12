@@ -3,7 +3,6 @@
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
     @vite(['resources/css/video.css', 'resources/css/menuArbo.css'])
-    <link rel="stylesheet" href="{{ asset('ressources/lib/Plyr/plyr.css') }}" />
 @endpush
 
 @section('content')
@@ -147,7 +146,7 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('ressources/lib/Plyr/plyr.js') }}"></script>
+    @vite(['resources/js/video.js'])
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             initLectureVideo();
