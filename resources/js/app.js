@@ -2,6 +2,9 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 
+// Font Awesome
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 // Importation des fichiers CSS
 import '../css/compte.css';
 import '../css/formulaire.css';

@@ -35,7 +35,7 @@
                         {{-- Bouton Modifier --}}
                         <a href="{{ route('medias.edit', $idMedia) }}" id="boutonModif" title="Modifier vidéo" class="btnVideo">
                             <div class="logo-btnvideo">
-                                <img src="{{ asset('ressources/Images/modifier_video.png') }}" alt="">
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </div>
                             <span>Modifier</span>
                         </a>
@@ -46,7 +46,7 @@
                             @method('DELETE')
                             <button type="submit" title="Supprimer vidéo" class="btnVideo" id="btnSuppr">
                                 <div class="logo-btnvideo">
-                                    <img src="{{ asset('ressources/Images/poubelle-de-recyclage.png') }}" alt="">
+                                    <i class="fa-solid fa-trash"></i>
                                 </div>
                                 <span>Supprimer</span>
                             </button>

@@ -77,21 +77,19 @@
     align-items: center;
 }
 
-/* Updated Image Paths for Laravel Public Folder */
+/* Font Awesome Folder Icons */
 .main-menuArbo .dossier::before{
-    content: " ";
+    content: "\f07b"; /* fa-folder */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
     display: inline-block;
     width: 20px;
-    height: 20px;
     margin-right: 10px;
-    background-image: url("/images/closed-file.png"); /* Absolute path */
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    font-size: 16px;
 }
 
 .main-menuArbo .dossier.ouvert::before{
-    background-image: url("/images/open-file.png");
+    content: "\f07c"; /* fa-folder-open */
 }
 
 /* Radio Buttons at Bottom */

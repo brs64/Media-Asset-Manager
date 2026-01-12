@@ -74,7 +74,7 @@
                                 <div class="relative">
                                     <input :type="show ? 'text' : 'password'" name="{{ $prefix }}_pass" value="{{ $settings[$prefix.'_pass'] ?? '' }}" class="w-full rounded border-gray-300 pr-10 shadow-sm">
                                     <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700">
-                                        <span x-show="!show">👁️</span><span x-show="show">🚫</span>
+                                        <i x-show="!show" class="fa-solid fa-eye"></i><i x-show="show" class="fa-solid fa-eye-slash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                                     <div class="relative">
                                         <input :type="show ? 'text' : 'password'" name="{{ $prefix }}_pass_sup" value="{{ $settings[$prefix.'_pass_sup'] ?? '' }}" class="w-full rounded border-gray-300 pr-10 shadow-sm">
                                         <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700">
-                                            <span x-show="!show">👁️</span><span x-show="show">🚫</span>
+                                            <i x-show="!show" class="fa-solid fa-eye"></i><i x-show="show" class="fa-solid fa-eye-slash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@
                             <div class="relative">
                                 <input :type="show ? 'text' : 'password'" name="db_pass" value="{{ $settings['db_pass'] ?? '' }}" class="w-full rounded border-gray-300 pr-10 shadow-sm">
                                 <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
-                                     <span x-show="!show">👁️</span><span x-show="show">🚫</span>
+                                     <i x-show="!show" class="fa-solid fa-eye"></i><i x-show="show" class="fa-solid fa-eye-slash"></i>
                                 </button>
                             </div>
                         </div>
