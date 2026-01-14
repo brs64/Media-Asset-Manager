@@ -35,42 +35,36 @@ class FfastransService
 
     /**
      * Submit a file to a specific workflow.
-     *
-     * @param string $sourceFile The full path to the source file (must be accessible by FFAStrans)
-     * @param string $workflowId The ID or Name of the FFAStrans workflow
-     * @param array $variables Optional user variables to pass to the workflow
-     * @return array The response containing the Job ID
-     * @throws Exception
+     * Handles both Absolute paths (starting with /) and Relative paths.
      */
     public function submitJob(string $sourceFile, string $workflowId, array $variables = [])
     {
-        // GET CONFIG
-        $localRoot  = config('services.ffastrans.path_local'); 
+        // 1. GET CONFIG
+        $localRoot  = config('services.ffastrans.path_local');
         $remoteRoot = config('services.ffastrans.path_remote');
 
-        // 2. TRANSLATE PATH
         $finalPath = $sourceFile;
 
-        if ($localRoot && $remoteRoot) {
-            // Check if the source file starts with the local root
-            if (str_starts_with($sourceFile, $localRoot)) {
-                // Remove the local root from the start
+        // 2. INTELLIGENT PATH TRANSLATION
+        if ($remoteRoot) {
+            $remoteRoot = rtrim($remoteRoot, '\\/');
+
+            // CASE A: Input is an Absolute Path matching Local Root
+            if ($localRoot && str_starts_with($sourceFile, $localRoot)) {
                 $relativePath = substr($sourceFile, strlen($localRoot));
-                
-                // Ensure remote root doesn't end with slash and relative doesn't start with slash
-                $remoteRoot = rtrim($remoteRoot, '\\/');
                 $relativePath = ltrim($relativePath, '/\\');
-                
-                // Combine them
                 $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $relativePath;
+            }
+            // CASE B: Input is a Relative Path
+            elseif (!str_starts_with($sourceFile, '/') && !preg_match('/^[a-zA-Z]:/', $sourceFile)) {
+                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $sourceFile;
             }
         }
 
-        // FORCE WINDOWS BACKSLASHES (Critical for FFAStrans)
-        // This turns "/path/to/file" into "\path\to\file"
+        // 3. FORCE WINDOWS BACKSLASHES
         $finalPath = str_replace('/', '\\', $finalPath);
 
-        // SUBMIT
+        // 4. SUBMIT TO API
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs";
         
         $payload = [

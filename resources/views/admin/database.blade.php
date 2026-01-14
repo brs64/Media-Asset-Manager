@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <div class="space-y-6">
     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-6">Sauvegarde de la base de données</h2>
 
@@ -69,3 +72,4 @@
         </div>
     </div>
 </div>
+@endsection

@@ -14,13 +14,9 @@ use App\Models\Eleve;
 
 class AdminController extends Controller
 {
-    /**
-     * MAIN ENTRY POINT
-     * Loads ALL data for the tabbed Admin Interface
-     */
-    public function index()
+
+    public function settings()
     {
-        // --- 1. SETTINGS DATA (From config/env) ---
         $settings = [
             // URIs
             'uri_nas_pad'       => config('btsplay.uris.nas_pad'),
@@ -73,31 +69,7 @@ class AdminController extends Controller
             'disp_history'      => config('btsplay.display.history_count'),
         ];
 
-        // --- 2. LOGS DATA ---
-        // Reads the log file defined in config, or empty array if missing
-        $logPath = storage_path('logs/laravel.log'); 
-        $logs = [];
-        if (File::exists($logPath)) {
-            // Reading last 50 lines for performance
-            $file = file($logPath);
-            $logs = array_slice($file, -50);
-            if(config('btsplay.logs.recent_first')) {
-                $logs = array_reverse($logs);
-            }
-        }
-
-        // --- 3. USERS DATA (For "Gérer les utilisateurs" Tab) ---
-        $professeurs = Professeur::all();
-
-        // --- 4. STATS (Optional, keeping your old logic just in case) ---
-        $stats = [
-            'total_professeurs' => Professeur::count(),
-            'total_eleves' => Eleve::count(),
-            'total_medias' => Media::count(),
-        ];
-
-        // Returning the NEW comprehensive view
-        return view('admin.dashboard', compact('settings', 'logs', 'professeurs', 'stats'));
+        return view('admin.settings', compact('settings'));
     }
 
     /**
@@ -184,6 +156,29 @@ class AdminController extends Controller
         file_put_contents($path, $envContent);
     }
 
+    public function logs()
+    {
+        $logPath = storage_path('logs/laravel.log'); 
+        $logs = [];
+
+        if (File::exists($logPath)) {
+            $file = file($logPath);
+            $logs = array_slice($file, -50);
+            if(config('btsplay.logs.recent_first')) {
+                $logs = array_reverse($logs);
+            }
+        }
+
+        return view('admin.logs', compact('logs'));
+    }
+
+    public function users()
+    {
+        // Only fetch users when on the Users tab
+        $professeurs = Professeur::all();
+
+        return view('admin.users', compact('professeurs'));
+    }
 
     /**
      * Créer un professeur
@@ -281,6 +276,10 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
+    public function database() {
+        return view('admin.database');
+    }
+
     public function runBackup() {
         // Logic to trigger database dump
 
@@ -291,6 +290,10 @@ class AdminController extends Controller
         // Logic to save schedule
 
         return back()->with('success', 'Paramètres de sauvegarde enregistrés !');
+    }
+
+    public function reconciliation(){
+        return view('admin.reconciliation');
     }
     
     public function runReconciliation() {

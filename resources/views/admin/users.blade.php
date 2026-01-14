@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <div class="space-y-6">
     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les utilisateurs</h2>
 
@@ -98,3 +101,4 @@
         </form>
     </div>
 </div>
+@endsection

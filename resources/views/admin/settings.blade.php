@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <style>
     .hover-orange-force:hover {
         color: #E6A23C !important;
@@ -215,3 +218,4 @@
         </form>
     </div>
 </div>
+@endsection

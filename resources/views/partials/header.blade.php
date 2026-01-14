@@ -47,7 +47,7 @@
                     
                     <div class="bg-white rounded-md shadow-xl border border-gray-100 overflow-hidden text-left">
                         
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
+                        <a href="{{ route('admin.database') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
                             <img class='w-5! h-5! object-contain' src='{{ asset('/images/Parametre.png') }}'>
                             <span>Administration</span>
                         </a>
