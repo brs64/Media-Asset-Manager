@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
-use App\Http\Controllers\ExplorerController;
 use App\Services\FileExplorerService;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
             // 1. Scan Local Storage
             try {
                 // Ensure 'external_local' is defined in config/filesystems.php
-                $localTree = FileExplorerService::scanDisk('external_local');
+                $localTree = FileExplorerService::scanDisk('external_local', config('file_explorer.external_local.root'));
             } catch (\Exception $e) {
                 $localTree = [];
             }
