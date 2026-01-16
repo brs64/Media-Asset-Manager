@@ -77,6 +77,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
 
+
+
+});
+
     Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
         ->name('explorer.scan');
     Route::get('/explorer', [FileExplorerController::class, 'index'])
@@ -84,9 +88,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('/admin/media/sync', [MediaController::class, 'sync'])
         ->name('admin.media.sync');
-
-
-});
 
 /*use App\Services\FfastransService;
 Route::get('/test-connection', function (FfastransService $service) {
