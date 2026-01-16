@@ -79,6 +79,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
         ->name('explorer.scan');
+    Route::get('/explorer', [FileExplorerController::class, 'index'])
+        ->name('explorer.index');
 
     Route::get('/admin/media/sync', [MediaController::class, 'sync'])
         ->name('admin.media.sync');
