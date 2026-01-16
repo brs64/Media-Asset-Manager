@@ -147,9 +147,7 @@
                     @foreach([
                         'backup_gen' => 'URI des fichiers générés:',
                         'backup_dump' => 'URI du dump de sauvegarde:',
-                        'backup_const' => 'URI des constantes:',
                         'backup_suf_dump' => 'Suffixe fichier dump:',
-                        'backup_suf_const' => 'Suffixe fichier constantes:'
                     ] as $name => $label)
                     <div>
                         <label class="block font-bold text-gray-700 mb-1 text-sm">{{ $label }}</label>

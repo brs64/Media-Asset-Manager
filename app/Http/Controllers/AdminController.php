@@ -53,9 +53,7 @@ class AdminController extends Controller
             // Backup & Logs & Process & Display
             'backup_gen'        => config('btsplay.backup.uri_generated'),
             'backup_dump'       => config('btsplay.backup.uri_dump'),
-            'backup_const'      => config('btsplay.backup.uri_constants'),
             'backup_suf_dump'   => config('btsplay.backup.suffix_dump'),
-            'backup_suf_const'  => config('btsplay.backup.suffix_constants'),
             
             'log_general'       => config('btsplay.logs.general'),
             'log_backup'        => config('btsplay.logs.backup'),
@@ -108,9 +106,7 @@ class AdminController extends Controller
 
             'URI_FICHIER_GENERES' => $request->backup_gen,
             'URI_DUMP_SAUVEGARDE' => $request->backup_dump,
-            'URI_CONSTANTES_SAUVEGARDE' => $request->backup_const,
             'SUFFIXE_FICHIER_DUMP_SAUVEGARDE' => $request->backup_suf_dump,
-            'SUFFIXE_FICHIER_CONSTANTES_SAUVEGARDE' => $request->backup_suf_const,
 
             'NOM_FICHIER_LOG_GENERAL' => $request->log_general,
             'NOM_FICHIER_LOG_SAUVEGARDE' => $request->log_backup,
@@ -276,20 +272,58 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
-    public function database() {
-        return view('admin.database');
+    public function databaseView() {
+        // Read the log file to display in the view
+        $logPath = storage_path('logs/backup.log');
+        $backupLogs = [];
+
+        if (File::exists($logPath)) {
+            // Get last 50 lines
+            $file = file($logPath);
+            $backupLogs = array_slice($file, -50);
+        }
+
+        return view('admin.database', compact('backupLogs'));
     }
 
     public function runBackup() {
-        // Logic to trigger database dump
-
-        return back()->with('success', 'Sauvegarde lancée !');
+        try {
+            // Trigger the command manually and get exit code
+            $exitCode = Artisan::call('db:backup --type=manual');
+            
+            // Get the output to show success message
+            $output = Artisan::output();
+            
+            if ($exitCode === 0) {
+                // SUCCESS
+                $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: Success\n";
+                file_put_contents(storage_path('logs/backup.log'), $logMessage, FILE_APPEND);
+                return back()->with('success', 'Sauvegarde manuelle terminée avec succès.');
+            } else {
+                // FAILURE
+                $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: FAILED. Error: " . trim($output) . "\n";
+                file_put_contents(storage_path('logs/backup.log'), $logMessage, FILE_APPEND);
+                return back()->with('error', 'Échec de la sauvegarde. Consultez les logs.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la sauvegarde: ' . $e->getMessage());
+        }
     }
     
     public function saveBackupSettings(Request $request) {
-        // Logic to save schedule
+        $validated = $request->validate([
+            'backup_time' => 'required',
+            'backup_day' => 'required',
+            'backup_month' => 'required',
+        ]);
 
-        return back()->with('success', 'Paramètres de sauvegarde enregistrés !');
+        $this->updateEnvFile([
+            'BACKUP_TIME' => $validated['backup_time'],
+            'BACKUP_DAY'  => $validated['backup_day'],
+            'BACKUP_MONTH' => $validated['backup_month'],
+        ]);
+
+        return back()->with('success', 'Planning de sauvegarde mis à jour !');
     }
 
     public function reconciliation(){

@@ -42,8 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     
     // --- TAB 1: BASE DE DONNEES ---
-    Route::get('/', [AdminController::class, 'database'])->name('database');
-    Route::get('/database', [AdminController::class, 'database'])->name('database.index');
+    Route::get('/', [AdminController::class, 'databaseView'])->name('database');
+    Route::get('/database', [AdminController::class, 'databaseView'])->name('database.index');
 
     // --- TAB 2: TRANSFERTS ---
     Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
