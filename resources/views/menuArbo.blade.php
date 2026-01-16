@@ -1,11 +1,10 @@
 <div class="main-menuArbo">
     <div class="dossiers">
         
+        {{-- Local --}}
         <div class="menuArbo local" id="tree-local">
             <h3 class="text-white p-2 font-bold bg-gray-800">Espace Local</h3>
             <div class="tree-container">
-                {{-- @dump($localTree) --}}
-
                 @if(isset($localTree) && count($localTree) > 0)
                     @include('explorer.tree-item', ['items' => $localTree])
                 @else
@@ -14,6 +13,7 @@
             </div>
         </div>
 
+        {{-- NAS PAD --}}
         <div class="menuArbo PAD hidden" id="tree-pad">
             <h3 class="text-white p-2 font-bold bg-blue-900">NAS PAD</h3>
             <div class="tree-container">
@@ -25,6 +25,7 @@
             </div>
         </div>
 
+        {{-- NAS ARCH --}}
         <div class="menuArbo ARCH hidden" id="tree-arch">
             <h3 class="text-white p-2 font-bold bg-green-900">NAS ARCH</h3>
             <div class="tree-container">
@@ -35,8 +36,10 @@
                 @endif
             </div>
         </div>
+
     </div>
 
+    {{-- Radios pour changer la source --}}
     <div class="radio flex gap-2 p-2">
         <label class="cursor-pointer text-white">
             <input type="radio" name="source_choix" value="local" checked onclick="changerSource('local')">
@@ -47,16 +50,14 @@
             <input type="radio" name="source_choix" value="pad" onclick="changerSource('pad')">
             NAS PAD
         </label>
-        
-        {{-- Optional: Uncomment if you want the button for ARCH --}}
-        {{-- 
+
         <label class="cursor-pointer text-white">
             <input type="radio" name="source_choix" value="arch" onclick="changerSource('arch')">
             NAS ARCH
-        </label> 
-        --}}
+        </label>
     </div>
 
+    {{-- Bouton pour ouvrir/fermer le menu --}}
     <button onclick="toggleMenuArbo()" class="absolute top-2 right-[-30px] bg-gray-800 text-white p-2 rounded-r">
         <svg fill="currentColor" viewBox="0 0 16 16" width="20" height="20">
             <path fill-rule="evenodd" d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
@@ -74,34 +75,43 @@
         document.querySelector('.voile').classList.toggle('ouvert');
     };
 
-    // OPEN/CLOSE FOLDERS (Recursive)
-    window.toggleFolder = function(element) {
-        let childrenContainer = element.nextElementSibling;
-        if(childrenContainer) {
-            childrenContainer.classList.toggle('hidden');
-        }
-    };
-
     // SWITCH TABS (Local vs PAD vs ARCH)
     window.changerSource = function(source) {
-        // 1. Define all possible IDs
         const ids = ['tree-local', 'tree-pad', 'tree-arch'];
-
-        // 2. Hide ALL of them safely
         ids.forEach(function(id) {
             const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('hidden');
-            }
+            if (el) el.classList.add('hidden');
         });
-        
-        // 3. Show only the selected one safely
         const target = document.getElementById('tree-' + source);
-        if (target) {
-            target.classList.remove('hidden');
-        } else {
-            console.warn("Target tab not found: " + source);
+        if (target) target.classList.remove('hidden');
+    };
+
+    // LOAD FOLDER AU CLIC (lazy-loading)
+    window.loadFolder = function(el) {
+        const container = el.nextElementSibling;
+
+        // Toggle si déjà chargé
+        if (container.dataset.loaded === '1') {
+            container.classList.toggle('hidden');
+            return;
         }
-    }
+
+        const disk = el.dataset.disk;
+        const path = el.dataset.path;
+
+        container.classList.remove('hidden');
+        container.innerHTML = '<div class="text-gray-400 text-sm">Chargement…</div>';
+
+        fetch(`/explorer/scan?disk=${encodeURIComponent(disk)}&path=${encodeURIComponent(path)}`)
+            .then(res => res.text())
+            .then(html => {
+                container.innerHTML = html;
+                container.dataset.loaded = '1';
+            })
+            .catch(err => {
+                console.error('Erreur fetch:', err);
+                container.innerHTML = '<div class="text-red-400 text-sm">Erreur de chargement</div>';
+            });
+    };
 </script>
 @endpush
