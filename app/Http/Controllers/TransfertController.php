@@ -14,20 +14,22 @@ class TransfertController extends Controller
         $this->ffastrans = $ffastrans;
     }
 
-    /**
-     * Display the Live Dashboard
-     */
     public function index()
     {
-        try {
-            // Get the list directly from the Service (API)
-            $transfers = $this->ffastrans->getFullStatusList();
-        } catch (\Exception $e) {
-            $transfers = [];
-            session()->flash('error', 'Impossible de contacter le serveur FFAStrans.');
-        }
+        return view('admin.transferts');
+    }
 
-        return view('admin.transfers', compact('transfers'));
+    /**
+     * Display the list of videos in transfer
+     */
+    public function list()
+{
+        try {
+            $transfers = $this->ffastrans->getFullStatusList();
+            return response()->json($transfers);
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
     }
 
     /**

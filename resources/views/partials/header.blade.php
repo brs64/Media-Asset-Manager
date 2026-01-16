@@ -52,7 +52,7 @@
                             <span>Profil</span>
                         </a>
 
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
+                        <a href="{{ route('admin.database') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
                             <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i>
                             <span>Administration</span>
                         </a>

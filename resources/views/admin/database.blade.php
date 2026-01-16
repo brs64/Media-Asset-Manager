@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <div class="space-y-6">
     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-6">Sauvegarde de la base de données</h2>
 
@@ -11,29 +14,31 @@
                     @csrf
                     <div>
                         <label class="block font-bold text-gray-700 mb-1 text-sm">Heure d'exécution :</label>
-                        <input type="time" name="backup_time" value="00:00" class="w-full rounded border-gray-300 shadow-sm">
+                        <input type="time" name="backup_time" value="{{ env('BACKUP_TIME', '00:00') }}" class="w-full rounded border-gray-300 shadow-sm">
                     </div>
 
                     <div>
                         <label class="block font-bold text-gray-700 mb-1 text-sm">Jour d'exécution :</label>
                         <select name="backup_day" class="w-full rounded border-gray-300 shadow-sm">
-                            <option value="*">Tous les jours</option>
-                            <option value="1">Lundi</option>
-                            <option value="2">Mardi</option>
-                            <option value="3">Mercredi</option>
-                            <option value="4">Jeudi</option>
-                            <option value="5">Vendredi</option>
-                            <option value="6">Samedi</option>
-                            <option value="0">Dimanche</option>
+                            <option value="*" {{ env('BACKUP_DAY') == '*' ? 'selected' : '' }}>Tous les jours</option>
+                            <option value="1" {{ env('BACKUP_DAY') == '1' ? 'selected' : '' }}>Lundi</option>
+                            <option value="2" {{ env('BACKUP_DAY') == '2' ? 'selected' : '' }}>Mardi</option>
+                            <option value="3" {{ env('BACKUP_DAY') == '3' ? 'selected' : '' }}>Mercredi</option>
+                            <option value="4" {{ env('BACKUP_DAY') == '4' ? 'selected' : '' }}>Jeudi</option>
+                            <option value="5" {{ env('BACKUP_DAY') == '5' ? 'selected' : '' }}>Vendredi</option>
+                            <option value="6" {{ env('BACKUP_DAY') == '6' ? 'selected' : '' }}>Samedi</option>
+                            <option value="0" {{ env('BACKUP_DAY') == '0' ? 'selected' : '' }}>Dimanche</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block font-bold text-gray-700 mb-1 text-sm">Mois d'exécution :</label>
                         <select name="backup_month" class="w-full rounded border-gray-300 shadow-sm">
-                            <option value="*">Tous les mois</option>
+                            <option value="*" {{ env('BACKUP_MONTH') == '*' ? 'selected' : '' }}>Tous les mois</option>
                             @foreach(range(1, 12) as $m)
-                                <option value="{{ $m }}">{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
+                                <option value="{{ $m }}" {{ env('BACKUP_MONTH') == $m ? 'selected' : '' }}>
+                                    {{ DateTime::createFromFormat('!m', $m)->format('F') }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -69,3 +74,4 @@
         </div>
     </div>
 </div>
+@endsection

@@ -39,36 +39,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Routes admin (uniquement pour les professeurs)
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     
-    // --- 1. The Main Dashboard (Loads ALL Tabs) ---
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
-    // --- 2. Settings Update 
-    Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
-    // --- 3. Actions (Create/Delete) ---
-    // Professeurs Actions
-    Route::post('/professeurs', [AdminController::class, 'createProfesseur'])->name('admin.professeurs.create');
-    Route::delete('/professeurs/{id}', [AdminController::class, 'deleteProfesseur'])->name('admin.professeurs.delete');
-    // Admins Actions
-    Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('admin.backup.run');
-    Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('admin.backup.save');
-    Route::post('/reconciliation', [AdminController::class, 'runReconciliation'])->name('admin.reconciliation.run');
-    Route::get('/logs/download', [AdminController::class, 'downloadLogs'])->name('admin.logs.download');
-    // Eleves Actions
-    Route::post('/eleves', [AdminController::class, 'createEleve'])->name('admin.eleves.create');
-    Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('admin.eleves.delete');
-    // Projets Actions
-    Route::post('/projets', [AdminController::class, 'createProjet'])->name('admin.projets.create');
-    Route::delete('/projets/{id}', [AdminController::class, 'deleteProjet'])->name('admin.projets.delete');
+    // --- TAB 1: BASE DE DONNEES ---
+    Route::get('/', [AdminController::class, 'databaseView'])->name('database');
+    Route::get('/database', [AdminController::class, 'databaseView'])->name('database.index');
 
-    // PAGE: Dashboard Transferts
-    Route::get('/transferts', [TransfertController::class, 'index'])->name('admin.transfers.index');
+    // --- TAB 2: TRANSFERTS ---
+    Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
+    Route::get('/transferts/list', [TransfertController::class, 'list'])->name('transfers.list');
+    Route::get('/transferts/status/{jobId}', [TransfertController::class, 'checkStatus'])->name('transfers.status');
+    Route::post('/transferts/cancel/{jobId}', [TransfertController::class, 'cancel'])->name('transfers.cancel');
 
-    // AJAX: Status Polling
-    Route::get('/transferts/status/{jobId}', [TransfertController::class, 'checkStatus'])->name('admin.transfers.status');
+    // --- TAB 3: RECONCILIATION ---
+    Route::get('/reconciliation', [AdminController::class, 'reconciliation'])->name('reconciliation');
+    Route::post('/reconciliation', [AdminController::class, 'runReconciliation'])->name('reconciliation.run');
 
-    // ACTION: Cancel Job
-    Route::post('/transferts/cancel/{jobId}', [TransfertController::class, 'cancel'])->name('admin.transfers.cancel');
+    // --- TAB 4: PARAMETRAGE (Settings) ---
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+    Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+
+    // --- TAB 5: LOGS ---
+    Route::get('/logs', [AdminController::class, 'logs'])->name('logs');
+    Route::get('/logs/download', [AdminController::class, 'downloadLogs'])->name('logs.download');
+
+    // --- TAB 6: UTILISATEURS ---
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    // User Actions
+    Route::post('/professeurs', [AdminController::class, 'createProfesseur'])->name('professeurs.create');
+    Route::delete('/professeurs/{id}', [AdminController::class, 'deleteProfesseur'])->name('professeurs.delete');
+    Route::post('/eleves', [AdminController::class, 'createEleve'])->name('eleves.create');
+    Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('eleves.delete');
+
+    // --- BACKUP ACTIONS ---
+    Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
+    Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
 });
 
 /*use App\Services\FfastransService;

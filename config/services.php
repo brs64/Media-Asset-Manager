@@ -39,6 +39,8 @@ return [
         'url' => env('FFASTRANS_URL', 'http://localhost:65445'),
         'user' => env('FFASTRANS_USER'),
         'password' => env('FFASTRANS_PASSWORD'),
+        'path_local'  => env('FFASTRANS_PATH_LOCAL'),
+        'path_remote' => env('FFASTRANS_PATH_REMOTE'),
     ],
 
 ];

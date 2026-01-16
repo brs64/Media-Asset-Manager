@@ -14,13 +14,9 @@ use App\Models\Eleve;
 
 class AdminController extends Controller
 {
-    /**
-     * MAIN ENTRY POINT
-     * Loads ALL data for the tabbed Admin Interface
-     */
-    public function index()
+
+    public function settings()
     {
-        // --- 1. SETTINGS DATA (From config/env) ---
         $settings = [
             // URIs
             'uri_nas_pad'       => config('btsplay.uris.nas_pad'),
@@ -57,9 +53,7 @@ class AdminController extends Controller
             // Backup & Logs & Process & Display
             'backup_gen'        => config('btsplay.backup.uri_generated'),
             'backup_dump'       => config('btsplay.backup.uri_dump'),
-            'backup_const'      => config('btsplay.backup.uri_constants'),
             'backup_suf_dump'   => config('btsplay.backup.suffix_dump'),
-            'backup_suf_const'  => config('btsplay.backup.suffix_constants'),
             
             'log_general'       => config('btsplay.logs.general'),
             'log_backup'        => config('btsplay.logs.backup'),
@@ -73,31 +67,7 @@ class AdminController extends Controller
             'disp_history'      => config('btsplay.display.history_count'),
         ];
 
-        // --- 2. LOGS DATA ---
-        // Reads the log file defined in config, or empty array if missing
-        $logPath = storage_path('logs/laravel.log'); 
-        $logs = [];
-        if (File::exists($logPath)) {
-            // Reading last 50 lines for performance
-            $file = file($logPath);
-            $logs = array_slice($file, -50);
-            if(config('btsplay.logs.recent_first')) {
-                $logs = array_reverse($logs);
-            }
-        }
-
-        // --- 3. USERS DATA (For "Gérer les utilisateurs" Tab) ---
-        $professeurs = Professeur::all();
-
-        // --- 4. STATS (Optional, keeping your old logic just in case) ---
-        $stats = [
-            'total_professeurs' => Professeur::count(),
-            'total_eleves' => Eleve::count(),
-            'total_medias' => Media::count(),
-        ];
-
-        // Returning the NEW comprehensive view
-        return view('admin.dashboard', compact('settings', 'logs', 'professeurs', 'stats'));
+        return view('admin.settings', compact('settings'));
     }
 
     /**
@@ -136,9 +106,7 @@ class AdminController extends Controller
 
             'URI_FICHIER_GENERES' => $request->backup_gen,
             'URI_DUMP_SAUVEGARDE' => $request->backup_dump,
-            'URI_CONSTANTES_SAUVEGARDE' => $request->backup_const,
             'SUFFIXE_FICHIER_DUMP_SAUVEGARDE' => $request->backup_suf_dump,
-            'SUFFIXE_FICHIER_CONSTANTES_SAUVEGARDE' => $request->backup_suf_const,
 
             'NOM_FICHIER_LOG_GENERAL' => $request->log_general,
             'NOM_FICHIER_LOG_SAUVEGARDE' => $request->log_backup,
@@ -184,6 +152,29 @@ class AdminController extends Controller
         file_put_contents($path, $envContent);
     }
 
+    public function logs()
+    {
+        $logPath = storage_path('logs/laravel.log'); 
+        $logs = [];
+
+        if (File::exists($logPath)) {
+            $file = file($logPath);
+            $logs = array_slice($file, -50);
+            if(config('btsplay.logs.recent_first')) {
+                $logs = array_reverse($logs);
+            }
+        }
+
+        return view('admin.logs', compact('logs'));
+    }
+
+    public function users()
+    {
+        // Only fetch users when on the Users tab
+        $professeurs = Professeur::all();
+
+        return view('admin.users', compact('professeurs'));
+    }
 
     /**
      * Créer un professeur
@@ -281,16 +272,62 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
-    public function runBackup() {
-        // Logic to trigger database dump
+    public function databaseView() {
+        // Read the log file to display in the view
+        $logPath = storage_path('logs/backup.log');
+        $backupLogs = [];
 
-        return back()->with('success', 'Sauvegarde lancée !');
+        if (File::exists($logPath)) {
+            // Get last 50 lines
+            $file = file($logPath);
+            $backupLogs = array_slice($file, -50);
+        }
+
+        return view('admin.database', compact('backupLogs'));
+    }
+
+    public function runBackup() {
+        try {
+            // Trigger the command manually and get exit code
+            $exitCode = Artisan::call('db:backup --type=manual');
+            
+            // Get the output to show success message
+            $output = Artisan::output();
+            
+            if ($exitCode === 0) {
+                // SUCCESS
+                $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: Success\n";
+                file_put_contents(storage_path('logs/backup.log'), $logMessage, FILE_APPEND);
+                return back()->with('success', 'Sauvegarde manuelle terminée avec succès.');
+            } else {
+                // FAILURE
+                $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: FAILED. Error: " . trim($output) . "\n";
+                file_put_contents(storage_path('logs/backup.log'), $logMessage, FILE_APPEND);
+                return back()->with('error', 'Échec de la sauvegarde. Consultez les logs.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la sauvegarde: ' . $e->getMessage());
+        }
     }
     
     public function saveBackupSettings(Request $request) {
-        // Logic to save schedule
+        $validated = $request->validate([
+            'backup_time' => 'required',
+            'backup_day' => 'required',
+            'backup_month' => 'required',
+        ]);
 
-        return back()->with('success', 'Paramètres de sauvegarde enregistrés !');
+        $this->updateEnvFile([
+            'BACKUP_TIME' => $validated['backup_time'],
+            'BACKUP_DAY'  => $validated['backup_day'],
+            'BACKUP_MONTH' => $validated['backup_month'],
+        ]);
+
+        return back()->with('success', 'Planning de sauvegarde mis à jour !');
+    }
+
+    public function reconciliation(){
+        return view('admin.reconciliation');
     }
     
     public function runReconciliation() {

@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <div class="text-center max-w-4xl mx-auto py-10">
     
     <div class="border-b-2 border-[#b91c1c] mb-10 pb-4">
@@ -26,3 +29,4 @@
         </form>
     </div>
 </div>
+@endsection

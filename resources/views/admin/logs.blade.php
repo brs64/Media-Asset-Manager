@@ -1,3 +1,6 @@
+@extends('layouts.admin')
+
+@section('tab_content')
 <div class="flex flex-col h-full">
     <div class="border-b border-gray-200 pb-4 mb-4 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">Consulter les logs</h2>
@@ -20,3 +23,4 @@
         </a>
     </div>
 </div>
+@endsection
