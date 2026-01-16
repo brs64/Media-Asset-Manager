@@ -7,6 +7,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThumbnailController;
+use App\Http\Controllers\FileExplorerController;
+
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique
@@ -74,6 +76,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // --- BACKUP ACTIONS ---
     Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
+
+    Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
+        ->name('explorer.scan');
+
+    Route::get('/admin/media/sync', [MediaController::class, 'sync'])
+        ->name('admin.media.sync');
+
+
 });
 
 /*use App\Services\FfastransService;
