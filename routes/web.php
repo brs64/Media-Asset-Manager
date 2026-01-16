@@ -91,7 +91,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/explorer', [FileExplorerController::class, 'index'])
         ->name('explorer.index');
 
-    Route::get('/admin/media/sync', [MediaController::class, 'sync'])
+    Route::post('/admin/media/sync', [MediaController::class, 'sync'])
         ->name('admin.media.sync');
 
 /*use App\Services\FfastransService;
