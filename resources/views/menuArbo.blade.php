@@ -1,8 +1,11 @@
 <div class="main-menuArbo">
     <div class="dossiers">
-        
+
         {{-- Local --}}
-        <div class="menuArbo local" id="tree-local">
+        <div class="menuArbo local"
+             id="tree-local"
+             data-disk="external_local"
+             data-loaded="0">
             <h3 class="text-white p-2 font-bold bg-gray-800">Espace Local</h3>
             <div class="tree-container">
                 @if(isset($localTree) && count($localTree) > 0)
@@ -14,27 +17,21 @@
         </div>
 
         {{-- NAS PAD --}}
-        <div class="menuArbo PAD hidden" id="tree-pad">
+        <div class="menuArbo PAD hidden"
+             id="tree-pad"
+             data-disk="ftp_pad"
+             data-loaded="0">
             <h3 class="text-white p-2 font-bold bg-blue-900">NAS PAD</h3>
-            <div class="tree-container">
-                @if(isset($nasPadTree) && count($nasPadTree) > 0)
-                    @include('explorer.tree-item', ['items' => $nasPadTree])
-                @else
-                    <p class="text-white p-4 italic text-sm">Non connecté ou vide.</p>
-                @endif
-            </div>
+            <div class="tree-container"></div>
         </div>
 
         {{-- NAS ARCH --}}
-        <div class="menuArbo ARCH hidden" id="tree-arch">
+        <div class="menuArbo ARCH hidden"
+             id="tree-arch"
+             data-disk="ftp_mpeg"
+             data-loaded="0">
             <h3 class="text-white p-2 font-bold bg-green-900">NAS ARCH</h3>
-            <div class="tree-container">
-                @if(isset($nasArchTree) && count($nasArchTree) > 0)
-                    @include('explorer.tree-item', ['items' => $nasArchTree])
-                @else
-                    <p class="text-white p-4 italic text-sm">Non connecté ou vide.</p>
-                @endif
-            </div>
+            <div class="tree-container"></div>
         </div>
 
     </div>
@@ -69,24 +66,55 @@
 
 @push('scripts')
 <script>
+
+    window.fileExplorerConfig = {
+        local: @json(config('filesystems.disks.external_local.root')),
+        pad: @json(config('filesystems.disks.ftp_pad.root')),
+        arch: @json(config('filesystems.disks.ftp_mpeg.root'))
+    };
+
     // OPEN/CLOSE MENU
     window.toggleMenuArbo = function() {
         document.querySelector('.main-menuArbo').classList.toggle('ouvert');
         document.querySelector('.voile').classList.toggle('ouvert');
     };
 
-    // SWITCH TABS (Local vs PAD vs ARCH)
+    // SWITCH TABS + AJAX LOAD
     window.changerSource = function(source) {
-        const ids = ['tree-local', 'tree-pad', 'tree-arch'];
-        ids.forEach(function(id) {
-            const el = document.getElementById(id);
+        const ids = ['local', 'pad', 'arch'];
+
+        ids.forEach(id => {
+            const el = document.getElementById('tree-' + id);
             if (el) el.classList.add('hidden');
         });
+
         const target = document.getElementById('tree-' + source);
-        if (target) target.classList.remove('hidden');
+        if (!target) return;
+
+        target.classList.remove('hidden');
+        if (target.dataset.loaded === '1') return;
+
+        const disk = target.dataset.disk;
+        const container = target.querySelector('.tree-container');
+        const path = window.fileExplorerConfig[source] || '/';
+
+        container.innerHTML = '<div class="text-gray-400 text-sm p-4">Chargement…</div>';
+
+        fetch(`/explorer/scan?disk=${encodeURIComponent(disk)}&path=${encodeURIComponent(path)}`)
+            .then(res => res.text())
+            .then(html => {
+                container.innerHTML = html;
+                target.dataset.loaded = '1';
+            })
+            .catch(err => {
+                console.error(err);
+                container.innerHTML =
+                    '<div class="text-red-400 text-sm p-4">Erreur de chargement</div>';
+            });
     };
 
-    // LOAD FOLDER AU CLIC (lazy-loading)
+
+    // LOAD FOLDER AU CLIC (lazy-loading des sous-dossiers)
     window.loadFolder = function(el) {
         const container = el.nextElementSibling;
 
@@ -100,7 +128,7 @@
         const path = el.dataset.path;
 
         container.classList.remove('hidden');
-        container.innerHTML = '<div class="text-gray-400 text-sm">Chargement…</div>';
+        container.innerHTML = '<div class="text-gray-400 text-sm p-2">Chargement…</div>';
 
         fetch(`/explorer/scan?disk=${encodeURIComponent(disk)}&path=${encodeURIComponent(path)}`)
             .then(res => res.text())
@@ -110,7 +138,7 @@
             })
             .catch(err => {
                 console.error('Erreur fetch:', err);
-                container.innerHTML = '<div class="text-red-400 text-sm">Erreur de chargement</div>';
+                container.innerHTML = '<div class="text-red-400 text-sm p-2">Erreur de chargement</div>';
             });
     };
 </script>

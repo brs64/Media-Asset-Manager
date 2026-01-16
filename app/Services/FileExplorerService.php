@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class FileExplorerService
 {
@@ -12,47 +13,86 @@ class FileExplorerService
      *  - les dossiers
      *  - les fichiers vidéos
      */
-    public static function scanDisk(string $diskName, string $directory = '/'): array
+    public static function scanDisk(string $diskName, string $directory): array
     {
+        // On nettoie le chemin
+        $directory = rtrim($directory, '/\\');
+
+        // Cas particulier : disque local absolu (Windows / Linux)
+        if ($diskName === 'external_local') {
+            if (!is_dir($directory)) {
+                return []; // chemin inexistant
+            }
+
+            $results = [];
+            foreach (scandir($directory) as $file) {
+                if ($file === '.' || $file === '..') continue;
+                $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
+
+                if (is_dir($fullPath)) {
+                    $results[] = [
+                        'type' => 'folder',
+                        'name' => $file,
+                        'path' => $fullPath,
+                        'disk' => $diskName,
+                    ];
+                } elseif (self::isVideo($file)) {
+                    $results[] = [
+                        'type' => 'video',
+                        'name' => $file,
+                        'path' => $fullPath,
+                        'disk' => $diskName,
+                        'id' => null,
+                    ];
+                }
+            }
+
+            // Tri alphabétique
+            usort($results, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+
+            return $results;
+        }
+
+        // Cas normal : NAS / FTP / disque Laravel
         $disk = Storage::disk($diskName);
         $results = [];
 
-        echo "<script>console.log($diskName; $directory)</script>";
+        try {
+            $directories = $disk->directories($directory);
+            sort($directories);
 
-        // 📁 Dossiers
-        $directories = $disk->directories($directory);
-        sort($directories);
-
-        foreach ($directories as $dirPath) {
-            $results[] = [
-                'type' => 'folder',
-                'name' => basename($dirPath),
-                'path' => $dirPath,
-                'disk' => $diskName,
-            ];
-        }
-
-        // 🎬 Fichiers vidéos uniquement
-        $files = $disk->files($directory);
-        sort($files);
-
-        foreach ($files as $filePath) {
-            $fileName = basename($filePath);
-
-            // fichiers cachés ou non vidéos
-            if ($fileName === '.gitkeep' || str_starts_with($fileName, '.')) {
-                continue;
-            }
-
-            if (self::isVideo($fileName)) {
+            foreach ($directories as $dirPath) {
                 $results[] = [
-                    'type' => 'video',
-                    'name' => $fileName,
-                    'path' => $filePath,
+                    'type' => 'folder',
+                    'name' => basename($dirPath),
+                    'path' => $dirPath,
                     'disk' => $diskName,
-                    'id'   => null, // prêt pour ton helper legacy
                 ];
             }
+
+            $files = $disk->files($directory);
+            sort($files);
+
+            foreach ($files as $filePath) {
+                $fileName = basename($filePath);
+
+                if ($fileName === '.gitkeep' || str_starts_with($fileName, '.')) {
+                    continue;
+                }
+
+                if (self::isVideo($fileName)) {
+                    $results[] = [
+                        'type' => 'video',
+                        'name' => $fileName,
+                        'path' => $filePath,
+                        'disk' => $diskName,
+                        'id'   => null,
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            // Si erreur FTP ou disque inaccessible, on renvoie vide
+            return [];
         }
 
         return $results;
