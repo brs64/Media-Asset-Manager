@@ -61,6 +61,6 @@ class FileExplorerService
      */
     public static function isVideo(string $filename): bool
     {
-        return preg_match('/\.(mp4|mov|avi|mkv|webm|m4v)$/i', $filename);
+        return preg_match('/\.(mp4|mov|avi|mkv|webm|m4v|mxf)$/i', $filename);
     }
 }
