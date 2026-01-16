@@ -17,6 +17,8 @@ class FileExplorerService
         $disk = Storage::disk($diskName);
         $results = [];
 
+        echo "<script>console.log($diskName " / " $directory);</script>";
+
         // 📁 Dossiers
         $directories = $disk->directories($directory);
         sort($directories);
