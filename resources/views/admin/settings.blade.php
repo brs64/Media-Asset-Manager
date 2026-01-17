@@ -181,15 +181,15 @@
             </section>
             
             <section id="section-multi" class="scroll-mt-32">
-                <h3 class="text-lg font-bold text-[#b91c1c] border-b border-[#b91c1c] mb-4">Multiprocessing</h3>
+                <h3 class="text-lg font-bold text-[#b91c1c] border-b border-[#b91c1c] mb-4">Configuration FFAStrans :</h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1 text-sm">Nombre maximum de processus de transfert:</label>
-                        <input type="number" name="proc_transfer" value="{{ $settings['proc_transfer'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
+                        <label class="block font-bold text-gray-700 mb-1 text-sm">Nombre maximum de vidéos à traiter:</label>
+                        <input type="number" name="max_videos" value="{{ $settings['max_videos'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1 text-sm">Nombre maximum de sous-processus de transfert:</label>
-                        <input type="number" name="proc_sub" value="{{ $settings['proc_sub'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
+                        <label class="block font-bold text-gray-700 mb-1 text-sm">ID du Workflow :</label>
+                        <input type="number" name="workflow_id" value="{{ $settings['workflow_id'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
                     </div>
                 </div>
             </section>

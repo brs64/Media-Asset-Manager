@@ -60,8 +60,8 @@ class AdminController extends Controller
             'log_lines'         => config('btsplay.logs.max_lines'),
             'log_recent'        => config('btsplay.logs.recent_first'),
 
-            'proc_transfer'     => config('btsplay.process.max_transfer'),
-            'proc_sub'          => config('btsplay.process.max_sub_transfer'),
+            'max_videos'        => config('btsplay.process.max_videos'),
+            'Workflow_id'       => config('btsplay.process.workflow_id'),
 
             'disp_swiper'       => config('btsplay.display.swiper_count'),
             'disp_history'      => config('btsplay.display.history_count'),
@@ -113,8 +113,8 @@ class AdminController extends Controller
             'NB_LIGNES_LOGS' => $request->log_lines,
             'AFFICHAGE_LOGS_PLUS_RECENTS_PREMIERS' => $request->has('log_recent') ? 'true' : 'false',
 
-            'NB_MAX_PROCESSUS_TRANSFERT' => $request->proc_transfer,
-            'NB_MAX_SOUS_PROCESSUS_TRANSFERT' => $request->proc_sub,
+            'NB_VIDEOS_FFASTRANS' => $request->max_videos,
+            'WORKFLOW_ID' => $request->workflow_id,
 
             'NB_VIDEOS_PAR_SWIPER' => $request->disp_swiper,
             'NB_VIDEOS_HISTORIQUE_TRANSFERT' => $request->disp_history,

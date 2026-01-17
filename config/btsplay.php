@@ -32,9 +32,7 @@ return [
     'backup' => [
         'uri_generated'    => env('URI_FICHIER_GENERES'),
         'uri_dump'         => env('URI_DUMP_SAUVEGARDE'),
-        'uri_constants'    => env('URI_CONSTANTES_SAUVEGARDE'),
         'suffix_dump'      => env('SUFFIXE_FICHIER_DUMP_SAUVEGARDE'),
-        'suffix_constants' => env('SUFFIXE_FICHIER_CONSTANTES_SAUVEGARDE'),
     ],
     'logs' => [
         'general'       => env('NOM_FICHIER_LOG_GENERAL'),
@@ -43,8 +41,8 @@ return [
         'recent_first'  => env('AFFICHAGE_LOGS_PLUS_RECENTS_PREMIERS'),
     ],
     'process' => [
-        'max_transfer'      => env('NB_MAX_PROCESSUS_TRANSFERT'),
-        'max_sub_transfer'  => env('NB_MAX_SOUS_PROCESSUS_TRANSFERT'),
+        'max_videos'      => env('NB_VIDEOS_FFASTRANS'),
+        'workflow_id'  => env('WORKFLOW_ID'),
     ],
     'display' => [
         'swiper_count'  => env('NB_VIDEOS_PAR_SWIPER'),

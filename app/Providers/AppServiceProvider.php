@@ -40,9 +40,9 @@ class AppServiceProvider extends ServiceProvider
                 $nasPadTree = [];
             }
 
-            // 3. Scan FTP MPEG (formerly ARCH)
+            // 3. Scan FTP ARCH
             try {
-                $nasArchTree = FileExplorerService::scanDisk('ftp_mpeg');
+                $nasArchTree = FileExplorerService::scanDisk('ftp_arch');
             } catch (\Exception $e) {
                 $nasArchTree = [];
             }

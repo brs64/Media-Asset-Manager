@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\FfastransService;
+use App\Services\FileExplorerService;
+use App\Models\Media;
+use Illuminate\Support\Facades\Log;
 
 class TransfertController extends Controller
 {
@@ -16,20 +19,120 @@ class TransfertController extends Controller
 
     public function index()
     {
-        return view('admin.transferts');
+        $maxConcurrent = env('NB_MAX_PROCESSUS_TRANSFERT');
+
+        return view('admin.transferts', compact('maxConcurrent'));
     }
 
     /**
      * Display the list of videos in transfer
      */
     public function list()
-{
+    {
         try {
-            $transfers = $this->ffastrans->getFullStatusList();
-            return response()->json($transfers);
+            // 1. Get Active Jobs from FFAStrans
+            $activeJobs = $this->ffastrans->getFullStatusList();
+            
+            $activeMap = [];
+            foreach ($activeJobs as $job) {
+                $activeMap[$job['filename']] = $job;
+            }
+
+            // 2. Get Target Folder from .env
+            $targetFolder = trim(env('URI_RACINE_NAS_PAD'), '/'); 
+            
+            // 3. Scan the Disk (Reusing your Service)
+            $rawTree = FileExplorerService::scanDisk('ftp_pad', $targetFolder);
+            $flatFiles = $this->flattenTree($rawTree);
+
+            // 4. Build the Unified List
+            $unifiedList = [];
+            $dbColumn = 'URI_NAS_MPEG'; // Need to change it to URI_LOCAL possibly
+
+            foreach ($flatFiles as $file) {
+                if ($file['type'] !== 'video') continue;
+
+                $filename = $file['name'];
+                $path = $file['path'];
+
+                // A. Check if this file is already in the Database (Archived/Done previously)
+                if (Media::where($dbColumn, $path)->exists()) {
+                    continue; 
+                }
+
+                // B. Check if it is currently processing (Active Job)
+                if (isset($activeMap[$filename])) {
+                    // IT IS RUNNING: Use the data from FFAStrans
+                    $job = $activeMap[$filename];
+                    $unifiedList[] = [
+                        'filename' => $filename,
+                        'path'     => $path,
+                        'disk'     => 'ftp_pad',
+                        'job_id'   => $job['id'],        // Exists -> Shows Progress Bar
+                        'status'   => $job['status'],
+                        'progress' => $job['progress'],
+                        'finished' => $job['is_finished']
+                    ];
+                } else {
+                    // IT IS PENDING: Use default data
+                    $unifiedList[] = [
+                        'filename' => $filename,
+                        'path'     => $path,
+                        'disk'     => 'ftp_pad',
+                        'job_id'   => null,              // Null -> Shows Start Button
+                        'status'   => 'En attente',
+                        'progress' => 0,
+                        'finished' => false
+                    ];
+                }
+            }
+
+            return response()->json($unifiedList);
+
         } catch (\Exception $e) {
-            return response()->json([], 500);
+            Log::error("List Error: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function startJob(Request $request)
+    {
+        $filePath = $request->input('path');
+        $workflowId = env('WORKFLOW_ID'); 
+
+        $directoryPath = dirname($filePath);
+        $windowsDirectory = str_replace('/', '\\', $directoryPath);
+
+        $variables = [
+            [
+                'name' => 'project_path', 
+                'data' => $windowsDirectory
+            ]
+        ];
+
+        try {
+            $response = $this->ffastrans->submitJob($filePath, $workflowId, $variables);
+            
+            return response()->json([
+                'success' => true,
+                'job_id' => $response['job_id'] ?? 'unknown',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    private function flattenTree($nodes) {
+        $result = [];
+        foreach ($nodes as $node) {
+            if ($node['type'] === 'folder') {
+                $result = array_merge($result, $this->flattenTree($node['children']));
+            } else {
+                $result[] = $node;
+            }
+        }
+        return $result;
     }
 
     /**

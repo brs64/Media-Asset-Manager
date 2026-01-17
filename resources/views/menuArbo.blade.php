@@ -48,13 +48,10 @@
             NAS PAD
         </label>
         
-        {{-- Optional: Uncomment if you want the button for ARCH --}}
-        {{-- 
         <label class="cursor-pointer text-white">
             <input type="radio" name="source_choix" value="arch" onclick="changerSource('arch')">
             NAS ARCH
-        </label> 
-        --}}
+        </label>
     </div>
 
     <button onclick="toggleMenuArbo()" class="absolute top-2 right-[-30px] bg-gray-800 text-white p-2 rounded-r">
