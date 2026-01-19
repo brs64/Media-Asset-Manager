@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
-use App\Http\Controllers\ExplorerController;
 use App\Services\FileExplorerService;
+use App\http\Controllers\FileExplorerController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,35 +23,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // View Composer: Run this logic EVERY time 'menuArbo' is loaded
+        
+    // View Composer: Run this logic EVERY time 'menuArbo' is loaded
+
         View::composer('menuArbo', function ($view) {
             
-            // 1. Scan Local Storage
+
+            // UNIQUEMENT local (rapide)
             try {
-                // Ensure 'external_local' is defined in config/filesystems.php
-                $localTree = FileExplorerService::scanDisk('external_local');
-            } catch (\Exception $e) {
+            $directory = config('filesystems.disks.external_local.root'); // => /mnt/archivage
+            $localTree = FileExplorerService::scanDisk('external_local', $directory);
+
+            } catch (\Throwable $e) {
                 $localTree = [];
             }
 
-            // 2. Scan FTP PAD
-            try {
-                $nasPadTree = FileExplorerService::scanDisk('ftp_pad');
-            } catch (\Exception $e) {
-                $nasPadTree = [];
-            }
-
-            // 3. Scan FTP ARCH
-            try {
-                $nasArchTree = FileExplorerService::scanDisk('ftp_arch');
-            } catch (\Exception $e) {
-                $nasArchTree = [];
-            }
-
-            // Inject variables into the view
-            $view->with('localTree', $localTree);
-            $view->with('nasPadTree', $nasPadTree);
-            $view->with('nasArchTree', $nasArchTree);
+            // PAS de FTP ici
+            $view->with([
+                'localTree' => $localTree,
+                'nasPadTree' => [],
+                'nasArchTree' => [],
+            ]);
         });
     }
 }

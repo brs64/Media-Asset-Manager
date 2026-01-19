@@ -187,7 +187,30 @@ button {
 .player{
     width: 100%;
     height: auto;
-} 
+    aspect-ratio: 16/9;
+    background: #000;
+}
+
+/* Styles spécifiques pour Plyr */
+.plyr {
+    width: 100%;
+    height: 100%;
+}
+
+.plyr--video {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.plyr__video-wrapper {
+    background: #000;
+}
+
+.plyr video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 
 .metadata {
     display: flex;

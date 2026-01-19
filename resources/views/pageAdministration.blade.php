@@ -138,7 +138,7 @@
                         </div> 
                     </div>
                     <div class="symbol-container">
-                        <img src='{{ asset('ressources/Images/avance-rapide.png') }}' alt="Symbole de transfert">
+                        <i class="fa-solid fa-forward-fast fa-2x"></i>
                     </div>
                     <div class="table-container">
                         <table>
@@ -222,7 +222,7 @@
                 <div class="input-with-icon">
                     <input type="password" id="password_nas_pad" name="password_nas_pad" value="{{ PASSWORD_NAS_PAD }}" pattern="^\S+$" title="Les espaces ne sont pas autorisés" class="form-input" required>
                     <button type="button" onclick="afficherMotDePasse('password_nas_pad', 'eye_pad')" class="password-toggle-button">
-                        <img id="eye_pad" src="{{ asset('ressources/Images/eye-closed.png') }}" alt="Afficher/Masquer" class="eye-icon">
+                        <i id="eye_pad" class="fa-solid fa-eye-slash eye-icon"></i>
                     </button>
                 </div><br>
                 {{-- Suite des inputs FTP (NAS PAD SUP, NAS ARCH, NAS DIFF) --}}

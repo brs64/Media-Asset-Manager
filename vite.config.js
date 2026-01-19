@@ -19,7 +19,8 @@ export default defineConfig({
                 'resources/css/sauvegarde.css',
                 'resources/css/transfert.css',
                 'resources/css/video.css',
-                'resources/js/app.js'
+                'resources/js/app.js',
+                'resources/js/video.js'
             ],
             refresh: true,
         }),

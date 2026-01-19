@@ -3,7 +3,6 @@
 {{-- On ajoute les styles et scripts spécifiques à cette page --}}
 @push('styles')
     @vite(['resources/css/video.css', 'resources/css/menuArbo.css'])
-    <link rel="stylesheet" href="{{ asset('ressources/lib/Plyr/plyr.css') }}" />
 @endpush
 
 @section('content')
@@ -35,7 +34,7 @@
                         {{-- Bouton Modifier --}}
                         <a href="{{ route('medias.edit', $idMedia) }}" id="boutonModif" title="Modifier vidéo" class="btnVideo">
                             <div class="logo-btnvideo">
-                                <img src="{{ asset('ressources/Images/modifier_video.png') }}" alt="">
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </div>
                             <span>Modifier</span>
                         </a>
@@ -46,7 +45,7 @@
                             @method('DELETE')
                             <button type="submit" title="Supprimer vidéo" class="btnVideo" id="btnSuppr">
                                 <div class="logo-btnvideo">
-                                    <img src="{{ asset('ressources/Images/poubelle-de-recyclage.png') }}" alt="">
+                                    <i class="fa-solid fa-trash"></i>
                                 </div>
                                 <span>Supprimer</span>
                             </button>
@@ -147,7 +146,7 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('ressources/lib/Plyr/plyr.js') }}"></script>
+    @vite(['resources/js/video.js'])
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             initLectureVideo();

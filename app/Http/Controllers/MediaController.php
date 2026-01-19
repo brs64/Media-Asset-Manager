@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+use App\Models\Media;
+
 use App\Services\MediaService;
-use App\Helpers\VideoHelper;
+use App\Services\FileExplorerService;
 
 class MediaController extends Controller
 {
@@ -200,5 +203,50 @@ class MediaController extends Controller
 
         return redirect()->route('medias.index')
             ->withErrors('Error deleting media');
+    }
+
+    public function sync()
+    {
+        $disks = [
+            'external_local' => 'URI_NAS_MPEG',
+            'ftp_pad'        => 'URI_NAS_PAD',
+            'ftp_arch'       => 'URI_NAS_ARCH',
+        ];
+
+        foreach ($disks as $disk => $uriField) {
+            $items = FileExplorerService::scanDisk($disk, '/');
+
+            foreach ($items as $item) {
+                if ($item['type'] == 'video') {
+
+                    // Cherche la vidéo existante sur n'importe quel NAS
+                    $media = Media::where('URI_NAS_MPEG', $item['path'])
+                        ->orWhere('URI_NAS_PAD', $item['path'])
+                        ->orWhere('URI_NAS_ARCH', $item['path'])
+                        ->first() ?? new Media();
+
+                    // Mets à jour le chemin du NAS courant si nécessaire
+                    if (empty($media->$uriField) || $media->$uriField !== $item['path']) {
+                        $media->$uriField = $item['path'];
+                    }
+
+                    // Mets à jour le titre de la vidéo (toujours)
+                    $media->mtd_tech_titre = $item['name'];
+
+                    // Remplit les autres champs si le record est nouveau
+                    if (!$media->exists) {
+                        $media->type = 'video';
+                        $media->promotion = null;
+                        $media->theme = null;
+                        $media->description = null;
+                        $media->professeur_id = null;
+                    }
+
+                    $media->save();
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Synchronisation terminée ✅');
     }
 }

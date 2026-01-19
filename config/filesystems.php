@@ -47,6 +47,14 @@ return [
             'report' => false,
         ],
 
+        'app' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -75,6 +83,18 @@ return [
         'ftp_arch' => [
             'driver' => 'ftp',
             'host' => env('FTP_ARCH_HOST', 'btsplay-ftp-mpeg'),
+            'username' => env('FTP_ARCH_USER', 'ftpuser'),
+            'password' => env('FTP_ARCH_PASS', 'ftppass'),
+            'port' => (int) env('FTP_ARCH_PORT', 21),
+            'root' => env('FTP_ARCH_ROOT') ?: '',
+            'passive' => true,
+            'ssl' => false,
+            'timeout' => 30,
+        ],
+
+        'ftp_arch' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_ARCH_HOST', 'btsplay-ftp-arch'),
             'username' => env('FTP_ARCH_USER', 'ftpuser'),
             'password' => env('FTP_ARCH_PASS', 'ftppass'),
             'port' => (int) env('FTP_ARCH_PORT', 21),

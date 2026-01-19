@@ -19,6 +19,9 @@
         "vite": "^7.2.4"
     },
     "dependencies": {
-        "@tailwindcss/postcss": "^4.1.17"
+        "@fortawesome/fontawesome-free": "^7.1.0",
+        "@tailwindcss/postcss": "^4.1.17",
+        "hls.js": "^1.6.15",
+        "plyr": "^3.8.4"
     }
 }

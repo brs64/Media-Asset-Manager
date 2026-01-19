@@ -23,7 +23,7 @@
                 <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
                 <button type="submit">
                     <div class="logo-search">
-                        <img src="{{ asset('public/images/recherche.png') }}" alt="Rechercher">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
                 </button>
             </form>

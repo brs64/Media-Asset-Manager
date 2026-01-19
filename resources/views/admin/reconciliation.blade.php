@@ -21,7 +21,7 @@
             <span class="text-sm italic text-gray-500">(Cette opération peut prendre quelques minutes)</span>
         </p>
 
-        <form action="{{ route('admin.reconciliation.run') }}" method="POST">
+        <form action="{{ route('admin.media.sync') }}" method="POST">
             @csrf
             <button type="submit" class="bg-[#b91c1c] hover:bg-red-800 text-white font-bold text-xl py-4 px-10 rounded shadow-lg transform transition hover:scale-105">
                 Lancer la réconciliation

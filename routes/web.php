@@ -7,6 +7,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThumbnailController;
+use App\Http\Controllers\FileExplorerController;
+
+use App\Http\Controllers\StreamController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique
@@ -14,6 +17,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Miniatures
 Route::get('/thumbnails/{mediaId}', [ThumbnailController::class, 'show'])->name('thumbnails.show');
+
+// Streaming vidéo
+Route::get('/stream/{mediaId}', [StreamController::class, 'stream'])->name('stream.video');
+Route::get('/stream/{mediaId}/segment/{segment}', [StreamController::class, 'segment'])->name('stream.segment');
 
 // Gestion des médias
 Route::resource('medias', MediaController::class);
@@ -40,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Routes admin (uniquement pour les professeurs)
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    
+
     // --- TAB 1: BASE DE DONNEES ---
     Route::get('/', [AdminController::class, 'databaseView'])->name('database');
     Route::get('/database', [AdminController::class, 'databaseView'])->name('database.index');
@@ -75,7 +82,18 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // --- BACKUP ACTIONS ---
     Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
+
+
+
 });
+
+    Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
+        ->name('explorer.scan');
+    Route::get('/explorer', [FileExplorerController::class, 'index'])
+        ->name('explorer.index');
+
+    Route::post('/admin/media/sync', [MediaController::class, 'sync'])
+        ->name('admin.media.sync');
 
 /*use App\Services\FfastransService;
 Route::get('/test-connection', function (FfastransService $service) {

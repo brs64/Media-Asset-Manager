@@ -17,7 +17,7 @@
             <input type="search" name="motCle" placeholder="Rechercher une vidéo...">
             <button type="submit">
                 <div class="logo-search">
-                    <img src="{{ asset('/images/recherche.png') }}" alt="Rechercher">
+                    <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
             </button>
         </form>
@@ -28,8 +28,8 @@
             @if(!\Auth::check())
                 <a href="{{ route('login') }}" class="flex items-center gap-2 text-white! hover:text-[#f09520] font-bold transition duration-200">
                     Se connecter
-                    <div class="w-8 h-8">
-                        <img src="{{ asset('/images/account.png') }}" alt="Compte" class="w-full h-full object-contain brightness-0 invert">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-2xl"></i>
                     </div>
                 </a>
 
@@ -37,9 +37,9 @@
             @else
                 <button class="flex items-center gap-2 cursor-pointer focus:outline-none text-white group-hover:text-[#f09520] transition duration-200 py-4 bg-transparent border-0">
                     <span class="font-bold text-base">{{ \Auth::user()->name }}</span>
-                    
-                    <div class="w-8 h-8 min-w-8">
-                        <img src="{{ asset('/images/account.png') }}" alt="Compte" class="w-full h-full object-contain brightness-0 invert group-hover:invert-0 group-hover:brightness-100 transition-all">
+
+                    <div class="w-8 h-8 min-w-8 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-2xl"></i>
                     </div>
                 </button>
 
@@ -47,8 +47,13 @@
                     
                     <div class="bg-white rounded-md shadow-xl border border-gray-100 overflow-hidden text-left">
                         
+                        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            <span>Profil</span>
+                        </a>
+
                         <a href="{{ route('admin.database') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700! hover:bg-orange-50 hover:text-[#f09520]! transition-colors no-underline">
-                            <img class='w-5! h-5! object-contain' src='{{ asset('/images/Parametre.png') }}'>
+                            <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i>
                             <span>Administration</span>
                         </a>
 
@@ -57,7 +62,7 @@
                         <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
                             @csrf
                             <button type="submit" class="w-full text-left flex items-center gap-3 px-4 py-3 text-sm text-red-600! hover:bg-red-50 transition-colors bg-transparent border-0 cursor-pointer">
-                                <img class='w-5! h-5! object-contain' src='{{ asset('/images/logout.png') }}'>
+                                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
                                 <span>Se déconnecter</span>
                             </button>
                         </form>
