@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // --- TAB 1: BASE DE DONNEES ---
     Route::get('/', [AdminController::class, 'databaseView'])->name('database');
     Route::get('/database', [AdminController::class, 'databaseView'])->name('database.index');
+    Route::post('/admin/media/sync', [MediaController::class, 'sync'])->name('media.sync');
 
     // --- TAB 2: TRANSFERTS ---
     Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
@@ -94,8 +95,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/explorer', [FileExplorerController::class, 'index'])
         ->name('explorer.index');
 
-    Route::post('/admin/media/sync', [MediaController::class, 'sync'])
-        ->name('admin.media.sync');
+
 
 
 /*use App\Services\FfastransService;
