@@ -55,6 +55,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // --- TAB 2: TRANSFERTS ---
     Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
+    Route::get('/transferts/list', [TransfertController::class, 'list'])->name('transferts.list');
     Route::post('/transferts/start', [TransfertController::class, 'startJob'])->name('transferts.start');
     Route::get('/transferts/status/{jobId}', [TransfertController::class, 'checkStatus'])->name('transfers.status');
     Route::post('/transferts/cancel/{jobId}', [TransfertController::class, 'cancel'])->name('transfers.cancel');
