@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\FileExplorerService;
+use App\Services\FfastransService;
+use App\Models\Media;
 use Illuminate\Http\Request;
+use App\Jobs\ScanDiskJob;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class FileExplorerController extends Controller
 {
@@ -28,7 +33,7 @@ class FileExplorerController extends Controller
         $disk = $request->query('disk');
         $path = $request->query('path', '/');
 
-        // 🔐 Sécurité minimale
+        // Sécurité minimale
         abort_unless(
             in_array($disk, array_keys(config('filesystems.disks'))),
             403,
@@ -39,5 +44,127 @@ class FileExplorerController extends Controller
 
         // Retourne UNIQUEMENT le HTML
         return view('explorer.tree-item', compact('items'))->render();
+    }
+
+    public function startScan(Request $request)
+    {
+        $disk = $request->query('disk', "ftp_pad");
+
+        $envPath = env('URI_RACINE_NAS_PAD');
+        $path = $request->input('path') ?: $envPath ?: '/';
+        
+        $forceRefresh = $request->boolean('force');
+        $cacheKey = "scan_lock:" . md5($disk . $path);
+
+        if (!$forceRefresh) {
+            $existingScanId = Cache::get($cacheKey);
+            if ($existingScanId && Cache::get("scan:{$existingScanId}:status") === 'done') {
+                return response()->json([
+                    'scan_id' => $existingScanId,
+                    'status'  => 'started',
+                    'cached'  => true
+                ]);
+            }
+        }
+
+        $scanId = (string) Str::uuid();
+
+        Cache::put($cacheKey, $scanId, now()->addMinutes(5));
+
+        Cache::put(
+            "scan:{$scanId}:status",
+            'running',
+            now()->addHours(2)
+        );
+
+        ScanDiskJob::dispatch($disk, $path, $scanId);
+
+        return response()->json([
+            'scan_id' => $scanId,
+            'status' => 'started',
+        ]);
+    }
+
+    public function scanStatus(string $scanId)
+    {
+        return response()->json([
+            'status' => Cache::get("scan:{$scanId}:status", 'unknown'),
+            'count'  => Cache::get("scan:{$scanId}:count", 0),
+        ]);
+    }
+
+    public function scanResults(string $scanId, FfastransService $ffastrans)
+    {
+        // Check Status
+        $status = Cache::get("scan:{$scanId}:status", 'unknown');
+
+        if ($status !== 'done') {
+            return response()->json([
+                'status' => $status,
+                'count'  => Cache::get("scan:{$scanId}:count", 0),
+                'results'=> []
+            ]);
+        }
+
+        $rawFiles = Cache::get("scan:{$scanId}:results", []);
+        
+        $allScannedPaths = array_column($rawFiles, 'path');
+        
+        $archivedPaths = Media::whereIn('URI_NAS_MPEG', $allScannedPaths)
+                            ->pluck('URI_NAS_MPEG')
+                            ->flip()
+                            ->toArray();
+
+        $activeMap = [];
+        try {
+            $activeJobs = $ffastrans->getFullStatusList();
+            foreach ($activeJobs as $job) {
+                $activeMap[$job['filename']] = $job;
+            }
+        } catch (\Exception $e) {
+            $activeMap = [];
+        }
+
+        $unifiedList = [];
+
+        foreach ($rawFiles as $file) {
+            if (($file['type'] ?? '') !== 'video') continue;
+
+            $filename = $file['name'];
+            $path = $file['path'];
+
+            if (isset($archivedPaths[$path])) {
+                continue; // Skip archived files
+            }
+
+            if (isset($activeMap[$filename])) {
+                $job = $activeMap[$filename];
+                $unifiedList[] = [
+                    'filename' => $filename,
+                    'path'     => $path,
+                    'disk'     => 'ftp_pad',
+                    'job_id'   => $job['id'],
+                    'status'   => $job['status'],
+                    'progress' => $job['progress'],
+                    'finished' => $job['is_finished']
+                ];
+            } else {
+                $unifiedList[] = [
+                    'filename' => $filename,
+                    'path'     => $path,
+                    'disk'     => 'ftp_pad',
+                    'job_id'   => null,
+                    'status'   => 'En attente',
+                    'progress' => 0,
+                    'finished' => false
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 'done',
+            'count'  => count($unifiedList),
+            'results'=> $unifiedList, 
+        ]);
     }
 }

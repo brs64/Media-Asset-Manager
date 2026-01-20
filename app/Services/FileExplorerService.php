@@ -98,6 +98,30 @@ class FileExplorerService
         return $results;
     }
 
+    public static function scanDiskRecursive(string $diskName, string $path = '/', callable $onItemFound = null)
+    {
+        ini_set('memory_limit', '512M'); 
+        ini_set('max_execution_time', 600); // 10 minutes
+
+        $allFiles = [];
+        
+        $items = self::scanDisk($diskName, $path);
+
+        foreach ($items as $item) {
+
+            if ($onItemFound) {
+                $onItemFound($item);
+            }
+    
+            if ($item['type'] === 'folder') {
+
+                self::scanDiskRecursive($diskName, $item['path'], $onItemFound);
+            }
+        }
+
+        return $allFiles;
+    }
+
     /**
      * Détection vidéo
      */

@@ -54,10 +54,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // --- TAB 2: TRANSFERTS ---
     Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
-    Route::get('/transferts/list', [TransfertController::class, 'list'])->name('transfers.list');
     Route::post('/transferts/start', [TransfertController::class, 'startJob'])->name('transferts.start');
     Route::get('/transferts/status/{jobId}', [TransfertController::class, 'checkStatus'])->name('transfers.status');
     Route::post('/transferts/cancel/{jobId}', [TransfertController::class, 'cancel'])->name('transfers.cancel');
+
+    Route::post('/scan/start', [FileExplorerController::class, 'startScan'])->name('scan.start');
+    Route::get('/scan/{scanId}/status', [FileExplorerController::class, 'scanStatus'])->name('scan.status');
+    Route::get('/scan/{scanId}/results', [FileExplorerController::class, 'scanResults'])->name('scan.results');
 
     // --- TAB 3: RECONCILIATION ---
     Route::get('/reconciliation', [AdminController::class, 'reconciliation'])->name('reconciliation');
@@ -84,7 +87,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
 
 
-
 });
 
     Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
@@ -94,6 +96,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::post('/admin/media/sync', [MediaController::class, 'sync'])
         ->name('admin.media.sync');
+
 
 /*use App\Services\FfastransService;
 Route::get('/test-connection', function (FfastransService $service) {

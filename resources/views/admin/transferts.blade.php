@@ -9,9 +9,26 @@
     @open-cancel-modal="openModal($event.detail.id)"
     @open-limit-modal="limitModalOpen = true"
 >
-    <h2 class="text-xl text-center text-gray-800 font-medium mb-4">
-        Vidéos en cours de transfert
-    </h2>
+    <div class="relative w-full flex items-center justify-end mb-4 min-h-[40px]">
+        
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <h2 class="text-xl text-gray-800 font-medium">
+                Vidéos en cours de transfert
+            </h2>
+        </div>
+
+        <button 
+            @click="fetchData(true)" 
+            class="relative z-10 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded inline-flex items-center transition"
+            :class="{'opacity-50 cursor-not-allowed': loading}"
+            :disabled="loading"
+        >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Actualiser
+        </button>
+    </div>
     <hr class="border-gray-300 mb-8">
 
     <div x-show="loading" class="flex flex-col items-center justify-center py-20">
@@ -19,7 +36,12 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <p class="text-gray-500 font-medium">Connexion au serveur...</p>
+
+        <div  class="text-gray-500 font-medium">
+            <p>Chargement du contenu du NAS...</p>
+            <p>Status: <span id="scan-status">en attente...</span></p>
+            <p>Fichiers scannés: <span id="scan-count">0</span></p>
+        </div>
     </div>
 
     <div x-show="!loading && error" x-cloak class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg text-center">
@@ -49,7 +71,12 @@
                             <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
                         </svg>
                     </div>
-                    <div class="font-bold text-gray-800 truncate" :title="file.filename" x-text="file.filename"></div>
+                    
+                    <div class="flex flex-col overflow-hidden">
+                        <div class="font-bold text-gray-800 truncate" :title="file.filename" x-text="file.filename"></div>
+                        
+                        <div class="text-xs text-gray-500 truncate" :title="file.path" x-text="file.path"></div>
+                    </div>
                 </div>
 
                 <template x-if="!job_id">
@@ -205,20 +232,93 @@
             loading: true,
             error: false,
             files: [],
-            
-            // Modal States
+
+            // Scan async
+            scanId: null,
+            scanPoller: null,
+
+            // Modals
             modalOpen: false,
             limitModalOpen: false,
             cancelId: null,
 
-            fetchData() {
-                fetch('{{ route("admin.transfers.list") }}')
+            /**
+             * INIT → démarre le scan (rapide, sans timeout)
+             */
+            fetchData(force = false) {
+                this.loading = true;
+                this.error = false;
+                this.files = [];
+
+                fetch('{{ route("admin.scan.start") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
+                    },
+                    body: JSON.stringify({ disk: 'ftp_pad', path: '', force: force })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.scanId = data.scan_id;
+
+                    if(data.cached) {
+                        console.log("Using Cached Scan");
+                    } else {
+                        document.getElementById("scan-status").textContent = "Démarré";
+                    }
+                    this.startScanPolling();
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.error = true;
+                    this.loading = false;
+                });
+            },
+
+            /**
+             * POLLING → surveille l’état du scan
+             */
+            startScanPolling() {
+                this.scanPoller = setInterval(() => {
+                    fetch(`/admin/scan/${this.scanId}/status`)
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById("scan-status").textContent = data.status;
+                            document.getElementById("scan-count").textContent = data.count;
+
+                            if (data.status === 'done') {
+                                clearInterval(this.scanPoller);
+                                this.fetchScanResults();
+                            }
+                            if (data.status === 'failed') {
+                                clearInterval(this.scanPoller);
+                                this.error = true;
+                                this.loading = false;
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            clearInterval(this.scanPoller);
+                            this.error = true;
+                            this.loading = false;
+                        });
+                }, 2000);
+            },
+
+            /**
+             * RÉCUPÈRE LES RÉSULTATS (rapide)
+             */
+            fetchScanResults() {
+                fetch(`/admin/scan/${this.scanId}/results`)
                     .then(res => {
-                        if(!res.ok) throw new Error("API Error");
+                        if (!res.ok) throw new Error('Scan results failed');
                         return res.json();
                     })
                     .then(data => {
-                        this.files = data;
+                        this.files = data.results ?? [];
                         this.loading = false;
                     })
                     .catch(err => {
@@ -228,6 +328,9 @@
                     });
             },
 
+            /**
+             * Modales (inchangées)
+             */
             openModal(id) {
                 this.cancelId = id;
                 this.modalOpen = true;
@@ -235,12 +338,13 @@
 
             confirmCancel() {
                 this.modalOpen = false;
-                window.dispatchEvent(new CustomEvent('confirm-cancel-event', { 
-                    detail: { id: this.cancelId } 
+                window.dispatchEvent(new CustomEvent('confirm-cancel-event', {
+                    detail: { id: this.cancelId }
                 }));
             }
         }
     }
+
 
     function transferRow(fileData) {
         return {
