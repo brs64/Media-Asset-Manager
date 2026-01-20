@@ -9,7 +9,7 @@
     @open-cancel-modal="openModal($event.detail.id)"
     @open-limit-modal="limitModalOpen = true"
 >
-    <div class="relative w-full flex items-center justify-end mb-6 min-h-[40px]">
+    <div class="relative w-full flex items-center justify-end mb-6 min-h-10">
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <h2 class="text-xl text-gray-800 font-medium">
                 Vidéos en cours de transfert
@@ -31,7 +31,7 @@
 
     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded shadow-sm">
         <div class="flex items-start">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
                 <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                 </svg>
@@ -75,7 +75,7 @@
     </div>
 
     <div x-show="!loading && files.length > 0" x-cloak class="space-y-8">
-        <template x-for="file in files" :key="file.filename">
+        <template x-for="file in files" :key="file.id">
             
             <div 
                 x-data="transferRow(file)"
@@ -92,15 +92,15 @@
                     </div>
                     
                     <div class="flex flex-col overflow-hidden">
-                        <div class="font-bold text-gray-800 truncate" :title="file.filename" x-text="file.filename"></div>
+                        <div class="font-bold text-gray-800 truncate" :title="filename" x-text="filename"></div>
                         
-                        <div class="text-xs text-gray-500 truncate" :title="file.path">
+                        <div class="text-xs text-gray-500 truncate" :title="path">
                             <span 
                                 class="font-bold" 
                                 :class="file.source === 'NAS_ARCH' ? 'text-blue-600' : 'text-orange-600'" 
                                 x-text="file.source + ':'">
                             </span>
-                            <span x-text="file.path"></span>
+                            <span x-text="path"></span>
                         </div>
                     </div>
                 </div>
@@ -195,21 +195,15 @@
             error: false,
             files: [],
 
-            // We no longer need scanId or Polling for the list itself
-            // Just basic modals
             modalOpen: false,
             limitModalOpen: false,
             cancelId: null,
 
-            /**
-             * NEW FETCH METHOD (Direct DB Call)
-             */
             fetchData() {
                 this.loading = true;
                 this.error = false;
                 this.files = [];
 
-                // Use the route for the Controller's list method
                 fetch('{{ route("admin.transferts.list") }}')
                 .then(res => {
                     if (!res.ok) throw new Error('Network response was not ok');
@@ -226,7 +220,6 @@
                 });
             },
 
-            // ... Modals Logic (OpenModal, ConfirmCancel) remains the same ...
             openModal(id) {
                 this.cancelId = id;
                 this.modalOpen = true;
@@ -238,9 +231,13 @@
         }
     }
 
-    // ... transferRow function remains exactly the same ...
     function transferRow(fileData) {
         return {
+            id: fileData.id,
+            filename: fileData.filename,
+            path: fileData.path,
+            source: fileData.source,
+
             job_id: fileData.job_id,
             progress: fileData.progress,
             status: fileData.status,

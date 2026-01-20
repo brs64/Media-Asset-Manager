@@ -24,69 +24,80 @@ class TransfertController extends Controller
         return view('admin.transferts', compact('maxConcurrent'));
     }
     
-    public function list(FfastransService $ffastrans){
+    public function list(FfastransService $ffastrans)
+    {
         $activeMap = [];
         try {
             $activeJobs = $ffastrans->getFullStatusList();
             foreach ($activeJobs as $job) {
-                $key = pathinfo($job['filename'], PATHINFO_FILENAME);
-                $activeMap[$key] = $job;
+                if (isset($job['filename'])) {
+                    $key = pathinfo($job['filename'], PATHINFO_FILENAME);
+                    $activeMap[$key] = $job;
+                }
             }
         } catch (\Exception $e) {
+            Log::error("FFAStrans Status Check Failed: " . $e->getMessage());
             $activeMap = [];
         }
 
-        $padRoot = rtrim(env('URI_RACINE_NAS_PAD'), '/');
-        $archRoot = rtrim(env('URI_RACINE_NAS_ARCH'), '/');
+        $padRoot = rtrim(config('btsplay.uris.nas_pad'), '/');
+        $archRoot = rtrim(config('btsplay.uris.nas_arch'), '/');
 
-        $candidates = Media::whereNull('URI_NAS_MPEG')
-            ->where(function ($query) use ($padRoot, $archRoot) {
-                $query->where('URI_NAS_PAD', 'LIKE', "{$padRoot}%")
-                      ->orWhere('URI_NAS_ARCH', 'LIKE', "{$archRoot}%");
-            })
-            ->get();
+        $query = Media::whereNull('URI_NAS_MPEG')
+            ->where(function ($q) use ($padRoot, $archRoot) {
+                if ($padRoot) $q->where('URI_NAS_PAD', 'LIKE', "{$padRoot}%");
+                if ($archRoot) $q->orWhere('URI_NAS_ARCH', 'LIKE', "{$archRoot}%");
+            });
 
         $results = [];
 
-        foreach ($candidates as $media) {
-            $assetName = $media->asset_name;
-
+        foreach ($query->cursor() as $media) {
+            
             if (!empty($media->URI_NAS_ARCH)) {
                 $finalPath = $media->URI_NAS_ARCH;
                 $finalDisk = 'nas_arch';
                 $displayExt = '.mp4';
                 $sourceLabel = 'NAS_ARCH';
             } else {
-                $finalPath = $media->URI_NAS_PAD;
+                $finalPath = $media->URI_NAS_PAD ?? ''; 
                 $finalDisk = 'ftp_pad';
                 $displayExt = '.mxf';
                 $sourceLabel = 'NAS_PAD';
             }
 
-            if (isset($activeMap[$assetName])) {
-                $job = $activeMap[$assetName];
-                $results[] = [
-                    'filename' => $assetName . $displayExt,
-                    'path'     => $finalPath,
-                    'disk'     => $finalDisk,
-                    'source'   => $sourceLabel,
-                    'job_id'   => $job['id'],
-                    'status'   => $job['status'],
-                    'progress' => $job['progress'],
-                    'finished' => $job['is_finished']
-                ];
-            } else {
-                $results[] = [
-                    'filename' => $assetName . $displayExt,
-                    'path'     => $finalPath,
-                    'disk'     => $finalDisk,
-                    'source'   => $sourceLabel,
-                    'job_id'   => null,
-                    'status'   => 'En attente',
-                    'progress' => 0,
-                    'finished' => false
-                ];
+            if (empty($finalPath)) {
+                 continue; 
             }
+
+            $nameWithoutExt = pathinfo($finalPath, PATHINFO_FILENAME);
+
+            if (empty($nameWithoutExt) || $nameWithoutExt === '.') {
+                $nameWithoutExt = $media->mtd_tech_titre ?? 'Video_' . $media->id;
+            }
+
+            $fullFilename = $nameWithoutExt . $displayExt;
+
+            $item = [
+                'id'       => $media->id,
+                'filename' => $fullFilename,
+                'path'     => $finalPath,
+                'disk'     => $finalDisk,
+                'source'   => $sourceLabel,
+                'job_id'   => null,
+                'status'   => 'En attente',
+                'progress' => 0,
+                'finished' => false
+            ];
+
+            if (isset($activeMap[$nameWithoutExt])) {
+                $job = $activeMap[$nameWithoutExt];
+                $item['job_id']   = $job['id'];
+                $item['status']   = $job['status'];
+                $item['progress'] = $job['progress'];
+                $item['finished'] = $job['is_finished'];
+            }
+
+            $results[] = $item;
         }
 
         return response()->json([
