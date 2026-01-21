@@ -40,9 +40,11 @@ class MediaService
             'media' => $media,
             'idMedia' => $media->id,
             'nomFichier' => $media->mtd_tech_titre,
-            'titreVideo' => $this->extractVideoTitle($media->mtd_tech_titre),
+            'titreVideo' => $this->sanitizeForDisplay($this->extractVideoTitle($media->mtd_tech_titre)),
             'description' => $media->description ?? '',
-            'promotion' => $media->promotion ?? '',
+            'promotion' => $this->sanitizeForDisplay($media->promotion),
+            'type' => $this->sanitizeForDisplay($media->type),
+            'theme' => $this->sanitizeForDisplay($media->theme),
 
             // Chemins
             'cheminVideoComplet' => route('stream.video', $media->id),
@@ -397,7 +399,7 @@ class MediaService
 
         // Determine FTP disk
         $ftpDisk = null;
-        if ($media->URI_NAS_ARCH    ) {
+        if ($media->URI_NAS_ARCH) {
             $ftpDisk = 'ftp_mpeg';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
@@ -513,5 +515,16 @@ class MediaService
         $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
 
         return round($bytes / pow(1024, $power), 2) . ' ' . $units[$power];
+    }
+
+    /**
+     * Sanitize string for display: remove newlines
+     */
+    private function sanitizeForDisplay(?string $value): string
+    {
+        if (!$value) {
+            return '';
+        }
+        return preg_replace('/[\r\n]+/', ' ', trim($value));
     }
 }

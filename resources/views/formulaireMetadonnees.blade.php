@@ -43,7 +43,7 @@
                 {{-- Titre --}}
                 <div class="form-field">
                     <label for="mtd_tech_titre" class="form-label">Titre *</label>
-                    <input type="text" id="mtd_tech_titre" name="mtd_tech_titre" class="form-input" required
+                    <input type="text" id="mtd_tech_titre" name="mtd_tech_titre" class="form-input" required maxlength="255"
                            value="{{ old('mtd_tech_titre', $media->mtd_tech_titre ?? '') }}">
                 </div>
 
@@ -94,14 +94,28 @@
                 {{-- Description --}}
                 <div class="form-field">
                     <label for="description" class="form-label">Description</label>
-                    <textarea id="description" name="description" class="form-input" rows="4">{{ old('description', $media->description ?? '') }}</textarea>
+                    <textarea id="description" name="description" class="form-input" rows="4" maxlength="5000">{{ old('description', $media->description ?? '') }}</textarea>
                 </div>
 
                 {{-- Promotion --}}
                 <div class="form-field">
                     <label for="promotion" class="form-label">Promotion</label>
-                    <input type="text" id="promotion" name="promotion" class="form-input"
+                    <input type="text" id="promotion" name="promotion" class="form-input" maxlength="255"
                            value="{{ old('promotion', $media->promotion ?? '') }}">
+                </div>
+
+                {{-- Type --}}
+                <div class="form-field">
+                    <label for="type" class="form-label">Type</label>
+                    <input type="text" id="type" name="type" class="form-input" maxlength="255"
+                           value="{{ old('type', $media->type ?? '') }}">
+                </div>
+
+                {{-- Theme --}}
+                <div class="form-field">
+                    <label for="theme" class="form-label">Thème</label>
+                    <input type="text" id="theme" name="theme" class="form-input" maxlength="255"
+                           value="{{ old('theme', $media->theme ?? '') }}">
                 </div>
 
                 {{-- Participations --}}

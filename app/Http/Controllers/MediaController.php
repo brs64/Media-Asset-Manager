@@ -50,14 +50,14 @@ class MediaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'mtd_tech_titre' => 'required|max:255',
-            'promotion' => 'nullable|string',
-            'type' => 'nullable|string',
-            'theme' => 'nullable|string',
-            'description' => 'nullable|string',
-            'URI_NAS_ARCH' => 'nullable|string',
-            'URI_NAS_PAD' => 'nullable|string',
-            'URI_NAS_MPEG' => 'nullable|string',
+            'mtd_tech_titre' => 'required|string|max:255',
+            'promotion' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
+            'theme' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:5000',
+            'URI_NAS_ARCH' => 'nullable|string|max:2048',
+            'URI_NAS_PAD' => 'nullable|string|max:2048',
+            'URI_NAS_MPEG' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
             'eleves' => 'nullable|array',
@@ -65,6 +65,13 @@ class MediaController extends Controller
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
+
+        // Sanitize single-line fields: remove newlines
+        foreach (['mtd_tech_titre', 'promotion', 'type', 'theme'] as $field) {
+            if (!empty($validated[$field])) {
+                $validated[$field] = preg_replace('/[\r\n]+/', ' ', trim($validated[$field]));
+            }
+        }
 
         // Création du média
         $media = \App\Models\Media::create($validated);
@@ -127,11 +134,11 @@ class MediaController extends Controller
 
         $validated = $request->validate([
             // Basic media fields (URIs are managed elsewhere, not in this form)
-            'mtd_tech_titre' => 'required|string',
-            'promotion' => 'nullable|string',
-            'type' => 'nullable|string',
-            'theme' => 'nullable|string',
-            'description' => 'nullable|string',
+            'mtd_tech_titre' => 'required|string|max:255',
+            'promotion' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
+            'theme' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:5000',
 
             // Foreign keys
             'professeur_id' => 'nullable|exists:professeurs,id',
@@ -143,6 +150,13 @@ class MediaController extends Controller
             'participations.*.eleve_id' => 'required|exists:eleves,id',
             'participations.*.role_id' => 'required|exists:roles,id',
         ]);
+
+        // Sanitize single-line fields: remove newlines
+        foreach (['mtd_tech_titre', 'promotion', 'type', 'theme'] as $field) {
+            if (!empty($validated[$field])) {
+                $validated[$field] = preg_replace('/[\r\n]+/', ' ', trim($validated[$field]));
+            }
+        }
 
         \DB::beginTransaction();
         try {

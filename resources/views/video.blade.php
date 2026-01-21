@@ -26,7 +26,7 @@
             <div class="info_video">
 
                 <div class ="titre_nom">
-                    <h1 class="titre">{{ $titreVideo }}</h1>
+                    <h1 class="titre" title="{{ $titreVideo }}">{{ Str::limit($titreVideo, 80) }}</h1>
                 </div>
 
                 <div class="container-button">
@@ -77,7 +77,15 @@
                     </tr>
                     <tr>
                         <td><strong>Promotion</strong></td>
-                        <td>{{ $promotion }}</td>
+                        <td title="{{ $promotion }}">{{ $promotion ? Str::limit($promotion, 50) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Type</strong></td>
+                        <td title="{{ $type }}">{{ $type ? Str::limit($type, 50) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thème</strong></td>
+                        <td title="{{ $theme }}">{{ $theme ? Str::limit($theme, 50) : 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td><strong>Professeur référent</strong></td>

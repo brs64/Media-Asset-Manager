@@ -53,7 +53,8 @@ button {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    width: 25%;
+    flex: 1;
+    min-width: 0;
 }
 .titre_nom h1 , .titre_nom h2 {
     margin: 0;
@@ -65,7 +66,10 @@ button {
 .titre_nom h1 {
     font-size: large;
     font-weight: bold;
-
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
 }
 .titre_nom h2 {
     font-size: large;
@@ -250,11 +254,16 @@ button {
 .metadata_detaillee table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .metadata_detaillee td {
     padding: 8px;
     border: 1px solid #ddd;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .metadata_detaillee td:first-child {
