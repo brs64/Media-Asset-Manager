@@ -46,6 +46,9 @@ class MediaService
             'type' => $this->sanitizeForDisplay($media->type),
             'theme' => $this->sanitizeForDisplay($media->theme),
 
+            // Source vidéo (priorité: local > arch > pad)
+            'sourceVideo' => $media->chemin_local ? 'local' : ($media->URI_NAS_ARCH ? 'arch' : ($media->URI_NAS_PAD ? 'pad' : null)),
+
             // Chemins
             'cheminVideoComplet' => route('stream.video', $media->id),
             'cheminMiniatureComplet' => route('thumbnails.show', $media->id),
@@ -55,7 +58,7 @@ class MediaService
             // URIs
             'URIS' => [
                 'URI_NAS_PAD' => $media->URI_NAS_PAD ?? 'N/A',
-                'URI_NAS_MPEG' => $media->URI_NAS_MPEG ?? 'N/A',
+                'chemin_local' => $media->chemin_local ?? 'N/A',
                 'URI_NAS_ARCH' => $media->URI_NAS_ARCH ?? 'N/A',
             ],
 
@@ -388,10 +391,21 @@ class MediaService
     {
         Log::info("getTechnicalMetadata called for media #{$media->id}");
 
-        $remoteVideoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
+        // Priorité: chemin_local > ARCH > PAD
+        // Si chemin_local existe, extraire les métadonnées du fichier local
+        if ($media->chemin_local) {
+            $localPath = storage_path('app/' . ltrim($media->chemin_local, '/'));
+            if (file_exists($localPath)) {
+                Log::info("getTechnicalMetadata: Using local file = {$localPath}");
+                return $this->extractMetadataFromFile($localPath);
+            }
+        }
+
+        // Sinon fallback FTP
+        $remoteVideoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
 
         if (!$remoteVideoPath) {
-            Log::warning("getTechnicalMetadata: No remote video path for media #{$media->id}");
+            Log::warning("getTechnicalMetadata: No video path for media #{$media->id}");
             return null;
         }
 
@@ -403,8 +417,6 @@ class MediaService
             $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
-        } elseif ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {
@@ -517,6 +529,73 @@ class MediaService
         $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
 
         return round($bytes / pow(1024, $power), 2) . ' ' . $units[$power];
+    }
+
+    /**
+     * Extract metadata from local file using ffprobe
+     */
+    private function extractMetadataFromFile(string $filePath): ?array
+    {
+        $command = sprintf(
+            'ffprobe -v quiet -print_format json -show_format -show_streams %s 2>&1',
+            escapeshellarg($filePath)
+        );
+
+        exec($command, $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            Log::error("extractMetadataFromFile: ffprobe failed for {$filePath}");
+            return null;
+        }
+
+        $json = implode("\n", $output);
+        $data = json_decode($json, true);
+
+        if (!$data || !isset($data['streams']) || !isset($data['format'])) {
+            return null;
+        }
+
+        $videoStream = collect($data['streams'])->firstWhere('codec_type', 'video');
+
+        $metadata = [
+            'duree' => isset($data['format']['duration']) ? (float)$data['format']['duration'] : null,
+            'duree_format' => null,
+            'taille_octets' => isset($data['format']['size']) ? (int)$data['format']['size'] : null,
+            'taille_format' => null,
+            'bitrate' => isset($data['format']['bit_rate']) ? (int)$data['format']['bit_rate'] : null,
+        ];
+
+        if ($videoStream) {
+            $metadata['largeur'] = $videoStream['width'] ?? null;
+            $metadata['hauteur'] = $videoStream['height'] ?? null;
+            $metadata['resolution'] = ($metadata['largeur'] && $metadata['hauteur'])
+                ? $metadata['largeur'] . 'x' . $metadata['hauteur']
+                : null;
+            $metadata['codec_video'] = $videoStream['codec_name'] ?? null;
+            $metadata['fps'] = null;
+
+            if (isset($videoStream['r_frame_rate'])) {
+                $parts = explode('/', $videoStream['r_frame_rate']);
+                if (count($parts) === 2 && $parts[1] > 0) {
+                    $metadata['fps'] = round($parts[0] / $parts[1], 2);
+                }
+            }
+        }
+
+        if ($metadata['duree']) {
+            $seconds = (int)$metadata['duree'];
+            $metadata['duree_format'] = sprintf('%02d:%02d:%02d',
+                floor($seconds / 3600),
+                floor(($seconds % 3600) / 60),
+                $seconds % 60
+            );
+        }
+
+        if ($metadata['taille_octets']) {
+            $metadata['taille_format'] = $this->formatFileSize($metadata['taille_octets']);
+        }
+
+        return $metadata;
     }
 
     /**

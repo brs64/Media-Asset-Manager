@@ -32,7 +32,7 @@ class SyncMediaFromDiskJob implements ShouldQueue
         $this->uriField = match ($disk) {
             'ftp_arch'       => 'URI_NAS_ARCH',
             'ftp_pad'        => 'URI_NAS_PAD',
-            'external_local' => 'URI_NAS_MPEG',
+            'external_local' => 'chemin_local',
             default => throw new \InvalidArgumentException("Disk non supporté: $disk"),
         };
     }

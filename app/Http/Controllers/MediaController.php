@@ -57,7 +57,7 @@ class MediaController extends Controller
             'description' => 'nullable|string|max:5000',
             'URI_NAS_ARCH' => 'nullable|string|max:2048',
             'URI_NAS_PAD' => 'nullable|string|max:2048',
-            'URI_NAS_MPEG' => 'nullable|string|max:2048',
+            'chemin_local' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
             'eleves' => 'nullable|array',

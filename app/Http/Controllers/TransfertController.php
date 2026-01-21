@@ -43,7 +43,7 @@ class TransfertController extends Controller
         $padRoot = rtrim(config('btsplay.uris.nas_pad'), '/');
         $archRoot = rtrim(config('btsplay.uris.nas_arch'), '/');
 
-        $query = Media::whereNull('URI_NAS_MPEG')
+        $query = Media::whereNull('chemin_local')
             ->where(function ($q) use ($padRoot, $archRoot) {
                 if ($padRoot) $q->where('URI_NAS_PAD', 'LIKE', "{$padRoot}%");
                 if ($archRoot) $q->orWhere('URI_NAS_ARCH', 'LIKE', "{$archRoot}%");

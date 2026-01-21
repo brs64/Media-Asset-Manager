@@ -25,7 +25,7 @@ class MediaSeeder extends Seeder
                 'description' => 'Un court-metrage sur la solitude urbaine',
                 'mtd_tech_titre' => 'Exemple 1',
                 'URI_NAS_PAD' => 'example1.mxf',
-                'URI_NAS_MPEG' => 'example1.mp4',
+                'URI_NAS_ARCH' => 'example1.mp4',
             ],
             [
                 'promotion' => '2024',
@@ -34,7 +34,7 @@ class MediaSeeder extends Seeder
                 'description' => 'Documentaire sur la faune locale',
                 'mtd_tech_titre' => 'Exemple 2',
                 'URI_NAS_PAD' => 'example2.mxf',
-                'URI_NAS_MPEG' => 'example2.mp4',
+                'URI_NAS_ARCH' => 'example2.mp4',
             ],
             [
                 'promotion' => '2023',
@@ -43,7 +43,7 @@ class MediaSeeder extends Seeder
                 'description' => 'Clip musical pour un groupe local',
                 'mtd_tech_titre' => 'Exemple 3',
                 'URI_NAS_PAD' => 'example3.mxf',
-                'URI_NAS_MPEG' => 'example3.mp4',
+                'URI_NAS_ARCH' => 'example3.mp4',
             ],
         ];
 

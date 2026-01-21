@@ -26,18 +26,35 @@ class MediaThumbnailService
 
     public function generateThumbnail(Media $media, ?string $videoPath = null, bool $force = false): ?string
     {
-        $remoteVideoPath = $videoPath ?? $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
-
-        if (!$remoteVideoPath) {
-            Log::warning("No video path for media #{$media->id}");
-            return null;
-        }
-
         $thumbnailFilename = $media->id . $this->thumbnailSuffix;
         $thumbnailPath = $this->thumbnailsPath . '/' . $thumbnailFilename;
 
         if (!$force && file_exists($thumbnailPath)) {
             return $thumbnailPath;
+        }
+
+        // Priorité: chemin_local > ARCH > PAD
+        // Si chemin_local existe, générer depuis le fichier local
+        if ($media->chemin_local) {
+            $localPath = storage_path('app/' . ltrim($media->chemin_local, '/'));
+            if (file_exists($localPath)) {
+                Log::info("Generating thumbnail from local file: {$localPath}");
+                $duration = $this->getVideoDuration($localPath);
+                $timecode = $duration ? $this->calculateTimecode($duration) : 5;
+                $success = $this->executeFfmpeg($localPath, $thumbnailPath, $timecode);
+                if ($success) {
+                    Log::info("Thumbnail generated for media #{$media->id}");
+                    return $thumbnailPath;
+                }
+            }
+        }
+
+        // Fallback FTP (ARCH > PAD)
+        $remoteVideoPath = $videoPath ?? $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
+
+        if (!$remoteVideoPath) {
+            Log::warning("No video path for media #{$media->id}");
+            return null;
         }
 
         // Build FTP URL
@@ -65,14 +82,12 @@ class MediaThumbnailService
 
     protected function buildFtpUrl(Media $media, string $remoteVideoPath): ?string
     {
-        // Determine FTP disk
+        // Determine FTP disk (ARCH > PAD)
         $ftpDisk = null;
         if ($media->URI_NAS_ARCH) {
             $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
-        } elseif ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {
@@ -106,7 +121,7 @@ class MediaThumbnailService
     {
         $stats = ['success' => 0, 'failed' => 0, 'skipped' => 0];
 
-        $medias = Media::whereNotNull('URI_NAS_MPEG')
+        $medias = Media::whereNotNull('chemin_local')
             ->orWhereNotNull('URI_NAS_PAD')
             ->orWhereNotNull('URI_NAS_ARCH')
             ->get();

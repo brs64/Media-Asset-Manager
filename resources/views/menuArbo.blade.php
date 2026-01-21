@@ -69,7 +69,7 @@
     window.fileExplorerConfig = {
         local: @json(config('filesystems.disks.external_local.root')),
         pad: @json(config('filesystems.disks.ftp_pad.root')),
-        arch: @json(config('filesystems.disks.ftp_mpeg.root'))
+        arch: @json(config('filesystems.disks.ftp_arch.root'))
     };
 
     // OPEN/CLOSE MENU

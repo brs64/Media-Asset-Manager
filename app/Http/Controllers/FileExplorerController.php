@@ -110,8 +110,8 @@ class FileExplorerController extends Controller
         
         $allScannedPaths = array_column($rawFiles, 'path');
         
-        $archivedPaths = Media::whereIn('URI_NAS_MPEG', $allScannedPaths)
-                            ->pluck('URI_NAS_MPEG')
+        $archivedPaths = Media::whereIn('chemin_local', $allScannedPaths)
+                            ->pluck('chemin_local')
                             ->flip()
                             ->toArray();
 

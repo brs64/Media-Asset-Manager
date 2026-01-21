@@ -23,20 +23,21 @@ class StreamController extends Controller
                 return $this->streamLocalMediaVideo($media, $request);
             }
 
-            // Déterminer le chemin de la vidéo (préférer ARCH, puis PAD, puis MPEG)
-            $videoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
+            // Priorité: chemin_local (transcodé) > ARCH > PAD
+            // Si chemin_local existe, streamer en local
+            if ($media->chemin_local) {
+                return $this->streamLocalVideo($media->chemin_local, $request);
+            }
+
+            // Sinon utiliser les chemins NAS
+            $videoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
 
             if (!$videoPath) {
                 abort(404, 'Vidéo non trouvée');
             }
 
-            // Vérifier si c'est un chemin local (commence par storage/app/)
-            if (str_starts_with($videoPath, 'storage/app/')) {
-                return $this->streamLocalVideo($videoPath, $request);
-            }
-
             // Si pas de connexion FTP configurée, essayer en local
-            if (!env('FTP_PAD_HOST') && !env('FTP_MPEG_HOST')) {
+            if (!env('FTP_PAD_HOST') && !env('FTP_ARCH_HOST')) {
                 return $this->streamLocalMediaVideo($media, $request);
             }
 
@@ -49,7 +50,7 @@ class StreamController extends Controller
                 return $this->streamLocalVideoByMapping($mediaId, $request);
             }
 
-            return redirect('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+            abort(404, 'Vidéo non trouvée');
         }
 
         // Déterminer le disque FTP à utiliser
@@ -58,8 +59,6 @@ class StreamController extends Controller
             $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
-        } elseif ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {
@@ -267,8 +266,8 @@ class StreamController extends Controller
         ];
 
         // Si le chemin URI contient un nom de fichier, l'utiliser
-        if ($media->URI_NAS_ARCH || $media->URI_NAS_PAD || $media->URI_NAS_MPEG) {
-            $uriPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
+        if ($media->chemin_local || $media->URI_NAS_ARCH || $media->URI_NAS_PAD) {
+            $uriPath = $media->chemin_local ?? $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
             $possibleFilenames[] = basename($uriPath);
         }
 
@@ -336,7 +335,7 @@ class StreamController extends Controller
             return $this->streamLocalVideo('storage/app/' . $firstMp4, $request);
         }
 
-        return redirect('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+        abort(404, 'Vidéo locale non trouvée');
     }
 
     /**
@@ -347,7 +346,7 @@ class StreamController extends Controller
         $media = Media::findOrFail($mediaId);
 
         // Déterminer le chemin de base
-        $basePath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
+        $basePath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
 
         if (!$basePath) {
             abort(404, 'Vidéo non trouvée');
@@ -362,8 +361,6 @@ class StreamController extends Controller
             $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
-        } elseif ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {

@@ -23,7 +23,7 @@ class Media extends Model
         'mtd_tech_titre',
         'URI_NAS_ARCH',
         'URI_NAS_PAD',
-        'URI_NAS_MPEG',
+        'chemin_local',
         'professeur_id',
     ];
 
