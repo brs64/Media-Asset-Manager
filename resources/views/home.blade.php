@@ -37,27 +37,6 @@
             </div>
         </div>
 
-        {{-- Section Dernier Projet --}}
-        @if (!empty($tabDernierProjet))
-            <div class="sliderVideoProjet my-8">
-                <h2 class="text-2xl font-bold mb-6">{{ $tabDernierProjet[0]["projet"] }}</h2>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @foreach ($tabDernierProjet as $video)
-                        <div class="video-card group">
-                            <a href="{{ route('medias.show', $media->id) }}" class="block">
-                                <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                    <img src="{{ route('thumbnails.show', $video['id']) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video' loading='lazy'/>
-                                </div>
-                                <h3 class="mt-2 text-lg font-semibold">{{ $video['titre'] }}</h3>
-                                <h4 class="text-sm text-gray-600">{{ $video['titreVideo'] }}</h4>
-                            </a>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-        
     </div>
 
 @endsection
