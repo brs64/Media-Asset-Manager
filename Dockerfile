@@ -25,8 +25,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     default-mysql-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd \
-
+    && docker-php-ext-install -j$(nproc) gd
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl ftp

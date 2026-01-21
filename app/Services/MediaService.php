@@ -412,6 +412,12 @@ class MediaService
 
         // Build FTP URL
         $config = config("filesystems.disks.{$ftpDisk}");
+
+        Log::info("Got config, for FTP disk = {$ftpDisk} : " .
+                    ", with username : {$config['username']}" .
+                    ", password : {$config['password']}" .
+                    ", host : {$config['host']}");
+
         $ftpUrl = sprintf(
             'ftp://%s:%s@%s/%s',
             $config['username'],

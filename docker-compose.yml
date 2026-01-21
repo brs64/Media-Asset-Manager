@@ -21,7 +21,7 @@ services:
     depends_on:
       - btsplay-mysql
       - btsplay-ftp-pad
-      - btsplay-ftp-mpeg
+      - btsplay-ftp-arch
 
   btsplay-queue:
     build:
@@ -40,10 +40,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - btsplay-mysql
       - btsplay-laravel
-      - btsplay-ftp-pad
-      - btsplay-ftp-mpeg
 
   btsplay-nginx:
     image: nginx:alpine
@@ -56,6 +53,11 @@ services:
       - ./docker-compose/nginx:/etc/nginx/conf.d/:z
     networks:
       - app-network
+    depends_on:
+      - btsplay-mysql
+      - btsplay-laravel
+      - btsplay-ftp-pad
+      - btsplay-ftp-arch
 
   btsplay-mysql:
     image: mysql:5.7
@@ -86,6 +88,7 @@ services:
     depends_on:
       - btsplay-mysql
 
+  # FTP avec les MXF
   btsplay-ftp-pad:
     image: stilliard/pure-ftpd:latest
     container_name: btsplay-ftp-pad
@@ -103,12 +106,13 @@ services:
     networks:
       - app-network
 
-  btsplay-ftp-mpeg:
+  # FTP avec les H264 25Mbps
+  btsplay-ftp-arch:
     image: stilliard/pure-ftpd:latest
-    container_name: btsplay-ftp-mpeg
+    container_name: btsplay-ftp-arch
     restart: unless-stopped
     environment:
-      PUBLICHOST: btsplay-ftp-mpeg
+      PUBLICHOST: btsplay-ftp-arch
       FTP_USER_NAME: ftpuser
       FTP_USER_PASS: ftppass
       FTP_USER_HOME: /home/ftpuser
