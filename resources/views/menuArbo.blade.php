@@ -28,7 +28,7 @@
         {{-- NAS ARCH --}}
         <div class="menuArbo ARCH hidden"
              id="tree-arch"
-             data-disk="ftp_mpeg"
+             data-disk="ftp_arch"
              data-loaded="0">
             <h3 class="text-white p-2 font-bold bg-green-900">NAS ARCH</h3>
             <div class="tree-container"></div>
