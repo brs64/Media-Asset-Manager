@@ -388,7 +388,7 @@ class MediaService
     {
         Log::info("getTechnicalMetadata called for media #{$media->id}");
 
-        $remoteVideoPath = $media->URI_NAS_MPEG ?? $media->URI_NAS_PAD ?? $media->URI_NAS_ARCH;
+        $remoteVideoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
 
         if (!$remoteVideoPath) {
             Log::warning("getTechnicalMetadata: No remote video path for media #{$media->id}");
@@ -400,9 +400,11 @@ class MediaService
         // Determine FTP disk
         $ftpDisk = null;
         if ($media->URI_NAS_ARCH) {
-            $ftpDisk = 'ftp_mpeg';
+            $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
+        } elseif ($media->URI_NAS_MPEG) {
+            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {

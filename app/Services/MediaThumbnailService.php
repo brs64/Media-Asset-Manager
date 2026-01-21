@@ -26,7 +26,7 @@ class MediaThumbnailService
 
     public function generateThumbnail(Media $media, ?string $videoPath = null, bool $force = false): ?string
     {
-        $remoteVideoPath = $videoPath ?? $media->URI_NAS_MPEG ?? $media->URI_NAS_PAD ?? $media->URI_NAS_ARCH;
+        $remoteVideoPath = $videoPath ?? $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
 
         if (!$remoteVideoPath) {
             Log::warning("No video path for media #{$media->id}");
@@ -67,10 +67,12 @@ class MediaThumbnailService
     {
         // Determine FTP disk
         $ftpDisk = null;
-        if ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
+        if ($media->URI_NAS_ARCH) {
+            $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
+        } elseif ($media->URI_NAS_MPEG) {
+            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {

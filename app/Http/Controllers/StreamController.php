@@ -23,8 +23,8 @@ class StreamController extends Controller
                 return $this->streamLocalMediaVideo($media, $request);
             }
 
-            // Déterminer le chemin de la vidéo (préférer MPEG, puis PAD, puis ARCH)
-            $videoPath = $media->URI_NAS_MPEG ?? $media->URI_NAS_PAD ?? $media->URI_NAS_ARCH;
+            // Déterminer le chemin de la vidéo (préférer ARCH, puis PAD, puis MPEG)
+            $videoPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
 
             if (!$videoPath) {
                 abort(404, 'Vidéo non trouvée');
@@ -54,12 +54,12 @@ class StreamController extends Controller
 
         // Déterminer le disque FTP à utiliser
         $ftpDisk = null;
-        if ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
+        if ($media->URI_NAS_ARCH) {
+            $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
-        } elseif ($media->URI_NAS_ARCH) {
-            $ftpDisk = 'ftp_arch';
+        } elseif ($media->URI_NAS_MPEG) {
+            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {
@@ -267,8 +267,8 @@ class StreamController extends Controller
         ];
 
         // Si le chemin URI contient un nom de fichier, l'utiliser
-        if ($media->URI_NAS_MPEG || $media->URI_NAS_PAD || $media->URI_NAS_ARCH) {
-            $uriPath = $media->URI_NAS_MPEG ?? $media->URI_NAS_PAD ?? $media->URI_NAS_ARCH;
+        if ($media->URI_NAS_ARCH || $media->URI_NAS_PAD || $media->URI_NAS_MPEG) {
+            $uriPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
             $possibleFilenames[] = basename($uriPath);
         }
 
@@ -347,7 +347,7 @@ class StreamController extends Controller
         $media = Media::findOrFail($mediaId);
 
         // Déterminer le chemin de base
-        $basePath = $media->URI_NAS_MPEG ?? $media->URI_NAS_PAD ?? $media->URI_NAS_ARCH;
+        $basePath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD ?? $media->URI_NAS_MPEG;
 
         if (!$basePath) {
             abort(404, 'Vidéo non trouvée');
@@ -358,10 +358,12 @@ class StreamController extends Controller
 
         // Déterminer le disque FTP
         $ftpDisk = null;
-        if ($media->URI_NAS_MPEG) {
-            $ftpDisk = 'ftp_mpeg';
+        if ($media->URI_NAS_ARCH) {
+            $ftpDisk = 'ftp_arch';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
+        } elseif ($media->URI_NAS_MPEG) {
+            $ftpDisk = 'ftp_mpeg';
         }
 
         if (!$ftpDisk) {
