@@ -397,7 +397,7 @@ class MediaService
 
         // Determine FTP disk
         $ftpDisk = null;
-        if ($media->URI_NAS_MPEG) {
+        if ($media->URI_NAS_ARCH    ) {
             $ftpDisk = 'ftp_mpeg';
         } elseif ($media->URI_NAS_PAD) {
             $ftpDisk = 'ftp_pad';
@@ -412,11 +412,6 @@ class MediaService
 
         // Build FTP URL
         $config = config("filesystems.disks.{$ftpDisk}");
-
-        Log::info("Got config, for FTP disk = {$ftpDisk} : " .
-                    ", with username : {$config['username']}" .
-                    ", password : {$config['password']}" .
-                    ", host : {$config['host']}");
 
         $ftpUrl = sprintf(
             'ftp://%s:%s@%s/%s',
