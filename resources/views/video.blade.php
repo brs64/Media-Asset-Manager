@@ -18,7 +18,7 @@
         <div class="container_principal">
             <div class="container_video">
                 <div class="lecteurVideo">
-                    <video class="player" id="player" playsinline controls poster="{{ $cheminMiniatureComplet }}">
+                    <video class="player" id="player" data-media-id="{{ $idMedia }}" playsinline controls poster="{{ $cheminMiniatureComplet }}">
                         <source src="{{ $cheminVideoComplet }}" type="video/mp4"/>
                     </video>
                 </div>
@@ -26,7 +26,12 @@
             <div class="info_video">
 
                 <div class ="titre_nom">
-                    <h1 class="titre" title="{{ $titreVideo }}">{{ Str::limit($titreVideo, 80) }}</h1>
+                    <div class="titre-avec-source">
+                        @if($sourceVideo)
+                            <span class="source-badge source-{{ $sourceVideo }}">{{ strtoupper($sourceVideo) }}</span>
+                        @endif
+                        <h1 class="titre" title="{{ $titreVideo }}">{{ Str::limit($titreVideo, 80) }}</h1>
+                    </div>
                 </div>
 
                 <div class="container-button">
@@ -135,16 +140,16 @@
 
                     {{-- URIs --}}
                     <tr>
-                        <td><strong>URI NAS PAD</strong></td>
-                        <td>{{ $URIS['URI_NAS_PAD'] }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>URI NAS MPEG</strong></td>
-                        <td>{{ $URIS['URI_NAS_MPEG'] }}</td>
+                        <td><strong>Chemin local</strong></td>
+                        <td title="{{ $URIS['chemin_local'] }}">{{ $URIS['chemin_local'] ? Str::limit($URIS['chemin_local'], 40) : 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td><strong>URI NAS ARCH</strong></td>
-                        <td>{{ $URIS['URI_NAS_ARCH'] }}</td>
+                        <td title="{{ $URIS['URI_NAS_ARCH'] }}">{{ $URIS['URI_NAS_ARCH'] !== 'N/A' ? Str::limit($URIS['URI_NAS_ARCH'], 40) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>URI NAS PAD</strong></td>
+                        <td title="{{ $URIS['URI_NAS_PAD'] }}">{{ $URIS['URI_NAS_PAD'] !== 'N/A' ? Str::limit($URIS['URI_NAS_PAD'], 40) : 'N/A' }}</td>
                     </tr>
                 </table>
             </div>

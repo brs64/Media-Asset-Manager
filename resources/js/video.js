@@ -74,6 +74,9 @@ const initLectureVideo = function() {
 
 // Fonction pour initialiser Plyr
 function initPlyrPlayer(videoElement) {
+    // Get media ID from the video page for preview thumbnails
+    const mediaId = document.querySelector('[data-media-id]')?.dataset.mediaId;
+
     const player = new Plyr(videoElement, {
             controls: [
                 'play-large',
@@ -93,6 +96,10 @@ function initPlyrPlayer(videoElement) {
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
             keyboard: { focused: true, global: false },
             tooltips: { controls: true, seek: true },
+            previewThumbnails: mediaId ? {
+                enabled: true,
+                src: `/api/media/${mediaId}/preview-thumbnails.vtt`
+            } : { enabled: false },
             captions: { active: false, language: 'auto' },
             fullscreen: {
                 enabled: true,

@@ -71,6 +71,38 @@ button {
     white-space: nowrap;
     max-width: 100%;
 }
+
+.titre-avec-source {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.source-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.source-local {
+    background-color: #22c55e;
+    color: white;
+}
+
+.source-arch {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.source-pad {
+    background-color: #f59e0b;
+    color: white;
+}
 .titre_nom h2 {
     font-size: large;
 }
@@ -242,6 +274,16 @@ button {
 }
 
 .plyr.plyr--stopped .plyr__controls { display: none }
+
+/* Lock the big play button in place */
+.plyr__control--overlaid {
+    transform: translate(-50%, -50%) !important;
+    transition: opacity 0.2s ease !important;
+}
+
+.plyr__control--overlaid:hover {
+    transform: translate(-50%, -50%) !important;
+}
 
 
 
