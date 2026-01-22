@@ -39,37 +39,19 @@ class FfastransService
      */
     public function submitJob(string $sourceFile, string $workflowId, array $variables = [])
     {
-        // 1. GET CONFIG
-        $localRoot  = config('services.ffastrans.path_local');
-        $remoteRoot = config('services.ffastrans.path_remote');
+        if (str_starts_with($sourceFile, '\\\\')) {
+            $finalPath = $sourceFile;
+        } 
+        else {
+            $finalPath = $this->translatePath($sourceFile);
+        };
 
-        $finalPath = $sourceFile;
-
-        // 2. INTELLIGENT PATH TRANSLATION
-        if ($remoteRoot) {
-            $remoteRoot = rtrim($remoteRoot, '\\/');
-
-            // CASE A: Input is an Absolute Path matching Local Root
-            if ($localRoot && str_starts_with($sourceFile, $localRoot)) {
-                $relativePath = substr($sourceFile, strlen($localRoot));
-                $relativePath = ltrim($relativePath, '/\\');
-                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $relativePath;
-            }
-            // CASE B: Input is a Relative Path
-            elseif (!str_starts_with($sourceFile, '/') && !preg_match('/^[a-zA-Z]:/', $sourceFile)) {
-                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $sourceFile;
-            }
-        }
-
-        // 3. FORCE WINDOWS BACKSLASHES
-        $finalPath = str_replace('/', '\\', $finalPath);
-
-        // 4. SUBMIT TO API
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs";
         
         $payload = [
-            'workflow' => $workflowId,
-            'input' => $finalPath,
+            'wf_id' => $workflowId,
+            'inputfile' => $finalPath,
+            'priority' => 5,
             'variables' => $variables
         ];
 
@@ -86,6 +68,31 @@ class FfastransService
             Log::error('FFAStrans Exception: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    public function translatePath(string $linuxPath): string
+    {
+        $localRoot  = config('services.ffastrans.path_local');
+        $remoteRoot = config('services.ffastrans.path_remote');
+        
+        $finalPath = $linuxPath;
+
+        if ($remoteRoot) {
+            $remoteRoot = rtrim($remoteRoot, '\\/');
+
+            // CASE A: Input is an Absolute Path matching Local Root
+            if ($localRoot && str_starts_with($linuxPath, $localRoot)) {
+                $relativePath = substr($linuxPath, strlen($localRoot));
+                $relativePath = ltrim($relativePath, '/\\');
+                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $relativePath;
+            }
+            // CASE B: Input is a Relative Path (No starting slash, no Drive letter)
+            elseif (!str_starts_with($linuxPath, '/') && !preg_match('/^[a-zA-Z]:/', $linuxPath)) {
+                $finalPath = $remoteRoot . DIRECTORY_SEPARATOR . $linuxPath;
+            }
+        }
+
+        return str_replace('/', '\\', $finalPath);
     }
 
     public function getFullStatusList()
@@ -142,21 +149,34 @@ class FfastransService
 
     /**
      * Get the status of a specific job.
-     *
-     * @param string $jobId
-     * @return array
+     * Checks Active jobs first, then falls back to History if not found.
      */
     public function getJobStatus(string $jobId)
     {
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
-
         $response = $this->client()->get($endpoint);
 
-        if ($response->failed()) {
-            return ['state' => 'Error', 'msg' => 'Could not retrieve status'];
+        if ($response->successful()) {
+            $data = $response->json();
+            return $data;
         }
 
-        return $response->json();
+        if ($response->status() === 404) {
+            $historyEndpoint = "{$this->baseUrl}/api/json/v2/history/{$jobId}";
+            $historyResponse = $this->client()->get($historyEndpoint);
+
+            if ($historyResponse->successful()) {
+                $historyData = $historyResponse->json();
+                
+                return [
+                    'state'    => $historyData['result'] ?? 'Success', 
+                    'progress' => 100, 
+                    'message'  => $historyData['msg'] ?? ''
+                ];
+            }
+        }
+
+        return ['state' => 'Error', 'msg' => 'Job not found in Active or History'];
     }
 
     /**

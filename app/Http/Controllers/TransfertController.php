@@ -19,7 +19,7 @@ class TransfertController extends Controller
 
     public function index()
     {
-        $maxConcurrent = env('NB_MAX_PROCESSUS_TRANSFERT');
+        $maxConcurrent = config('btsplay.process.max_concurrent_transferts');
 
         return view('admin.transferts', compact('maxConcurrent'));
     }
@@ -110,20 +110,34 @@ class TransfertController extends Controller
     public function startJob(Request $request)
     {
         $filePath = $request->input('path');
-        $workflowId = env('WORKFLOW_ID'); 
+        $disk = $request->input('disk');
+        $workflowId = config('btsplay.process.workflow_id'); 
 
-        $directoryPath = dirname($filePath);
-        $windowsDirectory = str_replace('/', '\\', $directoryPath);
+        $windowsRoot = '';
+        if ($disk === 'nas_arch') {
+            $windowsRoot = env('URI_NAS_ARCH_WIN'); 
+        } elseif ($disk === 'ftp_pad') {
+            $windowsRoot = env('URI_NAS_PAD_WIN'); 
+        }
+
+        $windowsRoot = str_replace('/', '\\', $windowsRoot);
+        $directoryPart = dirname($filePath);
+
+        $winRelativeDir  = str_replace('/', '\\', $directoryPart);
+        $winRelativeFile = str_replace('/', '\\', $filePath);
+
+        $uncInputFile = rtrim($windowsRoot, '\\') . '\\' . ltrim($winRelativeFile, '\\');
+        $variableData = ltrim($winRelativeDir, '\\') . '\\';
 
         $variables = [
             [
-                'name' => 'project_path', 
-                'data' => $windowsDirectory
+                'name' => 's_project_path', 
+                'data' => $variableData
             ]
         ];
 
         try {
-            $response = $this->ffastrans->submitJob($filePath, $workflowId, $variables);
+            $response = $this->ffastrans->submitJob($uncInputFile, $workflowId, $variables);
             
             return response()->json([
                 'success' => true,
@@ -154,34 +168,50 @@ class TransfertController extends Controller
         return $flat;
     }
 
-    /**
-     * AJAX Endpoint: Check status of a single job
-     */
     public function checkStatus($jobId)
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
             
-            // Map API state to UI labels
             $rawState = $apiData['state'] ?? 'Unknown'; 
             $progress = $apiData['progress'] ?? 0;
 
-            if (in_array($rawState, ['Success', 'Finished', 'Done'])) {
+            if ($progress == 0 && isset($apiData['variables']) && is_array($apiData['variables'])) {
+                foreach ($apiData['variables'] as $var) {
+                    if (in_array($var['name'], ['progress', 'i_progress', 's_progress'])) {
+                        $progress = (int) $var['data'];
+                    }
+                    if (in_array($var['name'], ['status', 's_status'])) {
+                        $rawState = $var['data'];
+                    }
+                }
+            }
+            
+            $stateLower = strtolower($rawState);
+
+            if (in_array($stateLower, ['success', 'finished', 'done', 'terminé'])) {
                 $label = 'Terminé';
                 $finished = true;
-                $progress = 100;
-            } elseif (in_array($rawState, ['Error', 'Failed', 'Cancelled'])) {
+                $progress = 100; 
+            } 
+            elseif (in_array($stateLower, ['error', 'failed', 'cancelled', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
-            } else {
-                $label = 'En cours';
+            } 
+            else {
+                if ($rawState === 'Unknown' || empty($rawState)) {
+                    $label = 'En cours';
+                } else {
+                    $label = $rawState; 
+                }
                 $finished = false;
             }
 
             return response()->json([
                 'progress' => $progress,
                 'label' => $label,
-                'finished' => $finished
+                'finished' => $finished,
+                'debug_state' => $rawState
             ]);
 
         } catch (\Exception $e) {

@@ -77,22 +77,21 @@
     <div x-show="!loading && files.length > 0" x-cloak class="space-y-8">
         <template x-for="file in files" :key="file.id">
             
-            <div 
+        <div 
                 x-data="transferRow(file)"
                 x-init="init()"
                 x-bind:data-active="job_id && !finished" 
                 @confirm-cancel-event.window="if($event.detail.id === job_id) executeCancel()"
-                class="flex flex-col md:flex-row items-center md:space-x-6 space-y-4 md:space-y-0"
+                class="flex flex-col md:flex-row items-center w-full py-4 border-b border-gray-100 last:border-0"
             >
-                <div class="flex items-center w-full md:w-1/3">
+                <div class="flex items-center w-full md:w-7/12 pr-4">
                     <div class="shrink-0 mr-4">
                         <svg class="w-10 h-10 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
                         </svg>
                     </div>
                     
-                    <div class="flex flex-col overflow-hidden">
-                        <div class="font-bold text-gray-800 truncate" :title="filename" x-text="filename"></div>
+                    <div class="flex flex-col overflow-hidden min-w-0"> <div class="font-bold text-gray-800 truncate" :title="filename" x-text="filename"></div>
                         
                         <div class="text-xs text-gray-500 truncate" :title="path">
                             <span 
@@ -105,62 +104,66 @@
                     </div>
                 </div>
 
-                <template x-if="!job_id">
-                    <div class="flex items-center justify-end w-full md:w-2/3 pr-12">
-                        <button 
-                            @click="startJob"
-                            class="bg-[#2C3E50] hover:bg-[#34495e] text-white font-bold py-2 px-6 rounded shadow flex items-center transition"
-                            :class="{'opacity-75 cursor-wait': starting}"
-                            :disabled="starting"
-                        >
-                            <span x-show="!starting">Commencer Transcodage</span>
-                            <span x-show="starting" class="flex items-center">
-                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Lancement...
-                            </span>
-                        </button>
-                    </div>
-                </template>
+                <div class="w-full md:w-5/12 pl-4 flex items-center h-10">
+                    
+                    <template x-if="!job_id">
+                        <div class="w-full flex justify-end"> <button 
+                                @click="startJob"
+                                class="bg-[#2C3E50] hover:bg-[#34495e] text-white font-bold py-2 px-6 rounded shadow flex items-center transition whitespace-nowrap"
+                                :class="{'opacity-75 cursor-wait': starting}"
+                                :disabled="starting"
+                            >
+                                <span x-show="!starting">Commencer Transcodage</span>
+                                <span x-show="starting" class="flex items-center">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Lancement...
+                                </span>
+                            </button>
+                        </div>
+                    </template>
 
-                <template x-if="job_id">
-                    <div class="contents md:w-2/3"> 
-                        <div class="flex items-center w-full md:w-3/4 space-x-4 md:ml-12">
-                            <div class="grow h-3 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+                    <template x-if="job_id">
+                        <div class="w-full flex items-center space-x-4"> 
+                            <div class="grow h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300 relative">
                                 <div 
-                                    class="h-full bg-[#2C3E50] rounded-full transition-all duration-1000 ease-out"
+                                    class="h-full bg-[#2C3E50] transition-all duration-500 ease-out flex items-center justify-end pr-2"
+                                    :class="{'bg-green-500': finished && status === 'Terminé', 'bg-red-500': finished && status === 'Echoué'}"
                                     :style="`width: ${progress}%`"
-                                ></div>
+                                >
+                                </div>
                             </div>
-                            <div class="w-12 text-right font-bold text-gray-800 text-sm">
+                            
+                            <div class="w-12 text-right font-bold text-gray-800 text-sm shrink-0">
                                 <span x-text="Math.round(progress)"></span>%
                             </div>
-                        </div>
 
-                        <div class="flex items-center justify-center w-full md:w-1/4 text-right md:text-left pl-4 pr-12">
-                            <span 
-                                class="font-bold text-sm"
-                                :class="statusColorClass"
-                                x-text="status"
-                            ></span>
+                            <div class="w-28 text-right shrink-0 flex flex-col items-end">
+                                <span 
+                                    class="font-bold text-sm truncate w-full"
+                                    :class="statusColorClass"
+                                    x-text="status"
+                                ></span>
 
-                            <template x-if="!finished">
-                                <button 
-                                    @click="askCancel" 
-                                    class="ml-2 text-xs text-red-600 font-bold hover:text-red-800 underline cursor-pointer"
-                                >
-                                    (Annuler)
-                                </button>
-                            </template>
+                                <template x-if="!finished">
+                                    <button 
+                                        @click="askCancel" 
+                                        class="text-xs text-red-600 hover:text-red-800 underline cursor-pointer mt-1"
+                                    >
+                                        Annuler
+                                    </button>
+                                </template>
+                            </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </template>
     </div>
 
     <div 
         x-show="modalOpen" 
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
+        style="background-color: rgba(0, 0, 0, 0.5);"
         x-cloak
     >
         <div class="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-md overflow-hidden p-6 text-center" @click.away="modalOpen = false">
@@ -175,7 +178,8 @@
 
     <div 
         x-show="limitModalOpen" 
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
+        style="background-color: rgba(0, 0, 0, 0.5);"
         x-cloak
     >
         <div class="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-md overflow-hidden p-6 text-center" @click.away="limitModalOpen = false">
@@ -194,7 +198,6 @@
             loading: true,
             error: false,
             files: [],
-
             modalOpen: false,
             limitModalOpen: false,
             cancelId: null,
@@ -202,32 +205,14 @@
             fetchData() {
                 this.loading = true;
                 this.error = false;
-                this.files = [];
-
                 fetch('{{ route("admin.transferts.list") }}')
-                .then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    return res.json();
-                })
-                .then(data => {
-                    this.files = data.results ?? [];
-                    this.loading = false;
-                })
-                .catch(err => {
-                    console.error(err);
-                    this.error = true;
-                    this.loading = false;
-                });
+                .then(res => res.ok ? res.json() : Promise.reject(res))
+                .then(data => { this.files = data.results ?? []; this.loading = false; })
+                .catch(() => { this.error = true; this.loading = false; });
             },
 
-            openModal(id) {
-                this.cancelId = id;
-                this.modalOpen = true;
-            },
-            confirmCancel() {
-                this.modalOpen = false;
-                window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } }));
-            }
+            openModal(id) { this.cancelId = id; this.modalOpen = true; },
+            confirmCancel() { this.modalOpen = false; window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } })); }
         }
     }
 
@@ -237,34 +222,31 @@
             filename: fileData.filename,
             path: fileData.path,
             source: fileData.source,
-
             job_id: fileData.job_id,
-            progress: fileData.progress,
+            progress: Number(fileData.progress) || 0,
             status: fileData.status,
             finished: fileData.finished,
             starting: false,
+            fakeInterval: null, 
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
                 if (s.includes('termin') || s.includes('success')) return 'text-green-600'; 
-                if (s.includes('attente')) return 'text-orange-500'; 
                 if (s.includes('echou') || s.includes('error')) return 'text-red-600';
-                return 'text-[#2C3E50]'; 
+                return 'text-blue-600';
             },
 
             init() {
-                if (this.job_id && !this.finished) {
-                    this.startPolling();
-                }
+                if (this.job_id && !this.finished) this.startPolling();
             },
 
             startJob() {
                 const container = document.querySelector('[data-limit]');
-                const limitRaw = container ? container.getAttribute('data-limit') : '';
-                const maxConcurrent = limitRaw ? parseInt(limitRaw) : null;
-                const activeCount = document.querySelectorAll('[data-active="true"]').length;
+                const maxConcurrent = container && container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 2;
                 
-                if (maxConcurrent !== null && activeCount >= maxConcurrent) {
+                const busyCount = document.querySelectorAll('[data-active="true"], [data-starting="true"]').length;
+                
+                if (busyCount > maxConcurrent) {
                     this.$dispatch('open-limit-modal');
                     return; 
                 }
@@ -273,11 +255,8 @@
 
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ path: fileData.path, disk: fileData.disk })
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                    body: JSON.stringify({ path: this.path, disk: (this.source === 'NAS_ARCH' ? 'nas_arch' : 'ftp_pad') })
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -286,30 +265,56 @@
                         this.status = "Démarrage...";
                         this.progress = 0;
                         this.startPolling(); 
-                    } else {
-                        alert("Erreur: " + data.message);
-                        this.starting = false;
+                    } else { 
+                        alert("Erreur: " + data.message); 
+                        this.starting = false; 
                     }
                 })
-                .catch(err => {
-                    alert("Erreur technique");
-                    this.starting = false;
+                .catch(() => { 
+                    alert("Erreur technique"); 
+                    this.starting = false; 
                 });
             },
 
             startPolling() {
+                if (this.fakeInterval) clearInterval(this.fakeInterval);
+                this.fakeInterval = setInterval(() => {
+                    if (!this.finished && this.progress < 90) {
+                        this.progress += 0.5;
+                    }
+                }, 500);
+
                 let poller = setInterval(() => {
-                    if (this.finished) { clearInterval(poller); return; }
+                    if (this.finished) { 
+                        clearInterval(poller); 
+                        clearInterval(this.fakeInterval);
+                        return; 
+                    }
 
                     fetch(`/admin/transferts/status/${this.job_id}`)
                         .then(res => res.json())
                         .then(data => {
-                            this.progress = data.progress;
+                            let apiProgress = Number(data.progress);
+
+                            if (apiProgress > 0) {
+                                this.progress = apiProgress;
+                            }
+
                             this.status = data.label;
                             this.finished = data.finished;
+
+                            if (this.finished && (data.label === 'Terminé' || data.label === 'Success')) {
+                                this.progress = 100;
+                                this.starting = false; 
+                            } else if (this.finished) {
+                                this.starting = false;
+                            }
                         })
-                        .catch(() => clearInterval(poller));
-                }, 2000);
+                        .catch(() => { 
+                            clearInterval(poller); 
+                            clearInterval(this.fakeInterval);
+                        });
+                }, 1000); 
             },
 
             askCancel() {
@@ -321,8 +326,12 @@
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
                 }).then(() => {
-                    this.status = "Annulation...";
-                    setTimeout(() => window.location.reload(), 1000);
+                    this.status = "Annulé";
+                    this.finished = true;
+                    this.job_id = null; 
+                    this.progress = 0;
+                    this.starting = false;
+                    if (this.fakeInterval) clearInterval(this.fakeInterval);
                 });
             }
         }

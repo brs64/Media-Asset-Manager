@@ -40,7 +40,7 @@ return [
         'user' => env('FFASTRANS_USER'),
         'password' => env('FFASTRANS_PASSWORD'),
         'path_local'  => '',
-        'path_remote' => env('URI_NAS_PAD_WIN'),
+        'path_remote' => env('URI_NAS_ARCH_WIN'),
     ],
 
 ];
