@@ -304,7 +304,7 @@
                             this.status = data.label;
                             this.finished = data.finished;
 
-                            if (this.finished && (data.label === 'Terminé' || data.label === 'Success')) {
+                            if (!this.localPathSynced && this.finished && (data.label === 'Terminé' || data.label === 'Success')) {
                                 this.progress = 100;
                                 this.starting = false;
 
