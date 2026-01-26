@@ -208,15 +208,16 @@ class MediaService
         $kw = $filtres['keyword'];
 
         $query->where(function($q) use ($kw) {
-            $q->where('mtd_tech_titre', 'like', "%{$kw}%")
-              ->orWhere('description', 'like', "%{$kw}%")
-              ->orWhere('theme', 'like', "%{$kw}%")  // <--- AJOUT DU FILTRE THÈME
-              ->orWhere('promotion', 'like', "%{$kw}%")
-              ->orWhere('type', 'like', "%{$kw}%");    // <--- AJOUT DU FILTRE TYPE
+            $q->where('mtd_tech_titre', 'like', "%{$kw}%")//filtre titre
+              ->orWhere('description', 'like', "%{$kw}%")//filtre description
+              ->orWhere('theme', 'like', "%{$kw}%")  // filtre thheme
+              ->orWhere('promotion', 'like', "%{$kw}%")//filtre promotion
+              ->orWhere('type', 'like', "%{$kw}%");    // filtre type
             
-            // Si on veut aussi chercher par nom de prof
+            // Si on veut aussi chercher par nom + prenom de prof
             $q->orWhereHas('professeur', function($sq) use ($kw) {
-                $sq->where('nom', 'like', "%{$kw}%");
+                $sq->where('nom', 'like', "%{$kw}%")
+                ->orWhere('prenom', 'like', "%{$kw}%"); // On ajoute cette ligne
             });
         });
     }

@@ -25,20 +25,19 @@ public function index(Request $request)
 {
     $filtres = [];
 
-    // On récupère le mot saisi (soit du header 'motCle', soit de la page 'description')
+    // recup du mot saisi
     $searchTerm = $request->input('description') ?? $request->input('motCle');
 
     if ($searchTerm) {
-        // On envoie le mot-clé au service
+        //envoie le mot-clé au service
         $filtres['keyword'] = $searchTerm;
     }
 
-    // On appelle le service (qui va maintenant inclure le thème)
     $medias = $this->mediaService->searchMedia($filtres);
 
     $medias->appends($request->all());
 
-    // On définit les variables pour éviter les erreurs dans la vue
+    //défini les variables pour éviter les erreurs dans la vue
     $description = $searchTerm;
     $listeProjet = Projet::orderBy('libelle')->get();
     $listeProf = Professeur::orderBy('nom')->get();
