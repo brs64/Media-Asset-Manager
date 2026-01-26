@@ -608,4 +608,38 @@ class MediaService
         }
         return preg_replace('/[\r\n]+/', ' ', trim($value));
     }
+
+    /**
+     * Synchronise un chemin local avec un media existant
+     * IMPORTANT : Ne crée jamais de media dans le cas ou aucune correspondance n'est faite en BDD
+     */
+    public function syncLocalPath(string $path): bool
+    {
+        $title = pathinfo($path, PATHINFO_FILENAME);
+        $normalizedTitle = mb_strtolower(trim($title));
+
+        $media = Media::whereRaw(
+            'LOWER(mtd_tech_titre) = ?',
+            [$normalizedTitle]
+        )->first();
+
+        if (!$media) {
+            Log::warning('syncLocalPath: Media non trouvé', [
+                'path' => $path,
+                'title' => $normalizedTitle,
+            ]);
+            return false;
+        }
+
+        $media->chemin_local = $path;
+        $media->save();
+
+        Log::info('syncLocalPath: Chemin local mis à jour', [
+            'media_id' => $media->id,
+            'path' => $path,
+        ]);
+
+        return true;
+    }
+
 }

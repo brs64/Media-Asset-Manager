@@ -221,7 +221,7 @@ class MediaController extends Controller
             ->withErrors('Error deleting media');
     }
 
-public function sync()
+    public function sync()
     {
         foreach ([
             'ftp_arch',
@@ -234,4 +234,22 @@ public function sync()
         return back()->with('success', 'Synchronisation BD lancée 🚀');
     }
 
+    public function syncLocalPath(Request $request, MediaService $mediaService)
+    {
+        $request->validate([
+            'path' => ['required', 'string'],
+        ]);
+
+        $success = $mediaService->syncLocalPath($request->path);
+
+        if (!$success) {
+            return response()->json([
+                'message' => 'Media non trouvé',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Chemin local synchronisé',
+        ]);
+    }
 }

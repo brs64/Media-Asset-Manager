@@ -227,7 +227,8 @@
             status: fileData.status,
             finished: fileData.finished,
             starting: false,
-            fakeInterval: null, 
+            fakeInterval: null,
+            localPathSynced: false,
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
@@ -305,7 +306,10 @@
 
                             if (this.finished && (data.label === 'Terminé' || data.label === 'Success')) {
                                 this.progress = 100;
-                                this.starting = false; 
+                                this.starting = false;
+
+                                this.localPathSynced = true;
+                                this.syncLocalPath();
                             } else if (this.finished) {
                                 this.starting = false;
                             }
@@ -324,16 +328,41 @@
             executeCancel() {
                 fetch(`/admin/transferts/cancel/${this.job_id}`, {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
+                    headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
                 }).then(() => {
                     this.status = "Annulé";
                     this.finished = true;
-                    this.job_id = null; 
+                    this.job_id = null;
                     this.progress = 0;
                     this.starting = false;
                     if (this.fakeInterval) clearInterval(this.fakeInterval);
                 });
+            },
+
+            syncLocalPath() {
+                fetch('/admin/media/sync-local-path', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        path: this.path
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data || data.message !== 'Chemin local synchronisé') {
+                            console.warn('Sync local path: réponse inattendue', data);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Erreur syncLocalPath', err);
+                    });
             }
+
         }
     }
 </script>

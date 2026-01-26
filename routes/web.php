@@ -51,7 +51,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // --- TAB 1: BASE DE DONNEES ---
     Route::get('/', [AdminController::class, 'databaseView'])->name('database');
     Route::get('/database', [AdminController::class, 'databaseView'])->name('database.index');
-    Route::post('/admin/media/sync', [MediaController::class, 'sync'])->name('media.sync');
+    Route::post('/media/sync', [MediaController::class, 'sync'])->name('media.sync');
+    Route::post('/media/sync-local-path', [MediaController::class, 'syncLocalPath'])->name('media.addLocalPath');
 
     // --- TAB 2: TRANSFERTS ---
     Route::get('/transferts', [TransfertController::class, 'index'])->name('transferts');
@@ -63,6 +64,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/scan/start', [FileExplorerController::class, 'startScan'])->name('scan.start');
     Route::get('/scan/{scanId}/status', [FileExplorerController::class, 'scanStatus'])->name('scan.status');
     Route::get('/scan/{scanId}/results', [FileExplorerController::class, 'scanResults'])->name('scan.results');
+
+
 
     // --- TAB 3: RECONCILIATION ---
     Route::get('/reconciliation', [AdminController::class, 'reconciliation'])->name('reconciliation');
