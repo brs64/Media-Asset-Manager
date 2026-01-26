@@ -26,30 +26,42 @@
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @foreach($professeurs as $prof)
-                <tr class="{{ $loop->even ? 'bg-gray-50' : '' }}">
+                <tr class="{{ $loop->even ? 'bg-gray-50' : '' }}" data-prof-id="{{ $prof->id }}">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                         {{ $prof->nom }} {{ $prof->prenom }}
                     </td>
 
-                    @php 
-                        $isAdmin = $prof->role == 'admin'; // Adjust based on your Role logic
-                    @endphp
-
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <input type="checkbox"
+                               data-permission="can_edit_video"
+                               {{ $prof->is_admin || $prof->can_edit_video ? 'checked' : '' }}
+                               {{ $prof->is_admin ? 'disabled' : '' }}
+                               class="permission-toggle h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <input type="checkbox"
+                               data-permission="can_broadcast_video"
+                               {{ $prof->is_admin || $prof->can_broadcast_video ? 'checked' : '' }}
+                               {{ $prof->is_admin ? 'disabled' : '' }}
+                               class="permission-toggle h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <input type="checkbox"
+                               data-permission="can_delete_video"
+                               {{ $prof->is_admin || $prof->can_delete_video ? 'checked' : '' }}
+                               {{ $prof->is_admin ? 'disabled' : '' }}
+                               class="permission-toggle h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                         <input type="checkbox" {{ $isAdmin ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                         <input type="checkbox"
+                               data-permission="can_administer"
+                               {{ $prof->is_admin || $prof->can_administer ? 'checked' : '' }}
+                               {{ $prof->is_admin ? 'disabled' : '' }}
+                               class="permission-toggle h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
 
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        @if(!$isAdmin)
+                        @if(!$prof->is_admin)
                         <form action="{{ route('admin.professeurs.delete', $prof->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
                             @csrf
                             @method('DELETE')
@@ -102,3 +114,76 @@
     </div>
 </div>
 @endsection
+
+@push('admin_scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gérer les changements de permissions
+    const permissionToggles = document.querySelectorAll('.permission-toggle');
+
+    permissionToggles.forEach(toggle => {
+        toggle.addEventListener('change', async function() {
+            const row = this.closest('tr');
+            const profId = row.dataset.profId;
+            const permission = this.dataset.permission;
+            const value = this.checked;
+
+            try {
+                const response = await fetch(`/admin/professeurs/${profId}/permissions`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        permission: permission,
+                        value: value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Si l'utilisateur devient admin, désactiver et cocher tous les toggles
+                    if (data.is_admin) {
+                        row.querySelectorAll('.permission-toggle').forEach(t => {
+                            t.checked = true;
+                            t.disabled = true;
+                        });
+                        // Cacher le bouton supprimer
+                        const deleteForm = row.querySelector('form');
+                        if (deleteForm) {
+                            deleteForm.style.display = 'none';
+                        }
+                    } else if (permission === 'can_administer' && !value) {
+                        // Si on retire le droit d'administrer, réactiver les toggles
+                        row.querySelectorAll('.permission-toggle').forEach(t => {
+                            if (t.dataset.permission !== 'can_administer') {
+                                t.disabled = false;
+                            }
+                        });
+                        // Réafficher le bouton supprimer
+                        const deleteForm = row.querySelector('form');
+                        if (deleteForm) {
+                            deleteForm.style.display = 'block';
+                        }
+                    }
+
+                    // Afficher un message de succès (optionnel)
+                    console.log('Permission mise à jour avec succès');
+                } else {
+                    // En cas d'erreur, remettre le toggle dans son état précédent
+                    this.checked = !value;
+                    alert('Erreur: ' + (data.message || 'Impossible de mettre à jour la permission'));
+                }
+            } catch (error) {
+                // En cas d'erreur réseau, remettre le toggle dans son état précédent
+                this.checked = !value;
+                console.error('Erreur:', error);
+                alert('Erreur de connexion');
+            }
+        });
+    });
+});
+</script>
+@endpush

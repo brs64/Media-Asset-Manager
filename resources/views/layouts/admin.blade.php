@@ -50,3 +50,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    @stack('admin_scripts')
+@endpush

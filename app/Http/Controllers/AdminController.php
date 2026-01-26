@@ -186,6 +186,7 @@ class AdminController extends Controller
             'prenom' => 'required|string|max:255',
             'identifiant' => 'required|string|unique:users,name',
             'mot_de_passe' => 'required|min:8',
+            'is_admin' => 'sometimes|boolean',
         ]);
 
         // Utiliser une transaction pour garantir l'intégrité
@@ -197,10 +198,17 @@ class AdminController extends Controller
             ]);
 
             // 2. Créer le professeur lié à cet utilisateur
+            // Si c'est un admin, il aura tous les droits, sinon aucun droit par défaut
+            $isAdmin = $validated['is_admin'] ?? false;
             Professeur::create([
                 'user_id' => $user->id,
                 'nom' => $validated['nom'],
                 'prenom' => $validated['prenom'],
+                'is_admin' => $isAdmin,
+                'can_edit_video' => $isAdmin,
+                'can_broadcast_video' => $isAdmin,
+                'can_delete_video' => $isAdmin,
+                'can_administer' => $isAdmin,
             ]);
         });
 
@@ -228,6 +236,52 @@ class AdminController extends Controller
         });
 
         return back()->with('success', 'Professeur supprimé avec succès!');
+    }
+
+    /**
+     * Mettre à jour les permissions d'un professeur
+     */
+    public function updatePermissions(Request $request, $id)
+    {
+        $professeur = Professeur::findOrFail($id);
+
+        // Les admins ont toujours tous les droits
+        if ($professeur->is_admin) {
+            return response()->json(['success' => false, 'message' => 'Impossible de modifier les permissions d\'un administrateur'], 400);
+        }
+
+        $validated = $request->validate([
+            'permission' => 'required|in:can_edit_video,can_broadcast_video,can_delete_video,can_administer',
+            'value' => 'required|boolean'
+        ]);
+
+        // Si on donne le droit d'administrer, le professeur devient admin avec tous les droits
+        if ($validated['permission'] === 'can_administer' && $validated['value']) {
+            $professeur->update([
+                'is_admin' => true,
+                'can_edit_video' => true,
+                'can_broadcast_video' => true,
+                'can_delete_video' => true,
+                'can_administer' => true,
+            ]);
+        } elseif ($validated['permission'] === 'can_administer' && !$validated['value']) {
+            // Si on retire le droit d'administrer, on retire le statut admin
+            $professeur->update([
+                'is_admin' => false,
+                'can_administer' => false,
+            ]);
+        } else {
+            // Sinon, on met à jour uniquement la permission concernée
+            $professeur->update([
+                $validated['permission'] => $validated['value']
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permission mise à jour avec succès',
+            'is_admin' => $professeur->is_admin
+        ]);
     }
 
     /**

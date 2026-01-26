@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Routes admin (uniquement pour les professeurs)
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'check.permission:administer'])->prefix('admin')->name('admin.')->group(function () {
 
     // --- TAB 1: BASE DE DONNEES ---
     Route::get('/', [AdminController::class, 'databaseView'])->name('database');
@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // User Actions
     Route::post('/professeurs', [AdminController::class, 'createProfesseur'])->name('professeurs.create');
     Route::delete('/professeurs/{id}', [AdminController::class, 'deleteProfesseur'])->name('professeurs.delete');
+    Route::patch('/professeurs/{id}/permissions', [AdminController::class, 'updatePermissions'])->name('professeurs.permissions');
     Route::post('/eleves', [AdminController::class, 'createEleve'])->name('eleves.create');
     Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('eleves.delete');
 
