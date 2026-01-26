@@ -21,72 +21,30 @@ class SearchController extends Controller
     /**
      * Gère l'affichage ET le traitement de la recherche
      */
-    public function index(Request $request)
-    {
-        // 1. Préparation des filtres pour le Service
-        $filtres = [];
+public function index(Request $request)
+{
+    $filtres = [];
 
-        $searchTerm = $request->input('description') ?? $request->input('motCle');
+    // On récupère le mot saisi (soit du header 'motCle', soit de la page 'description')
+    $searchTerm = $request->input('description') ?? $request->input('motCle');
 
-        if ($searchTerm) {
-            $filtres['description'] = $searchTerm;
-        }
-
-        // Filtre : Description
-        if ($request->filled('description')) {
-            $filtres['description'] = $request->description;
-        }
-
-        // Filtre : Promotion
-        if ($request->filled('promotion')) {
-            $filtres['promotion'] = $request->promotion;
-        }
-
-        // Filtre : Projet (Conversion Nom -> ID)
-        if ($request->filled('projet')) {
-            $projetModel = Projet::where('intitule', $request->projet)->first();
-            if ($projetModel) {
-                $filtres['projet_id'] = $projetModel->id;
-            }
-        }
-
-        // Filtre : Professeur (Conversion Référent -> ID)
-        if ($request->filled('prof')) {
-            $profModel = Professeur::where('professeurReferent', $request->prof)->first(); 
-
-            if ($profModel) {
-                $filtres['professeur_id'] = $profModel->id;
-            }
-        }
-
-        // 2. Appel du Service pour récupérer les médias
-        // Le service renvoie déjà un objet Paginator, parfait pour la vue
-        $medias = $this->mediaService->searchMedia($filtres);
-
-        // On s'assure que les paramètres de recherche restent dans l'URL lors de la pagination
-        $medias->appends($request->all());
-
-        // 3. Charger les listes pour les menus déroulants
-        $listeProjet = Projet::orderBy('libelle')->get();
-        $listeProf = Professeur::orderBy('nom')->get();
-
-        // 4. Récupérer les valeurs actuelles pour pré-remplir le formulaire
-        $description = $request->description;
-        $prof = $request->prof;
-        $projet = $request->projet;
-        $promotion = $request->promotion;
-
-        // 5. Renvoyer la vue
-        return view('recherche', compact(
-            'medias', 
-            'listeProjet', 
-            'listeProf', 
-            'description', 
-            'prof', 
-            'projet', 
-            'promotion'
-        ));
+    if ($searchTerm) {
+        // On envoie le mot-clé au service
+        $filtres['keyword'] = $searchTerm;
     }
+
+    // On appelle le service (qui va maintenant inclure le thème)
+    $medias = $this->mediaService->searchMedia($filtres);
+
+    $medias->appends($request->all());
+
+    // On définit les variables pour éviter les erreurs dans la vue
+    $description = $searchTerm;
+    $listeProjet = Projet::orderBy('libelle')->get();
+    $listeProf = Professeur::orderBy('nom')->get();
+
+    return view('recherche', compact('medias', 'listeProjet', 'listeProf', 'description'));
+}
 
     /**
      * API for autocomplete

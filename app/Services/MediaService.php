@@ -200,34 +200,29 @@ class MediaService
     /**
      * Search media with filters (Title, Description, Project Name)
      */
-    public function searchMedia(array $filtres): \Illuminate\Pagination\LengthAwarePaginator
-    {
-        //dd($filtres); 
-        $query = Media::query()->with(['projets', 'professeur', 'participations.eleve', 'participations.role']);
+  public function searchMedia(array $filtres)
+{
+    $query = Media::query();
 
-        // --- 1. GLOBAL SEARCH BAR (Input name="description") ---
-        // This acts as a "General Search" across Title, Description, AND Project Name
-        if (!empty($filtres['description'])) {
-            $term = '%' . $filtres['description'] . '%';
+    if (!empty($filtres['keyword'])) {
+        $kw = $filtres['keyword'];
 
-            // We group these conditions in a closure: (A OR B OR C)
-            $query->where(function($q) use ($term) {
-                
-                // A. Search in Title
-                $q->where('mtd_tech_titre', 'like', $term)
-                
-                // B. Search in Description
-                  ->orWhere('description', 'like', $term)
-                  
-                // C. Search in Related Project Name
-                // This checks the 'projets' table via the relationship
-                  ->orWhereHas('projets', function ($queryProjet) use ($term) {
-                      // Note: I assumed the column is 'libelle'. 
-                      // If your column in the projets table is 'intitule' or 'nom', change it here.
-                      $queryProjet->where('libelle', 'like', $term);
-                  });
+        $query->where(function($q) use ($kw) {
+            $q->where('mtd_tech_titre', 'like', "%{$kw}%")
+              ->orWhere('description', 'like', "%{$kw}%")
+              ->orWhere('theme', 'like', "%{$kw}%")  // <--- AJOUT DU FILTRE THÈME
+              ->orWhere('promotion', 'like', "%{$kw}%")
+              ->orWhere('type', 'like', "%{$kw}%");    // <--- AJOUT DU FILTRE TYPE
+            
+            // Si on veut aussi chercher par nom de prof
+            $q->orWhereHas('professeur', function($sq) use ($kw) {
+                $sq->where('nom', 'like', "%{$kw}%");
             });
-        }
+        });
+    }
+
+    return $query->paginate(12);
+
 
         // --- 2. SPECIFIC DROPDOWN FILTERS (Strict AND conditions) ---
 
