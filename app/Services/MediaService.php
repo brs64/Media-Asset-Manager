@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+
 use App\Models\Media;
 use App\Models\Projet;
 use App\Models\Professeur;
@@ -217,7 +218,9 @@ class MediaService
             // Si on veut aussi chercher par nom + prenom de prof
             $q->orWhereHas('professeur', function($sq) use ($kw) {
                 $sq->where('nom', 'like', "%{$kw}%")
-                ->orWhere('prenom', 'like', "%{$kw}%"); // On ajoute cette ligne
+                ->orWhere('prenom', 'like', "%{$kw}%")
+                ->orWhere(DB::raw("CONCAT(prenom, ' ', nom)"), 'like', "%{$kw}%")
+                ->orWhere(DB::raw("CONCAT(nom, ' ', prenom)"), 'like', "%{$kw}%");
             });
         });
     }
