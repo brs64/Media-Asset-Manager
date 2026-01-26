@@ -184,12 +184,25 @@ class AdminController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'identifiant' => 'required|string|unique:professeurs',
+            'identifiant' => 'required|string|unique:users,name',
             'mot_de_passe' => 'required|min:8',
         ]);
 
-        $validated['mot_de_passe'] = bcrypt($validated['mot_de_passe']);
-        Professeur::create($validated);
+        // Utiliser une transaction pour garantir l'intégrité
+        \DB::transaction(function () use ($validated) {
+            // 1. Créer l'utilisateur avec l'identifiant comme 'name'
+            $user = User::create([
+                'name' => $validated['identifiant'],
+                'password' => bcrypt($validated['mot_de_passe']),
+            ]);
+
+            // 2. Créer le professeur lié à cet utilisateur
+            Professeur::create([
+                'user_id' => $user->id,
+                'nom' => $validated['nom'],
+                'prenom' => $validated['prenom'],
+            ]);
+        });
 
         return back()->with('success', 'Professeur créé avec succès!');
     }
@@ -205,7 +218,15 @@ class AdminController extends Controller
             return back()->withErrors('Impossible de supprimer un professeur référent de médias.');
         }
 
-        $professeur->delete();
+        // Utiliser une transaction pour supprimer le professeur et son utilisateur
+        \DB::transaction(function () use ($professeur) {
+            $user = $professeur->user;
+            $professeur->delete();
+            if ($user) {
+                $user->delete();
+            }
+        });
+
         return back()->with('success', 'Professeur supprimé avec succès!');
     }
 
