@@ -33,17 +33,48 @@ class FileExplorerController extends Controller
         $disk = $request->query('disk');
         $path = $request->query('path', '/');
 
-        // Sécurité minimale
         abort_unless(
             in_array($disk, array_keys(config('filesystems.disks'))),
             403,
             'Disque interdit'
         );
 
+        // scan filesystem
         $items = FileExplorerService::scanDisk($disk, $path);
 
-        // Retourne UNIQUEMENT le HTML
-        return view('explorer.tree-item', compact('items'))->render();
+        // chemins vidéos
+        $videoPaths = collect($items)
+            ->where('type', 'video')
+            ->pluck('path')
+            ->values();
+
+        // mapping disk → colonne BDD
+        $column = match ($disk) {
+            'external_local' => 'chemin_local',
+            'ftp_pad'        => 'URI_NAS_PAD',
+            'ftp_arch'       => 'URI_NAS_ARCH',
+            default          => null,
+        };
+
+        $medias = collect();
+
+        if ($column && $videoPaths->isNotEmpty()) {
+            $medias = Media::whereIn($column, $videoPaths)
+                ->get()
+                ->keyBy($column);
+        }
+
+        // enrichissement
+        $items = collect($items)->map(function ($item) use ($medias, $column) {
+            if ($item['type'] === 'video' && $column) {
+                $item['media'] = $medias->get($item['path']);
+            }
+            return $item;
+        });
+
+        return view('explorer.tree-item', [
+            'items' => $items,
+        ])->render();
     }
 
     public function startScan(Request $request)

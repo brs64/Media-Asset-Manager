@@ -16,9 +16,36 @@
 
         {{-- 🎬 VIDÉO --}}
         @elseif ($item['type'] === 'video')
-            <div class="video-link text-blue-400 hover:text-blue-200 flex items-center gap-2 cursor-pointer">
-                <span class="icon">🎬</span>
-                <span>{{ $item['name'] }}</span>
+
+            @php $media = $item['media'] ?? null; @endphp
+
+            <div class="flex items-center gap-2
+        @if (!$media)
+            text-gray-500
+        @elseif (!$media->chemin_local)
+            text-orange-400
+        @else
+            text-green-400 hover:text-green-200
+        @endif">
+
+                <span>🎬</span>
+
+                {{-- encodée --}}
+                @if ($media && $media->chemin_local)
+                    <a href="{{ route('medias.show', $media) }}" class="underline">
+                        {{ $item['name'] }}
+                    </a>
+
+                    {{-- en BDD mais pas encodée --}}
+                @elseif ($media)
+                    <span class="italic">
+                {{ $item['name'] }} (En attente)
+            </span>
+
+                    {{-- pas en BDD --}}
+                @else
+                    <span>{{ $item['name'] }}</span>
+                @endif
             </div>
 
         @endif
