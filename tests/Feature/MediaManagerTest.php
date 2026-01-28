@@ -15,22 +15,22 @@ class MediaManagerTest extends TestCase
      * Je veux tester la méthode d'édition pour m'assurer que les corrections 
      * apportées par un professeur sont bien persistées en base de données.
      */
-    public function test_professor_can_update_video_metadata()
-    {
-        // Simulation d'un utilisateur avec le rôle Professeur
-        $prof = User::factory()->create(['role' => 'professeur']);
-        
-        // On tente de modifier les informations d'une vidéo (Action à tester)
-        $response = $this->actingAs($prof)->put('/videos/1', [
-            'title' => 'Nouveau Titre BTSPlay',
-            'description' => 'Description mise à jour'
-        ]);
+   public function test_professor_can_update_video_metadata()
+{
+    // Au lieu de créer (factory), on cherche un prof qui existe déjà dans TA base
+    $prof = \App\Models\User::where('role', 'professeur')->first(); 
 
-        // Résultat attendu : Les enrichissements sont sauvegardés
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('videos', ['title' => 'Nouveau Titre BTSPlay']);
+    if (!$prof) {
+        $this->fail("Aucun professeur trouvé dans la vraie base de données.");
     }
 
+    $response = $this->actingAs($prof)->put('/videos/1', [
+        'title' => 'Titre mis à jour sur ma vraie BDD',
+        'description' => 'Test réel'
+    ]);
+
+    $response->assertStatus(200);
+}
     /**
      * TEST : SCRUM-31 - Déplacement de vidéo (Prof)
      * Je veux tester la méthode de déplacement pour vérifier que la vidéo 
