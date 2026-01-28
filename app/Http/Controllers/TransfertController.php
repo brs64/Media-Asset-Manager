@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\FfastransService;
-use App\Services\FileExplorerService;
 use App\Models\Media;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +19,6 @@ class TransfertController extends Controller
     public function index()
     {
         $maxConcurrent = config('btsplay.process.max_concurrent_transferts');
-
         return view('admin.transferts', compact('maxConcurrent'));
     }
     
@@ -28,11 +26,15 @@ class TransfertController extends Controller
     {
         $activeMap = [];
         try {
-            $activeJobs = $ffastrans->getFullStatusList();
-            foreach ($activeJobs as $job) {
+            $allJobs = $ffastrans->getFullStatusList();
+            
+            foreach ($allJobs as $job) {
                 if (isset($job['filename'])) {
                     $key = pathinfo($job['filename'], PATHINFO_FILENAME);
-                    $activeMap[$key] = $job;
+                   
+                    if ($job['is_finished'] === false) {
+                        $activeMap[$key] = $job;
+                    }
                 }
             }
         } catch (\Exception $e) {
@@ -65,16 +67,12 @@ class TransfertController extends Controller
                 $sourceLabel = 'NAS_PAD';
             }
 
-            if (empty($finalPath)) {
-                 continue; 
-            }
+            if (empty($finalPath)) continue; 
 
             $nameWithoutExt = pathinfo($finalPath, PATHINFO_FILENAME);
-
             if (empty($nameWithoutExt) || $nameWithoutExt === '.') {
                 $nameWithoutExt = $media->mtd_tech_titre ?? 'Video_' . $media->id;
             }
-
             $fullFilename = $nameWithoutExt . $displayExt;
 
             $item = [
@@ -92,7 +90,7 @@ class TransfertController extends Controller
             if (isset($activeMap[$nameWithoutExt])) {
                 $job = $activeMap[$nameWithoutExt];
                 $item['job_id']   = $job['id'];
-                $item['status']   = $job['status'];
+                $item['status']   = $job['status']; // Already French from Service
                 $item['progress'] = $job['progress'];
                 $item['finished'] = $job['is_finished'];
             }
@@ -122,58 +120,28 @@ class TransfertController extends Controller
 
         $windowsRoot = str_replace('/', '\\', $windowsRoot);
         $directoryPart = dirname($filePath);
-
         $winRelativeDir  = str_replace('/', '\\', $directoryPart);
         $winRelativeFile = str_replace('/', '\\', $filePath);
-
         $uncInputFile = rtrim($windowsRoot, '\\') . '\\' . ltrim($winRelativeFile, '\\');
         $variableData = ltrim($winRelativeDir, '\\') . '\\';
 
         $variables = [
-            [
-                'name' => 's_project_path', 
-                'data' => $variableData
-            ]
+            ['name' => 's_project_path', 'data' => $variableData]
         ];
 
         try {
             $response = $this->ffastrans->submitJob($uncInputFile, $workflowId, $variables);
-            
-            return response()->json([
-                'success' => true,
-                'job_id' => $response['job_id'] ?? 'unknown',
-            ]);
-
+            return response()->json(['success' => true, 'job_id' => $response['job_id'] ?? 'unknown']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-    }
-
-    private function flattenTree(array $tree): array
-    {
-        $flat = [];
-
-        foreach ($tree as $node) {
-            $flat[] = $node;
-
-            if (
-                isset($node['children']) &&
-                is_array($node['children']) &&
-                count($node['children']) > 0
-            ) {
-                $flat = array_merge($flat, $this->flattenTree($node['children']));
-            }
-        }
-
-        return $flat;
     }
 
     public function checkStatus($jobId)
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
-            
-            $rawState = $apiData['state'] ?? 'Unknown'; 
+            $rawState = $apiData['state'] ?? ''; 
             $progress = $apiData['progress'] ?? 0;
 
             if ($progress == 0 && isset($apiData['variables']) && is_array($apiData['variables'])) {
@@ -189,21 +157,23 @@ class TransfertController extends Controller
             
             $stateLower = strtolower($rawState);
 
+            // FORCE FRENCH LABELS
             if (in_array($stateLower, ['success', 'finished', 'done', 'terminé'])) {
                 $label = 'Terminé';
                 $finished = true;
                 $progress = 100; 
             } 
-            elseif (in_array($stateLower, ['error', 'failed', 'cancelled', 'aborted', 'echoué'])) {
+            elseif (in_array($stateLower, ['error', 'failed', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
             } 
+            elseif (in_array($stateLower, ['cancelled', 'canceled', 'annulé'])) {
+                $label = 'Annulé';
+                $finished = true;
+            }
             else {
-                if ($rawState === 'Unknown' || empty($rawState)) {
-                    $label = 'En cours';
-                } else {
-                    $label = $rawState; 
-                }
+                // If unknown or empty, assume running
+                $label = 'En cours'; 
                 $finished = false;
             }
 
@@ -219,17 +189,13 @@ class TransfertController extends Controller
         }
     }
 
-    /**
-     * Action: Cancel a Job
-     */
     public function cancel($jobId)
     {
         $success = $this->ffastrans->cancelJob($jobId);
-
         if ($success) {
             return back()->with('success', 'La demande d\'annulation a été envoyée.');
         } else {
-            return back()->with('error', 'Impossible d\'annuler le job (il est peut-être déjà fini).');
+            return back()->with('error', 'Impossible d\'annuler le job.');
         }
     }
 }
