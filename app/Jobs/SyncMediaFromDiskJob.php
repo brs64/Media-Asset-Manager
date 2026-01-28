@@ -75,9 +75,6 @@ class SyncMediaFromDiskJob implements ShouldQueue
             $media->professeur_id = null;
         }
 
-
-
-        // Mets à jour uniquement le NAS courant
         $media->{$this->uriField} = $item['path'];
 
         $media->save();

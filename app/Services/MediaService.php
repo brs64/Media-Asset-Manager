@@ -616,6 +616,7 @@ class MediaService
     public function syncLocalPath(string $path): bool
     {
         $title = pathinfo($path, PATHINFO_FILENAME);
+        $fullPath = $path;
         $normalizedTitle = mb_strtolower(trim($title));
 
         $media = Media::whereRaw(
@@ -625,18 +626,18 @@ class MediaService
 
         if (!$media) {
             Log::warning('syncLocalPath: Media non trouvé', [
-                'path' => $path,
+                'path' => $fullPath,
                 'title' => $normalizedTitle,
             ]);
             return false;
         }
 
-        $media->chemin_local = $path;
+        $media->chemin_local = $fullPath;
         $media->save();
 
         Log::info('syncLocalPath: Chemin local mis à jour', [
             'media_id' => $media->id,
-            'path' => $path,
+            'path' => $fullPath,
         ]);
 
         return true;

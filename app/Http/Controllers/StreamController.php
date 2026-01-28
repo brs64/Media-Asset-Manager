@@ -180,21 +180,18 @@ class StreamController extends Controller
      */
     private function streamLocalVideo($videoPath, Request $request)
     {
-        // Nettoyer le chemin
-        $cleanPath = str_replace('storage/app/', '', $videoPath);
-
         // Utiliser le disque app qui pointe vers storage/app/
-        $disk = Storage::disk('app');
+        $disk = Storage::disk('external_local');
 
-        if (!$disk->exists($cleanPath)) {
-            Log::error("Local video file not found: $cleanPath");
+        if (!$disk->exists($videoPath)) {
+            Log::error("Local video file not found: $videoPath");
             abort(404, 'Fichier vidéo local non trouvé');
         }
 
-        $fullPath = storage_path('app/' . $cleanPath);
-        $size = filesize($fullPath);
-        $mimeType = $disk->mimeType($cleanPath) ?? 'video/mp4';
-
+        $fullPath = $disk->path($videoPath);
+        $size = $disk->size($videoPath);
+        $mimeType = $disk->mimeType($videoPath) ?? 'video/mp4';
+    
         // Support pour les requêtes Range
         $start = 0;
         $end = $size - 1;
