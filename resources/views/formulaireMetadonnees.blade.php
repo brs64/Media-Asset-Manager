@@ -118,51 +118,56 @@
                            value="{{ old('theme', $media->theme ?? '') }}">
                 </div>
 
-                {{-- Participations --}}
-                <div class="form-field">
-                    <label class="form-label">Participations (Élèves & Rôles)</label>
-                    <div id="participations-container">
-                        @php
-                            $oldParticipations = old('participations', []);
-                            if (isset($media) && empty($oldParticipations)) {
-                                $oldParticipations = $media->participations->map(fn($p) => [
-                                    'eleve_id' => $p->eleve_id,
-                                    'role_id' => $p->role_id
-                                ])->toArray();
-                            }
-                        @endphp
+{{-- Participations (Élèves & Rôles) --}}
+<div class="form-field">
+    <label class="form-label">Participations (Élèves & Rôles)</label>
+    <div id="participations-container">
+        @php
+            $oldParticipations = old('participations', []);
+            if (isset($media) && empty($oldParticipations)) {
+                $oldParticipations = $media->participations->map(fn($p) => [
+                    'eleve_nom' => trim(($p->eleve->nom ?? '') . ' ' . ($p->eleve->prenom ?? '')),
+                    'role_id' => $p->role_id
+                ])->toArray();
+            }
+        @endphp
 
-                        @forelse($oldParticipations as $index => $participation)
-                            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
-                                <select name="participations[{{ $index }}][eleve_id]" class="form-select" style="flex: 1;" required>
-                                    <option value="">-- Élève --</option>
-                                    @foreach($eleves as $eleve)
-                                        <option value="{{ $eleve->id }}" {{ $participation['eleve_id'] == $eleve->id ? 'selected' : '' }}>
-                                            {{ $eleve->nom }} {{ $eleve->prenom }}
-                                        </option>
-                                    @endforeach
-                                </select>
+        @forelse($oldParticipations as $index => $participation)
+            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                {{-- Input text avec datalist pour permettre la saisie de nouveaux noms --}}
+                <input type="text" 
+                       name="participations[{{ $index }}][eleve_nom]" 
+                       class="form-select" 
+                       style="flex: 1;" 
+                       list="eleves-list" 
+                       placeholder="Nom de l'élève" 
+                       value="{{ $participation['eleve_nom'] ?? '' }}" 
+                       required>
 
-                                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
-                                    <option value="">-- Rôle --</option>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ $participation['role_id'] == $role->id ? 'selected' : '' }}>
-                                            {{ $role->libelle }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
+                    <option value="">-- Rôle --</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}" {{ ($participation['role_id'] ?? '') == $role->id ? 'selected' : '' }}>
+                            {{ $role->libelle }}
+                        </option>
+                    @endforeach
+                </select>
 
-                                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
-                            </div>
-                        @empty
-                            {{-- Empty state --}}
-                        @endforelse
-                    </div>
-                    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
-                </div>
+                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+            </div>
+        @empty
+            {{-- Laisser vide, le bouton ajouter créera la première ligne --}}
+        @endforelse
+    </div>
+    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
+</div>
 
-            </div>{{-- Close flex column --}}
-        </div>{{-- Close form wrapper --}}
+{{-- Liste de suggestions (à placer juste ici) --}}
+<datalist id="eleves-list">
+    @foreach($eleves as $eleve)
+        <option value="{{ $eleve->nom }} {{ $eleve->prenom }}">
+    @endforeach
+</datalist>
 
         {{-- Buttons --}}
         <div class="form-buttons-container">
@@ -216,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ==== PARTICIPATIONS ====
+ // ==== PARTICIPATIONS ====
     const participationsContainer = document.getElementById('participations-container');
     const addParticipationButton = document.getElementById('add-participation');
 
@@ -228,10 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
 
         item.innerHTML = `
-            <select name="participations[${participationIndex}][eleve_id]" class="form-select" style="flex: 1;" required>
-                <option value="">-- Élève --</option>
-                ${eleves.map(e => `<option value="${e.id}">${e.nom} ${e.prenom}</option>`).join('')}
-            </select>
+            <input type="text" name="participations[${participationIndex}][eleve_nom]" 
+                   list="eleves-list" class="form-select" style="flex: 1;" 
+                   placeholder="Nom de l'élève" required>
 
             <select name="participations[${participationIndex}][role_id]" class="form-select" style="flex: 1;" required>
                 <option value="">-- Rôle --</option>
@@ -244,7 +248,6 @@ document.addEventListener('DOMContentLoaded', function() {
         participationsContainer.appendChild(item);
         participationIndex++;
     });
-
     // Remove participation (delegated event)
     participationsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-participation')) {

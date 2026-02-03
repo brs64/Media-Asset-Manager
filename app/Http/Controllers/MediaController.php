@@ -60,10 +60,14 @@ class MediaController extends Controller
             'chemin_local' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
-            'eleves' => 'nullable|array',
+            // On valide maintenant le tableau de participations
+            'participations' => 'nullable|array',
+            'participations.*.eleve_nom' => 'required|string',
+            'participations.*.role_id' => 'required|exists:roles,id',
+           /* 'eleves' => 'nullable|array',
             'eleves.*' => 'exists:eleves,id',
             'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',
+            'roles.*' => 'exists:roles,id',*/
         ]);
 
         // Sanitize single-line fields: remove newlines
@@ -77,7 +81,31 @@ class MediaController extends Controller
         $media = \App\Models\Media::create($validated);
 
         // Ajout des participations élèves
-        if ($request->has('eleves') && $request->has('roles')) {
+        // --- LOGIQUE AUTO-CRÉATION ÉLÈVES ---
+        if (!empty($request->participations)) {
+            foreach ($request->participations as $item) {
+                $nomSaisi = trim($item['eleve_nom']);
+                
+                if ($nomSaisi) {
+                    // Séparation Nom/Prénom (le dernier mot est considéré comme le prénom)
+                    $parts = explode(' ', $nomSaisi);
+                    $prenom = count($parts) > 1 ? array_pop($parts) : '';
+                    $nom = implode(' ', $parts) ?: $prenom;
+
+                    // Crée l'élève s'il n'existe pas
+                    $eleve = \App\Models\Eleve::firstOrCreate(
+                        ['nom' => $nom, 'prenom' => $prenom]
+                    );
+
+                    \App\Models\Participation::create([
+                        'media_id' => $media->id,
+                        'eleve_id' => $eleve->id,
+                        'role_id'  => $item['role_id'],
+                    ]);
+                }
+            }
+        }
+       /* if ($request->has('eleves') && $request->has('roles')) {
             foreach ($request->eleves as $index => $eleveId) {
                 $roleId = $request->roles[$index] ?? null;
                 if ($roleId) {
@@ -88,7 +116,7 @@ class MediaController extends Controller
                     ]);
                 }
             }
-        }
+        }*/
 
         return redirect()->route('medias.show', $media->id)
             ->with('success', 'Média ajouté avec succès!');
@@ -147,7 +175,7 @@ class MediaController extends Controller
 
             // Participations (array of student-role pairs)
             'participations' => 'nullable|array',
-            'participations.*.eleve_id' => 'required|exists:eleves,id',
+            'participations.*.eleve_nom' => 'required|string',
             'participations.*.role_id' => 'required|exists:roles,id',
         ]);
 
@@ -180,15 +208,29 @@ class MediaController extends Controller
             // Update participations: delete old, create new
             // We don't use sync() here cause we have 3 columns
             $media->participations()->delete();
-            if (!empty($validated['participations'])) {
-                foreach ($validated['participations'] as $participation) {
-                    \App\Models\Participation::create([
-                        'media_id' => $media->id,
-                        'eleve_id' => $participation['eleve_id'],
-                        'role_id' => $participation['role_id'],
-                    ]);
-                }
+           if (!empty($validated['participations'])) {
+        foreach ($validated['participations'] as $participation) {
+            $nomSaisi = trim($participation['eleve_nom']);
+            
+            if ($nomSaisi) {
+                // Découpage du nom et prénom
+                $parts = explode(' ', $nomSaisi);
+                $prenom = count($parts) > 1 ? array_pop($parts) : '';
+                $nom = implode(' ', $parts) ?: $prenom;
+
+                // Cherche l'élève ou le crée s'il est nouveau
+                $eleve = \App\Models\Eleve::firstOrCreate(
+                    ['nom' => $nom, 'prenom' => $prenom]
+                );
+
+                // Crée le lien dans la table pivot
+                \App\Models\Participation::create([
+                    'media_id' => $media->id,
+                    'eleve_id' => $eleve->id,
+                    'role_id'  => $participation['role_id'],
+                ]);
             }
+            }}
 
             \DB::commit();
 
