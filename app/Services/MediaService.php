@@ -84,6 +84,10 @@ class MediaService
             'mtdEdito' => [
                 'projet' => $media->projets->pluck('libelle')->implode(', ') ?: 'N/A',
                 'professeur' => $media->professeur ? ($media->professeur->prenom . ' ' . $media->professeur->nom) : 'N/A',
+           // NOUVEAU : Récupération des élèves avec leurs rôles
+                'eleves' => $media->participations->map(function($p) {
+                    return $p->eleve->prenom . ' ' . $p->eleve->nom . ' (' . ($p->role->libelle ?? 'Rôle non défini') . ')';
+                })->implode(', ') ?: 'N/A',
             ],
 
             // Roles
