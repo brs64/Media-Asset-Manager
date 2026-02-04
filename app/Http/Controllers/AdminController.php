@@ -173,7 +173,10 @@ class AdminController extends Controller
         // Only fetch users when on the Users tab
         $professeurs = Professeur::all();
 
-        return view('admin.users', compact('professeurs'));
+        // Récupère les élèves avec le nombre de leurs participations pour la nouvelle table
+    $eleves = Eleve::withCount('participations')->orderBy('nom')->orderBy('prenom')->get();
+
+        return view('admin.users', compact('professeurs', 'eleves'));
     }
 
     /**
