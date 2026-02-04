@@ -1,7 +1,7 @@
 @foreach ($items as $item)
     <div class="tree-item {{ $item['type'] }} mb-1">
 
-        {{-- 📁 DOSSIER --}}
+        {{-- DOSSIER --}}
         @if ($item['type'] === 'folder')
             <div class="dossier-label cursor-pointer text-gray-200 hover:text-white select-none flex items-center gap-2"
                  data-disk="{{ $item['disk'] }}"
@@ -14,7 +14,7 @@
             {{-- Container vide pour lazy-loading --}}
             <div class="dossier-content hidden pl-4 border-l border-gray-600 ml-1 mt-1"></div>
 
-        {{-- 🎬 VIDÉO --}}
+        {{-- VIDÉO --}}
         @elseif ($item['type'] === 'video')
 
             @php $media = $item['media'] ?? null; @endphp

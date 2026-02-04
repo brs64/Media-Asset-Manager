@@ -120,7 +120,7 @@ services:
       - "21002:21"
       - "30010-30019:30000-30009"
     volumes:
-      - ftp-mpeg-data:/home/ftpuser:z
+      - ftp-arch-data:/home/ftpuser:z
     networks:
       - app-network
 
@@ -133,5 +133,5 @@ volumes:
     driver: local
   ftp-pad-data:
     driver: local
-  ftp-mpeg-data:
+  ftp-arch-data:
     driver: local
