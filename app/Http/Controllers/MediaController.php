@@ -60,11 +60,23 @@ class MediaController extends Controller
             'chemin_local' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
+
+            'properties' => 'nullable|array',
+            'properties.*.key' => 'nullable|string|max:255',
+            'properties.*.value' => 'nullable',
+
             'eleves' => 'nullable|array',
             'eleves.*' => 'exists:eleves,id',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
+
+        $properties = collect($request->input('properties', []))
+            ->filter(fn ($item) => !empty($item['key']))
+            ->mapWithKeys(fn ($item) => [
+                trim((string) $item['key']) => $item['value'] ?? null
+            ])
+            ->toArray();
 
         // Sanitize single-line fields: remove newlines
         foreach (['mtd_tech_titre', 'promotion', 'type', 'theme'] as $field) {
@@ -149,6 +161,11 @@ class MediaController extends Controller
             'participations' => 'nullable|array',
             'participations.*.eleve_id' => 'required|exists:eleves,id',
             'participations.*.role_id' => 'required|exists:roles,id',
+
+            // propriétés personalisées
+            'properties' => 'nullable|array',
+            'properties.*.key' => 'nullable|string|max:255',
+            'properties.*.value' => 'nullable',
         ]);
 
         // Sanitize single-line fields: remove newlines
@@ -157,6 +174,13 @@ class MediaController extends Controller
                 $validated[$field] = preg_replace('/[\r\n]+/', ' ', trim($validated[$field]));
             }
         }
+
+        $properties = collect($request->input('properties', []))
+            ->filter(fn ($item) => !empty($item['key']))
+            ->mapWithKeys(fn ($item) => [
+                trim((string) $item['key']) => $item['value'] ?? null
+            ])
+            ->toArray();
 
         \DB::beginTransaction();
         try {
@@ -168,6 +192,7 @@ class MediaController extends Controller
                 'theme' => $validated['theme'] ?? null,
                 'description' => $validated['description'] ?? null,
                 'professeur_id' => $validated['professeur_id'] ?? null,
+                'properties' => $properties,
             ]);
 
             // Sync projets (many-to-many)
@@ -231,7 +256,7 @@ class MediaController extends Controller
             SyncMediaFromDiskJob::dispatch($disk, '/');
         }
 
-        return back()->with('success', 'Synchronisation BD lancée 🚀');
+        return back()->with('success', 'Synchronisation BD lancée !');
     }
 
     public function syncLocalPath(Request $request, MediaService $mediaService)

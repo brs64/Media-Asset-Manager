@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('URI_NAS_PAD', 2048)->nullable();
             $table->string('chemin_local', 2048)->nullable();
             $table->foreignId('professeur_id')->nullable()->constrained('professeurs')->onDelete('set null');
+            $table->json('properties')->nullable();
             $table->timestamps();
         });
     }

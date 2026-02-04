@@ -161,6 +161,50 @@
                     <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
                 </div>
 
+                {{-- Propriétés libres --}}
+                <div class="form-field">
+                    <label class="form-label">Propriétés personnalisées</label>
+
+                    <div id="properties-container">
+                        @php
+                            $oldProperties = old('properties', []);
+
+                            if (isset($media) && empty($oldProperties)) {
+                                $oldProperties = collect($media->properties ?? [])
+                                    ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                                    ->values()
+                                    ->toArray();
+                            }
+                        @endphp
+
+                        @foreach($oldProperties as $index => $property)
+                            <div class="property-item" style="display:flex; gap:10px; margin-bottom:10px;">
+                                <input
+                                        type="text"
+                                        name="properties[{{ $index }}][key]"
+                                        class="form-input"
+                                        placeholder="Nom du champ"
+                                        value="{{ $property['key'] ?? '' }}"
+                                >
+
+                                <input
+                                        type="text"
+                                        name="properties[{{ $index }}][value]"
+                                        class="form-input"
+                                        placeholder="Valeur"
+                                        value="{{ $property['value'] ?? '' }}"
+                                >
+
+                                <button type="button" class="remove-property">×</button>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <button type="button" id="add-property" class="form-button">
+                        + Ajouter une propriété
+                    </button>
+                </div>
+
             </div>{{-- Close flex column --}}
         </div>{{-- Close form wrapper --}}
 
@@ -252,5 +296,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+const propertiesContainer = document.getElementById('properties-container');
+const addPropertyButton = document.getElementById('add-property');
+
+let propertyIndex = {{ count($oldProperties ?? []) }};
+
+addPropertyButton.addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.className = 'property-item';
+    div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
+
+    div.innerHTML = `
+        <input type="text"
+               name="properties[${propertyIndex}][key]"
+               class="form-input"
+               placeholder="Nom libre">
+
+        <input type="text"
+               name="properties[${propertyIndex}][value]"
+               class="form-input"
+               placeholder="Valeur libre">
+
+        <button type="button" class="remove-property">×</button>
+    `;
+
+    propertiesContainer.appendChild(div);
+    propertyIndex++;
+});
+
+propertiesContainer.addEventListener('click', e => {
+    if (e.target.classList.contains('remove-property')) {
+        e.target.closest('.property-item').remove();
+    }
+});
+
 </script>
 @endpush
