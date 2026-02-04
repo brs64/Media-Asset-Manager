@@ -109,6 +109,22 @@
                 </table>
             </div>
 
+            {{-- Champs personalisées --}}
+            @if(!empty($mtdCustom))
+                <div class="metadata_detaillee" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations personnalisées</h3>
+
+                    <table>
+                        @foreach($mtdCustom as $item)
+                            <tr>
+                                <td><strong>{{ $item['label'] }}</strong></td>
+                                <td>{{ $item['value'] ?: '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </table>
+                </div>
+            @endif
+
             {{-- Métadonnées techniques --}}
             <div class="metadata_detaillee" style="margin-top: 30px;">
                 <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations techniques</h3>

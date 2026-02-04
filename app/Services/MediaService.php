@@ -86,6 +86,18 @@ class MediaService
                 'professeur' => $media->professeur ? ($media->professeur->prenom . ' ' . $media->professeur->nom) : 'N/A',
             ],
 
+            // Métadonnées personnalisées
+            'mtdCustom' => collect($media->properties ?? [])
+                ->map(fn ($value, $key) => [
+                    'label' => $this->sanitizeForDisplay($key),
+                    'value' => $this->sanitizeForDisplay(
+                        is_array($value) ? json_encode($value) : (string) $value
+                    ),
+                ])
+                ->values()
+                ->toArray(),
+
+
             // Roles
             'mtdRoles' => $this->formatParticipations($media->participations),
         ];

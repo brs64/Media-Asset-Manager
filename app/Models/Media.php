@@ -25,12 +25,18 @@ class Media extends Model
         'URI_NAS_PAD',
         'chemin_local',
         'professeur_id',
+        'properties',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'properties' => 'array',
     ];
+
+     /*=======================
+     | Relations
+     =======================*/
 
     public function projets(): BelongsToMany
     {
