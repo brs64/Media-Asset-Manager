@@ -165,21 +165,30 @@
         </form>
     </div>
 </div>
-<div class="mt-8 p-6 bg-purple-50 border border-purple-200 rounded-lg shadow-sm">
-    <h3 class="text-lg font-bold mb-4 text-purple-800 border-b border-purple-200 pb-2">Importation rapide (Copier-Coller)</h3>
-
-    <form action="{{ route('admin.eleves.bulk') }}" method="POST">
+{{-- Importation par fichier CSV - Même style que l'ajout manuel --}}
+<div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
+    <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Importation groupée (Fichier CSV)</h3>
+    
+    <form action="{{ route('admin.eleves.bulk') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
         @csrf
-        <div class="flex flex-col mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-2">Liste des élèves (un par ligne)</label>
-            <textarea name="liste_eleves" rows="5" placeholder="NOM Prenom&#10;DUPONT Jean&#10;MARTIN Sophie"
-                class="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
+        <div class="flex flex-col md:col-span-2">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Sélectionner le fichier (.csv ou .txt)</label>
+            <input type="file" name="fichier_csv" accept=".csv,.txt" required 
+                   class="block w-full text-sm text-gray-500 
+                          file:mr-4 file:py-2 file:px-4 
+                          file:rounded-md file:border-0 
+                          file:text-sm file:font-semibold 
+                          file:bg-orange-100 file:text-orange-700 
+                          hover:file:bg-orange-200
+                          border border-gray-300 rounded-md shadow-sm h-10">
         </div>
 
-        <button type="submit" class="bg-purple-600 text-white font-bold py-2 px-6 rounded hover:bg-purple-700 shadow transition-colors">
-            Importer la liste
-        </button>
+        <div class="flex flex-col">
+            <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 h-10 shadow transition-colors">
+                Importer le fichier
+            </button>
+        </div>
     </form>
-    <p class="mt-2 text-xs text-purple-600 italic">Format : Un nom et un prénom par ligne, séparés par un espace.</p>
+    <p class="mt-2 text-xs text-gray-500 italic">Format : Un élève par ligne. Supporte "NOM Prénom" ou "NOM,Prénom".</p>
 </div>
 @endsection

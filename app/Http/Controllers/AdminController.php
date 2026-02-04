@@ -353,45 +353,54 @@ class AdminController extends Controller
         return back()->with('error', 'Fichier log introuvable.');
     }
 
+public function Ajouterelevedepuiscsv(Request $request)
+{
+    set_time_limit(300);
 
-    public function Ajouterelevedepuiscsv(Request $request)
-    {
-        // On force le temps d'exécution au début du script
-        set_time_limit(300);
+    $request->validate([
+        'fichier_csv' => 'required|file|mimes:csv,txt'
+    ]);
 
-        $request->validate(['liste_eleves' => 'required|string']);
+    $file = $request->file('fichier_csv');
+    $content = file_get_contents($file->getRealPath());
+    $lignes = explode("\n", str_replace("\r", "", $content));
+    
+    $countAdded = 0;
+    $now = now();
 
-        $lignes = explode("\n", str_replace("\r", "", $request->liste_eleves));
-        $dataToInsert = [];
-        $now = now();
+    foreach ($lignes as $ligne) {
+        $ligne = trim($ligne);
+        if (empty($ligne) || $ligne === 'nom,prenom') continue;
 
-        foreach ($lignes as $ligne) {
-            $nomComplet = trim($ligne);
-            if (empty($nomComplet)) continue;
-
-            $parts = explode(' ', $nomComplet);
+        // Détection du séparateur (Virgule ou Espaces)
+        if (str_contains($ligne, ',')) {
+            $parts = explode(',', $ligne);
+            $nom = strtoupper(trim($parts[0]));
+            $prenom = ucfirst(strtolower(trim($parts[1] ?? '')));
+        } else {
+            $parts = explode(' ', $ligne);
             $prenom = count($parts) > 1 ? array_pop($parts) : '';
-            $nom = implode(' ', $parts) ?: $prenom;
+            $nom = strtoupper(implode(' ', $parts) ?: $prenom);
+            $prenom = ucfirst(strtolower($prenom));
+        }
 
-            $dataToInsert[] = [
-                'nom' => strtoupper($nom),
-                'prenom' => ucfirst(strtolower($prenom)),
+        // VÉRIFICATION D'EXISTENCE
+        // On ne l'ajoute que s'il n'existe pas déjà avec ce nom ET ce prénom
+        $existe = \App\Models\Eleve::where('nom', $nom)
+                                   ->where('prenom', $prenom)
+                                   ->exists();
+
+        if (!$existe) {
+            \App\Models\Eleve::create([
+                'nom' => $nom,
+                'prenom' => $prenom,
                 'created_at' => $now,
                 'updated_at' => $now,
-            ];
-
-            // On insère par paquets de 100 pour ne pas saturer la mémoire
-            if (count($dataToInsert) >= 100) {
-                \DB::table('eleves')->insertOrIgnore($dataToInsert);
-                $dataToInsert = [];
-            }
+            ]);
+            $countAdded++;
         }
-
-        // On insère le reste
-        if (!empty($dataToInsert)) {
-            \DB::table('eleves')->insertOrIgnore($dataToInsert);
-        }
-
-        return back()->with('success', "Traitement terminé avec succès !");
     }
+
+    return back()->with('success', "$countAdded nouveaux élèves ont été importés (les doublons ont été ignorés).");
+}
 }
