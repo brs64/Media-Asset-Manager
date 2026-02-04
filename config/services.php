@@ -41,6 +41,7 @@ return [
         'password' => env('FFASTRANS_PASSWORD'),
         'path_local'  => '',
         'path_remote' => env('URI_NAS_ARCH_WIN'),
+        'thumbnails_path' => env('FFASTRANS_THUMBNAILS_PATH', '/mnt/archivage/Miniatures'),
     ],
 
 ];

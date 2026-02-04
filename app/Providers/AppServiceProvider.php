@@ -29,11 +29,9 @@ class AppServiceProvider extends ServiceProvider
         View::composer('menuArbo', function ($view) {
             
 
-            // UNIQUEMENT local (rapide)
+            // UNIQUEMENT local (rapide) - scan H264 subfolder only
             try {
-            $directory = config('filesystems.disks.external_local.root'); // => /mnt/archivage
-            $localTree = FileExplorerService::scanDisk('external_local', $directory);
-
+                $localTree = FileExplorerService::scanDisk('external_local', 'H264');
             } catch (\Throwable $e) {
                 $localTree = [];
             }

@@ -178,6 +178,8 @@ class FfastransService
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
         try {
             $response = $this->client()->delete($endpoint);
+
+            // 200 OK or 204 No Content means success
             return $response->successful();
         } catch (Exception $e) {
             Log::error("Failed to cancel: " . $e->getMessage());

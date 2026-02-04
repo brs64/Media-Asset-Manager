@@ -83,7 +83,7 @@ return [
         // 'ftp_arch' => [
         //     'driver' => 'ftp',
         //     'host' => env('FTP_ARCH_HOST', 'btsplay-ftp-mpeg'),
-        //     'username' => env('FTP_ARCH_USER', 'ftpuser'),
+        //     'username' => env('FTP_ARCsH_USER', 'ftpuser'),
         //     'password' => env('FTP_ARCH_PASS', 'ftppass'),
         //     'port' => (int) env('FTP_ARCH_PORT', 21),
         //     'root' => env('FTP_ARCH_ROOT') ?: '',

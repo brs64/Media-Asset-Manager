@@ -20,27 +20,36 @@ class FileExplorerService
 
         // Cas particulier : disque local absolu (Windows / Linux)
         if ($diskName === 'external_local') {
-            if (!is_dir($directory)) {
+            $diskRoot = rtrim(config('filesystems.disks.external_local.root'), '/\\');
+
+            // Build full path for scanning
+            $scanPath = $diskRoot . '/' . ltrim($directory, '/\\');
+            $scanPath = rtrim($scanPath, '/\\');
+
+            if (!is_dir($scanPath)) {
                 return []; // chemin inexistant
             }
 
             $results = [];
-            foreach (scandir($directory) as $file) {
+            foreach (scandir($scanPath) as $file) {
                 if ($file === '.' || $file === '..') continue;
-                $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
+                $fullPath = $scanPath . DIRECTORY_SEPARATOR . $file;
+
+                // Store path relative to disk root (not absolute)
+                $relativePath = ltrim($directory . '/' . $file, '/\\');
 
                 if (is_dir($fullPath)) {
                     $results[] = [
                         'type' => 'folder',
                         'name' => $file,
-                        'path' => $fullPath,
+                        'path' => $relativePath,
                         'disk' => $diskName,
                     ];
                 } elseif (self::isVideo($file)) {
                     $results[] = [
                         'type' => 'video',
                         'name' => $file,
-                        'path' => $fullPath,
+                        'path' => $relativePath,
                         'disk' => $diskName,
                         'id' => null,
                     ];

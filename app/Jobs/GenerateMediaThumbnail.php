@@ -1,4 +1,9 @@
 <?php
+/*
+  --------------------------------------------------------------------------
+   Ancienne implémentation directe avec FFProbe & FFMpeg.
+   Fonctionne, mais utilisation d'une équivalente avec un workflow FFASTrans sous demande du commanditaire pour unification sous un seul logiciel.
+  --------------------------------------------------------------------------
 
 namespace App\Jobs;
 
@@ -28,3 +33,4 @@ class GenerateMediaThumbnail implements ShouldQueue
         $service->generateThumbnail($media);
     }
 }
+*/

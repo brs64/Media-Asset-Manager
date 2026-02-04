@@ -2,20 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateMediaThumbnail;
+use App\Models\Media;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ThumbnailController extends Controller
 {
+    protected string $localThumbnailsPath;
+    protected string $archivageMountPath;
+
+    public function __construct()
+    {
+        $this->localThumbnailsPath = storage_path('app/public/thumbnails');
+        $this->archivageMountPath = env('FILESYSTEM_LOCAL_PATH', '/mnt/archivage');
+
+        if (!is_dir($this->localThumbnailsPath)) {
+            mkdir($this->localThumbnailsPath, 0755, true);
+        }
+    }
+
     public function show(int $mediaId)
     {
-        $thumbnailPath = storage_path("app/public/thumbnails/{$mediaId}_miniature.jpg");
+        $thumbnailFilename = "{$mediaId}_miniature.jpg";
+        $localPath = "{$this->localThumbnailsPath}/{$thumbnailFilename}";
 
-        if (file_exists($thumbnailPath)) {
-            return response()->file($thumbnailPath);
+        // 1. Check local storage first (cached copy)
+        if (file_exists($localPath)) {
+            return response()->file($localPath);
         }
 
-        GenerateMediaThumbnail::dispatch($mediaId);
+        // 2. Try to find FFAStrans-generated thumbnail
+        $media = Media::find($mediaId);
+        if ($media && $media->chemin_local) {
+            $ffastransThumbnail = $this->buildThumbnailPath($media->chemin_local);
 
+            if ($ffastransThumbnail && file_exists($ffastransThumbnail)) {
+                // Copy to local storage for future requests
+                if (copy($ffastransThumbnail, $localPath)) {
+                    Log::info("Copied FFAStrans thumbnail for media #{$mediaId}");
+                    return response()->file($localPath);
+                }
+                // If copy fails, serve directly from source
+                return response()->file($ffastransThumbnail);
+            }
+        }
+
+        // 3. Return placeholder
+        return $this->returnPlaceholder();
+    }
+
+    /**
+     * Build thumbnail path from video path.
+     * Replaces H264 -> Thumbnails and .mp4 -> .jpg
+     */
+    protected function buildThumbnailPath(string $videoPath): ?string
+    {
+        // Replace H264 folder with Thumbnails
+        $thumbnailPath = str_replace('H264', 'Thumbnails', $videoPath);
+
+        // Replace video extension with .jpg
+        $thumbnailPath = preg_replace('/\.(mp4|mov|mxf)$/i', '.jpg', $thumbnailPath);
+
+        // Build full path
+        return "{$this->archivageMountPath}/{$thumbnailPath}";
+    }
+
+    protected function returnPlaceholder()
+    {
         $placeholderPath = public_path('images/placeholder-video.png');
 
         if (file_exists($placeholderPath)) {

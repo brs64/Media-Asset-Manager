@@ -291,12 +291,14 @@ class MediaController extends Controller
 
     public function sync()
     {
-        foreach ([
-            'ftp_arch',
-            'ftp_pad',
-            'external_local',
-        ] as $disk) {
-            SyncMediaFromDiskJob::dispatch($disk, '/');
+        $disks = [
+            'ftp_arch' => '/',
+            'ftp_pad' => '/',
+            'external_local' => 'H264', // Only scan H264 subfolder, not entire Archivage root
+        ];
+
+        foreach ($disks as $disk => $path) {
+            SyncMediaFromDiskJob::dispatch($disk, $path);
         }
 
         return back()->with('success', 'Synchronisation BD lancée !');
