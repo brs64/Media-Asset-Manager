@@ -5,9 +5,9 @@
     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les utilisateurs</h2>
 
     @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            {{ session('success') }}
-        </div>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        {{ session('success') }}
+    </div>
     @endif
 
     <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -31,8 +31,8 @@
                         {{ $prof->nom }} {{ $prof->prenom }}
                     </td>
 
-                    @php 
-                        $isAdmin = $prof->role == 'admin'; // Adjust based on your Role logic
+                    @php
+                    $isAdmin = $prof->role == 'admin'; // Adjust based on your Role logic
                     @endphp
 
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
@@ -45,7 +45,7 @@
                         <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                         <input type="checkbox" {{ $isAdmin ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <input type="checkbox" {{ $isAdmin ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                     </td>
 
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -65,32 +65,32 @@
 
     <div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
         <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Ajouter un professeur</h3>
-        
+
         <form action="{{ route('admin.professeurs.create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
             @csrf
-            
+
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
-                <input type="text" name="nom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="nom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Prénom</label>
-                <input type="text" name="prenom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="prenom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Identifiant</label>
-                <input type="text" name="identifiant" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="identifiant" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
-                <input type="password" name="mot_de_passe" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="password" name="mot_de_passe" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
@@ -142,19 +142,19 @@
     {{-- Formulaire d'ajout d'élève --}}
     <div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
         <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Ajouter un élève</h3>
-        
+
         <form action="{{ route('admin.eleves.create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
             @csrf
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
-                <input type="text" name="nom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="nom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Prénom</label>
-                <input type="text" name="prenom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="prenom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
@@ -164,5 +164,22 @@
             </div>
         </form>
     </div>
+</div>
+<div class="mt-8 p-6 bg-purple-50 border border-purple-200 rounded-lg shadow-sm">
+    <h3 class="text-lg font-bold mb-4 text-purple-800 border-b border-purple-200 pb-2">Importation rapide (Copier-Coller)</h3>
+
+    <form action="{{ route('admin.eleves.bulk') }}" method="POST">
+        @csrf
+        <div class="flex flex-col mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Liste des élèves (un par ligne)</label>
+            <textarea name="liste_eleves" rows="5" placeholder="NOM Prenom&#10;DUPONT Jean&#10;MARTIN Sophie"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
+        </div>
+
+        <button type="submit" class="bg-purple-600 text-white font-bold py-2 px-6 rounded hover:bg-purple-700 shadow transition-colors">
+            Importer la liste
+        </button>
+    </form>
+    <p class="mt-2 text-xs text-purple-600 italic">Format : Un nom et un prénom par ligne, séparés par un espace.</p>
 </div>
 @endsection

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\File; 
+use Illuminate\Support\Facades\File;
 use App\Models\User;
 use App\Models\Media;
 use App\Models\Projet;
-use App\Models\Professeur; 
+use App\Models\Professeur;
 use App\Models\Eleve;
 
 class AdminController extends Controller
@@ -54,7 +54,7 @@ class AdminController extends Controller
             'backup_gen'        => config('btsplay.backup.uri_generated'),
             'backup_dump'       => config('btsplay.backup.uri_dump'),
             'backup_suf_dump'   => config('btsplay.backup.suffix_dump'),
-            
+
             'log_general'       => config('btsplay.logs.general'),
             'log_backup'        => config('btsplay.logs.backup'),
             'log_lines'         => config('btsplay.logs.max_lines'),
@@ -135,14 +135,14 @@ class AdminController extends Controller
         $envContent = file_get_contents($path);
 
         foreach ($values as $key => $newValue) {
-            $newValue = $newValue ?? ''; 
+            $newValue = $newValue ?? '';
 
             if (str_contains($newValue, ' ')) {
                 $newValue = '"' . $newValue . '"';
             }
 
             $pattern = "/^" . preg_quote($key, '/') . "=(.*)$/m";
-            
+
             if (preg_match($pattern, $envContent)) {
                 $envContent = preg_replace($pattern, "{$key}={$newValue}", $envContent);
             } else {
@@ -154,13 +154,13 @@ class AdminController extends Controller
 
     public function logs()
     {
-        $logPath = storage_path('logs/laravel.log'); 
+        $logPath = storage_path('logs/laravel.log');
         $logs = [];
 
         if (File::exists($logPath)) {
             $file = file($logPath);
             $logs = array_slice($file, -50);
-            if(config('btsplay.logs.recent_first')) {
+            if (config('btsplay.logs.recent_first')) {
                 $logs = array_reverse($logs);
             }
         }
@@ -174,7 +174,7 @@ class AdminController extends Controller
         $professeurs = Professeur::all();
 
         // Récupère les élèves avec le nombre de leurs participations pour la nouvelle table
-    $eleves = Eleve::withCount('participations')->orderBy('nom')->orderBy('prenom')->get();
+        $eleves = Eleve::withCount('participations')->orderBy('nom')->orderBy('prenom')->get();
 
         return view('admin.users', compact('professeurs', 'eleves'));
     }
@@ -275,7 +275,8 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
-    public function databaseView() {
+    public function databaseView()
+    {
         // Read the log file to display in the view
         $logPath = storage_path('logs/backup.log');
         $backupLogs = [];
@@ -289,14 +290,15 @@ class AdminController extends Controller
         return view('admin.database', compact('backupLogs'));
     }
 
-    public function runBackup() {
+    public function runBackup()
+    {
         try {
             // Trigger the command manually and get exit code
             $exitCode = Artisan::call('db:backup --type=manual');
-            
+
             // Get the output to show success message
             $output = Artisan::output();
-            
+
             if ($exitCode === 0) {
                 // SUCCESS
                 $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: Success\n";
@@ -312,8 +314,9 @@ class AdminController extends Controller
             return back()->with('error', 'Erreur lors de la sauvegarde: ' . $e->getMessage());
         }
     }
-    
-    public function saveBackupSettings(Request $request) {
+
+    public function saveBackupSettings(Request $request)
+    {
         $validated = $request->validate([
             'backup_time' => 'required',
             'backup_day' => 'required',
@@ -329,21 +332,66 @@ class AdminController extends Controller
         return back()->with('success', 'Planning de sauvegarde mis à jour !');
     }
 
-    public function reconciliation(){
+    public function reconciliation()
+    {
         return view('admin.reconciliation');
     }
-    
-    public function runReconciliation() {
+
+    public function runReconciliation()
+    {
         // Logic to sync files
-        
+
         return back()->with('reconciliation_result', 'Réconciliation terminée. (Résultat simulé)');
     }
-    
-    public function downloadLogs() {
+
+    public function downloadLogs()
+    {
         $path = storage_path('logs/laravel.log');
         if (File::exists($path)) {
             return response()->download($path);
         }
         return back()->with('error', 'Fichier log introuvable.');
+    }
+
+
+    public function Ajouterelevedepuiscsv(Request $request)
+    {
+        // On force le temps d'exécution au début du script
+        set_time_limit(300);
+
+        $request->validate(['liste_eleves' => 'required|string']);
+
+        $lignes = explode("\n", str_replace("\r", "", $request->liste_eleves));
+        $dataToInsert = [];
+        $now = now();
+
+        foreach ($lignes as $ligne) {
+            $nomComplet = trim($ligne);
+            if (empty($nomComplet)) continue;
+
+            $parts = explode(' ', $nomComplet);
+            $prenom = count($parts) > 1 ? array_pop($parts) : '';
+            $nom = implode(' ', $parts) ?: $prenom;
+
+            $dataToInsert[] = [
+                'nom' => strtoupper($nom),
+                'prenom' => ucfirst(strtolower($prenom)),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            // On insère par paquets de 100 pour ne pas saturer la mémoire
+            if (count($dataToInsert) >= 100) {
+                \DB::table('eleves')->insertOrIgnore($dataToInsert);
+                $dataToInsert = [];
+            }
+        }
+
+        // On insère le reste
+        if (!empty($dataToInsert)) {
+            \DB::table('eleves')->insertOrIgnore($dataToInsert);
+        }
+
+        return back()->with('success', "Traitement terminé avec succès !");
     }
 }
