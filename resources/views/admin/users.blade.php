@@ -2,7 +2,7 @@
 
 @section('tab_content')
 <div class="space-y-6">
-    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les utilisateurs</h2>
+    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les professeurs</h2>
 
     @if (session('success'))
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
