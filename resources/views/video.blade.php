@@ -96,6 +96,11 @@
                         <td><strong>Professeur référent</strong></td>
                         <td>{{ $mtdEdito["professeur"] }}</td>
                     </tr>
+                    {{-- NOUVEAU : Affichage des élèves --}}
+<tr>
+    <td><strong>Élève(s)</strong></td>
+    <td>{{ $mtdEdito["eleves"] ?? 'N/A' }}</td>
+</tr>
 
                     {{-- Rôles --}}
                     @if($mtdRoles && count($mtdRoles) > 0)

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\File; 
+use Illuminate\Support\Facades\File;
 use App\Models\User;
 use App\Models\Media;
 use App\Models\Projet;
-use App\Models\Professeur; 
+use App\Models\Professeur;
 use App\Models\Eleve;
 
 class AdminController extends Controller
@@ -54,7 +54,7 @@ class AdminController extends Controller
             'backup_gen'        => config('btsplay.backup.uri_generated'),
             'backup_dump'       => config('btsplay.backup.uri_dump'),
             'backup_suf_dump'   => config('btsplay.backup.suffix_dump'),
-            
+
             'log_general'       => config('btsplay.logs.general'),
             'log_backup'        => config('btsplay.logs.backup'),
             'log_lines'         => config('btsplay.logs.max_lines'),
@@ -135,14 +135,14 @@ class AdminController extends Controller
         $envContent = file_get_contents($path);
 
         foreach ($values as $key => $newValue) {
-            $newValue = $newValue ?? ''; 
+            $newValue = $newValue ?? '';
 
             if (str_contains($newValue, ' ')) {
                 $newValue = '"' . $newValue . '"';
             }
 
             $pattern = "/^" . preg_quote($key, '/') . "=(.*)$/m";
-            
+
             if (preg_match($pattern, $envContent)) {
                 $envContent = preg_replace($pattern, "{$key}={$newValue}", $envContent);
             } else {
@@ -154,13 +154,13 @@ class AdminController extends Controller
 
     public function logs()
     {
-        $logPath = storage_path('logs/laravel.log'); 
+        $logPath = storage_path('logs/laravel.log');
         $logs = [];
 
         if (File::exists($logPath)) {
             $file = file($logPath);
             $logs = array_slice($file, -50);
-            if(config('btsplay.logs.recent_first')) {
+            if (config('btsplay.logs.recent_first')) {
                 $logs = array_reverse($logs);
             }
         }
@@ -173,7 +173,10 @@ class AdminController extends Controller
         // Only fetch users when on the Users tab
         $professeurs = Professeur::all();
 
-        return view('admin.users', compact('professeurs'));
+        // Récupère les élèves avec le nombre de leurs participations pour la nouvelle table
+        $eleves = Eleve::withCount('participations')->orderBy('nom')->orderBy('prenom')->get();
+
+        return view('admin.users', compact('professeurs', 'eleves'));
     }
 
     /**
@@ -272,7 +275,8 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
-    public function databaseView() {
+    public function databaseView()
+    {
         // Read the log file to display in the view
         $logPath = storage_path('logs/backup.log');
         $backupLogs = [];
@@ -286,14 +290,15 @@ class AdminController extends Controller
         return view('admin.database', compact('backupLogs'));
     }
 
-    public function runBackup() {
+    public function runBackup()
+    {
         try {
             // Trigger the command manually and get exit code
             $exitCode = Artisan::call('db:backup --type=manual');
-            
+
             // Get the output to show success message
             $output = Artisan::output();
-            
+
             if ($exitCode === 0) {
                 // SUCCESS
                 $logMessage = "[" . date('Y-m-d H:i:s') . "] Manual Backup: Success\n";
@@ -309,8 +314,9 @@ class AdminController extends Controller
             return back()->with('error', 'Erreur lors de la sauvegarde: ' . $e->getMessage());
         }
     }
-    
-    public function saveBackupSettings(Request $request) {
+
+    public function saveBackupSettings(Request $request)
+    {
         $validated = $request->validate([
             'backup_time' => 'required',
             'backup_day' => 'required',
@@ -326,21 +332,75 @@ class AdminController extends Controller
         return back()->with('success', 'Planning de sauvegarde mis à jour !');
     }
 
-    public function reconciliation(){
+    public function reconciliation()
+    {
         return view('admin.reconciliation');
     }
-    
-    public function runReconciliation() {
+
+    public function runReconciliation()
+    {
         // Logic to sync files
-        
+
         return back()->with('reconciliation_result', 'Réconciliation terminée. (Résultat simulé)');
     }
-    
-    public function downloadLogs() {
+
+    public function downloadLogs()
+    {
         $path = storage_path('logs/laravel.log');
         if (File::exists($path)) {
             return response()->download($path);
         }
         return back()->with('error', 'Fichier log introuvable.');
     }
+
+public function Ajouterelevedepuiscsv(Request $request)
+{
+    set_time_limit(300);
+
+    $request->validate([
+        'fichier_csv' => 'required|file|mimes:csv,txt'
+    ]);
+
+    $file = $request->file('fichier_csv');
+    $content = file_get_contents($file->getRealPath());
+    $lignes = explode("\n", str_replace("\r", "", $content));
+    
+    $countAdded = 0;
+    $now = now();
+
+    foreach ($lignes as $ligne) {
+        $ligne = trim($ligne);
+        if (empty($ligne) || $ligne === 'nom,prenom') continue;
+
+        // Détection du séparateur (Virgule ou Espaces)
+        if (str_contains($ligne, ',')) {
+            $parts = explode(',', $ligne);
+            $nom = strtoupper(trim($parts[0]));
+            $prenom = ucfirst(strtolower(trim($parts[1] ?? '')));
+        } else {
+            $parts = explode(' ', $ligne);
+            $prenom = count($parts) > 1 ? array_pop($parts) : '';
+            $nom = strtoupper(implode(' ', $parts) ?: $prenom);
+            $prenom = ucfirst(strtolower($prenom));
+        }
+
+        // VÉRIFICATION D'EXISTENCE
+        // On ne l'ajoute que s'il n'existe pas déjà avec ce nom ET ce prénom
+        $existe = \App\Models\Eleve::where('nom', $nom)
+                                   ->where('prenom', $prenom)
+                                   ->exists();
+
+        if (!$existe) {
+            \App\Models\Eleve::create([
+                'nom' => $nom,
+                'prenom' => $prenom,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+            $countAdded++;
+        }
+    }
+
+    return back()->with('success', "$countAdded nouveaux élèves ont été importés (les doublons ont été ignorés).");
+}
 }

@@ -65,8 +65,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/scan/{scanId}/status', [FileExplorerController::class, 'scanStatus'])->name('scan.status');
     Route::get('/scan/{scanId}/results', [FileExplorerController::class, 'scanResults'])->name('scan.results');
 
-
-
     // --- TAB 3: RECONCILIATION ---
     Route::get('/reconciliation', [AdminController::class, 'reconciliation'])->name('reconciliation');
     Route::post('/reconciliation', [AdminController::class, 'runReconciliation'])->name('reconciliation.run');
@@ -87,17 +85,18 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/eleves', [AdminController::class, 'createEleve'])->name('eleves.create');
     Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('eleves.delete');
 
+    //transfert listes d'eleves en bd (depuis un csv par exemple)
+    Route::post('/eleves/bulk', [AdminController::class, 'Ajouterelevedepuiscsv'])->name('eleves.bulk');
+
     // --- BACKUP ACTIONS ---
     Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
-
-
 });
 
-    Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
-        ->name('explorer.scan');
-    Route::get('/explorer', [FileExplorerController::class, 'index'])
-        ->name('explorer.index');
+Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
+    ->name('explorer.scan');
+Route::get('/explorer', [FileExplorerController::class, 'index'])
+    ->name('explorer.index');
 
 
 
@@ -126,4 +125,4 @@ Route::get('/test-connection', function (FfastransService $service) {
 });*/
 
 // Routes d'authentification Breeze
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
