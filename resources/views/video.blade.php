@@ -130,33 +130,33 @@
                 </div>
             @endif
 
-            {{-- Métadonnées techniques --}}
-            <div class="metadata_detaillee" style="margin-top: 30px;">
+            {{-- Métadonnées techniques (loaded async) --}}
+            <div class="metadata_detaillee" style="margin-top: 30px;" id="technical-metadata" data-media-id="{{ $idMedia }}">
                 <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations techniques</h3>
                 <table>
                     <tr>
                         <td><strong>Durée</strong></td>
-                        <td></td>
+                        <td id="mtd-duree"><span class="loading-spinner"></span></td>
                     </tr>
                     <tr>
                         <td><strong>Résolution</strong></td>
-                        <td></td>
+                        <td id="mtd-resolution"><span class="loading-spinner"></span></td>
                     </tr>
                     <tr>
                         <td><strong>Images par seconde</strong></td>
-                        <td></td>
+                        <td id="mtd-fps"><span class="loading-spinner"></span></td>
                     </tr>
                     <tr>
                         <td><strong>Codec vidéo</strong></td>
-                        <td></td>
+                        <td id="mtd-codec"><span class="loading-spinner"></span></td>
                     </tr>
                     <tr>
                         <td><strong>Taille</strong></td>
-                        <td></td>
+                        <td id="mtd-taille"><span class="loading-spinner"></span></td>
                     </tr>
                     <tr>
                         <td><strong>Bitrate</strong></td>
-                        <td></td>
+                        <td id="mtd-bitrate"><span class="loading-spinner"></span></td>
                     </tr>
 
                     {{-- URIs --}}
@@ -185,6 +185,33 @@
         document.addEventListener("DOMContentLoaded", function () {
             initLectureVideo();
             pageLectureVideo();
+            loadTechnicalMetadata();
         });
+
+        function loadTechnicalMetadata() {
+            const container = document.getElementById('technical-metadata');
+            if (!container) return;
+
+            const mediaId = container.dataset.mediaId;
+            const url = `/medias/${mediaId}/technicalMetadata`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const mtd = data.mtdTech || {};
+                    document.getElementById('mtd-duree').textContent = mtd.mtd_tech_duree || 'N/A';
+                    document.getElementById('mtd-resolution').textContent = mtd.mtd_tech_resolution || 'N/A';
+                    document.getElementById('mtd-fps').textContent = mtd.mtd_tech_fps || 'N/A';
+                    document.getElementById('mtd-codec').textContent = mtd.mtd_tech_format || 'N/A';
+                    document.getElementById('mtd-taille').textContent = mtd.mtd_tech_taille || 'N/A';
+                    document.getElementById('mtd-bitrate').textContent = mtd.mtd_tech_bitrate || 'N/A';
+                })
+                .catch(error => {
+                    console.error('Error loading technical metadata:', error);
+                    document.querySelectorAll('#technical-metadata .loading-spinner').forEach(el => {
+                        el.parentElement.textContent = 'Erreur';
+                    });
+                });
+        }
     </script>
 @endpush
