@@ -74,7 +74,7 @@ class ThumbnailController extends Controller
 
     protected function returnPlaceholder()
     {
-        $placeholderPath = public_path('images/placeholder-video.png');
+        $placeholderPath = public_path('images/placeholder-miniature.webp');
 
         if (file_exists($placeholderPath)) {
             return response()->file($placeholderPath);
