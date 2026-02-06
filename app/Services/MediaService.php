@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\Participation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Media management service
@@ -389,7 +390,7 @@ class MediaService
         // Priorité: chemin_local > ARCH > PAD
         // Si chemin_local existe, extraire les métadonnées du fichier local
         if ($media->chemin_local) {
-            $localPath = storage_path('app/' . ltrim($media->chemin_local, '/'));
+            $localPath = Storage::disk('external_local')->path($media->chemin_local);
             if (file_exists($localPath)) {
                 Log::info("getTechnicalMetadata: Using local file = {$localPath}");
                 return $this->extractMetadataFromFile($localPath);

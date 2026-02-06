@@ -53,18 +53,23 @@ class ThumbnailController extends Controller
 
     /**
      * Build thumbnail path from video path.
-     * Replaces H264 -> Thumbnails and .mp4 -> .jpg
+     * Thumbnails are in /mnt/archivage/Thumbnails/<year>/<project>/<filename>.jpg
      */
     protected function buildThumbnailPath(string $videoPath): ?string
     {
-        // Replace H264 folder with Thumbnails
-        $thumbnailPath = str_replace('H264', 'Thumbnails', $videoPath);
+        // Split path into directory and filename
+        $dir = dirname($videoPath);
+        $filename = basename($videoPath);
+
+        // Replace H264 with Thumbnails only in directory part (not filename)
+        $thumbnailDir = str_replace('H264', 'Thumbnails', $dir);
 
         // Replace video extension with .jpg
-        $thumbnailPath = preg_replace('/\.(mp4|mov|mxf)$/i', '.jpg', $thumbnailPath);
+        $thumbnailFilename = preg_replace('/\.(mp4|mov|mxf)$/i', '.jpg', $filename);
 
-        // Build full path
-        return "{$this->archivageMountPath}/{$thumbnailPath}";
+        // Build full path, avoiding double slashes
+        $basePath = rtrim($this->archivageMountPath, '/');
+        return "{$basePath}/{$thumbnailDir}/{$thumbnailFilename}";
     }
 
     protected function returnPlaceholder()
