@@ -9,7 +9,7 @@
         {{-- Utilisation de route() pour les liens --}}
         <a href="{{ route('home') }}">
             <div class="logo-bts">
-                <img src="{{ asset('/images/logo_BTS_Play.png') }}" alt="logo">
+                <img loading="lazy" src="{{ asset('/images/logo_BTS_Play.png') }}" alt="logo">
             </div>
         </a>
 

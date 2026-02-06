@@ -18,7 +18,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
         <div class="mb-4"> 
             <a href="{{ route('home') }}">
-                <img src="{{ asset('/images/logo_BTS_Play.png') }}" class="w-24 h-auto" alt="Logo">
+                <img loading="lazy" src="{{ asset('/images/logo_BTS_Play.png') }}" class="w-24 h-auto" alt="Logo">
             </a>
         </div>
 
