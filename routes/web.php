@@ -25,6 +25,9 @@ Route::get('/stream/{mediaId}/segment/{segment}', [StreamController::class, 'seg
 // Gestion des médias
 Route::resource('medias', MediaController::class);
 
+// Récupérer les metadata techniques
+Route::get('/medias/{mediaId}/technicalMetadata', [MediaController::class, 'technicalMetadata'])->name('media.technicalMetadata');
+
 // Recherche
 Route::get('/recherche', [SearchController::class, 'index'])->name('search');
 Route::get('/search', [SearchController::class, 'search'])->name('search.results');

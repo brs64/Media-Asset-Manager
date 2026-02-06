@@ -34,9 +34,6 @@ class MediaService
             return null;
         }
 
-        // Extract technical metadata via FTP
-        $technicalMetadata = $this->getTechnicalMetadata($media);
-
         return [
             'media' => $media,
             'idMedia' => $media->id,
@@ -61,23 +58,6 @@ class MediaService
                 'URI_NAS_PAD' => $media->URI_NAS_PAD ?? 'N/A',
                 'chemin_local' => $media->chemin_local ?? 'N/A',
                 'URI_NAS_ARCH' => $media->URI_NAS_ARCH ?? 'N/A',
-            ],
-
-            // Technical metadata (from FTP)
-            'mtdTech' => $technicalMetadata ? [
-                'mtd_tech_duree' => $technicalMetadata['duree_format'] ?? 'N/A',
-                'mtd_tech_fps' => $technicalMetadata['fps'] ?? 'N/A',
-                'mtd_tech_resolution' => $technicalMetadata['resolution'] ?? 'N/A',
-                'mtd_tech_format' => $technicalMetadata['codec_video'] ?? 'N/A',
-                'mtd_tech_taille' => $technicalMetadata['taille_format'] ?? 'N/A',
-                'mtd_tech_bitrate' => isset($technicalMetadata['bitrate']) ? round($technicalMetadata['bitrate'] / 1000) . ' kbps' : 'N/A',
-            ] : [
-                'mtd_tech_duree' => 'N/A',
-                'mtd_tech_fps' => 'N/A',
-                'mtd_tech_resolution' => 'N/A',
-                'mtd_tech_format' => 'N/A',
-                'mtd_tech_taille' => 'N/A',
-                'mtd_tech_bitrate' => 'N/A',
             ],
 
             // Métadonnées éditoriales

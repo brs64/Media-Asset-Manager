@@ -322,4 +322,36 @@ class MediaController extends Controller
             'message' => 'Chemin local synchronisé',
         ]);
     }
+
+    public function technicalMetadata(int $idMedia, MediaService $mediaService): ?array
+    {
+        $media = Media::with([
+            'projets',
+            'professeur',
+            'participations.eleve',
+            'participations.role'
+        ])->find($idMedia);
+
+        // Extract technical metadata
+        $technicalMetadata = $mediaService->getTechnicalMetadata($media);
+
+        // Return technical metadata
+        return [
+                'mtdTech' => $technicalMetadata ? [
+                'mtd_tech_duree' => $technicalMetadata['duree_format'] ?? 'N/A',
+                'mtd_tech_fps' => $technicalMetadata['fps'] ?? 'N/A',
+                'mtd_tech_resolution' => $technicalMetadata['resolution'] ?? 'N/A',
+                'mtd_tech_format' => $technicalMetadata['codec_video'] ?? 'N/A',
+                'mtd_tech_taille' => $technicalMetadata['taille_format'] ?? 'N/A',
+                'mtd_tech_bitrate' => isset($technicalMetadata['bitrate']) ? round($technicalMetadata['bitrate'] / 1000) . ' kbps' : 'N/A',
+            ] : [
+                'mtd_tech_duree' => 'N/A',
+                'mtd_tech_fps' => 'N/A',
+                'mtd_tech_resolution' => 'N/A',
+                'mtd_tech_format' => 'N/A',
+                'mtd_tech_taille' => 'N/A',
+                'mtd_tech_bitrate' => 'N/A',
+            ]
+        ];
+    }
 }
