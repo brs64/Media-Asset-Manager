@@ -22,7 +22,7 @@
                                         
                                         {{-- Miniature --}}
                                         <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                            <img src="{{ route('thumbnails.show', $media->id) }}"
+                                            <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}"
                                                 alt="{{ $media->mtd_tech_titre }}"
                                                 class='imageMiniature w-full h-auto object-cover aspect-video'/>
                                         </div>
@@ -73,7 +73,7 @@
                                 
                                 {{-- Miniature --}}
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
-                                    <img src="{{ route('thumbnails.show', $media->id) }}"
+                                    <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}"
                                          alt="{{ $media->mtd_tech_titre }}"
                                          class='imageMiniature w-full h-auto object-cover aspect-video'/>
                                     

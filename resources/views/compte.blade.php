@@ -13,7 +13,7 @@
         
         @csrf {{-- PROTECTION OBLIGATOIRE LARAVEL (remplace ton ancienne sécurité) --}}
         
-        <img class="userIcon" src="{{ asset('ressources/Images/user.png') }}">
+        <img loading="lazy" class="userIcon" src="{{ asset('ressources/Images/user.png') }}">
         <input type="hidden" name="action" value="connexionUtilisateur">
         
         <p>Nom d'utilisateur :</p>

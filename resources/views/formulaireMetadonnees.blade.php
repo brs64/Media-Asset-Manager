@@ -28,7 +28,7 @@
         {{-- Thumbnail Section (top) --}}
         @isset($media)
             <div class="thumbnail-container" style="max-width: 600px; margin: 0 auto 30px;">
-                <img src="{{ route('thumbnails.show', $media->id) }}" alt="Miniature" class="thumbnail-image">
+                <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}" alt="Miniature" class="thumbnail-image">
             </div>
             <h2 style="text-align: center; margin-bottom: 30px; font-size: 1.5em;">{{ $media->mtd_tech_titre }}</h2>
         @else
