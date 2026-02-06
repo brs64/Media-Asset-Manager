@@ -47,8 +47,8 @@ class ThumbnailController extends Controller
             }
         }
 
-        // 3. Return placeholder
-        return $this->returnPlaceholder();
+        // 3. No thumbnail available
+        abort(404);
     }
 
     /**
@@ -70,16 +70,5 @@ class ThumbnailController extends Controller
         // Build full path, avoiding double slashes
         $basePath = rtrim($this->archivageMountPath, '/');
         return "{$basePath}/{$thumbnailDir}/{$thumbnailFilename}";
-    }
-
-    protected function returnPlaceholder()
-    {
-        $placeholderPath = public_path('images/placeholder-miniature.webp');
-
-        if (file_exists($placeholderPath)) {
-            return response()->file($placeholderPath);
-        }
-
-        return response()->noContent();
     }
 }

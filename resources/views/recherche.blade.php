@@ -24,7 +24,8 @@
                                         <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
                                             <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}"
                                                 alt="{{ $media->mtd_tech_titre }}"
-                                                class='imageMiniature w-full h-auto object-cover aspect-video'/>
+                                                class='imageMiniature w-full h-auto object-cover aspect-video'
+                                                onerror="this.onerror=null;this.src='{{ asset('images/placeholder-miniature.webp') }}'"/>
                                         </div>
 
                                         <div class="mt-2">
@@ -75,8 +76,9 @@
                                 <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
                                     <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}"
                                          alt="{{ $media->mtd_tech_titre }}"
-                                         class='imageMiniature w-full h-auto object-cover aspect-video'/>
-                                    
+                                         class='imageMiniature w-full h-auto object-cover aspect-video'
+                                         onerror="this.onerror=null;this.src='{{ asset('images/placeholder-miniature.webp') }}'"/>
+
                                     {{-- Overlay --}}
                                     <div class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                                     </div>
