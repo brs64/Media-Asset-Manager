@@ -136,27 +136,27 @@
                 <table>
                     <tr>
                         <td><strong>Durée</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_duree"] }}</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Résolution</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_resolution"] }}</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Images par seconde</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_fps"] }} fps</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Codec vidéo</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_format"] }}</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Taille</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_taille"] }}</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Bitrate</strong></td>
-                        <td>{{ $mtdTech["mtd_tech_bitrate"] }}</td>
+                        <td></td>
                     </tr>
 
                     {{-- URIs --}}
