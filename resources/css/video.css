@@ -285,7 +285,20 @@ button {
     transform: translate(-50%, -50%) !important;
 }
 
+/* Loading spinner for async metadata */
+.loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e0e0e0;
+    border-top-color: #f09520;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
 
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
 
 .metadata_detaillee {

@@ -323,21 +323,20 @@ class MediaController extends Controller
         ]);
     }
 
-    public function technicalMetadata(int $idMedia, MediaService $mediaService): ?array
+    public function technicalMetadata(int $idMedia, MediaService $mediaService)
     {
-        $media = Media::with([
-            'projets',
-            'professeur',
-            'participations.eleve',
-            'participations.role'
-        ])->find($idMedia);
+        $media = Media::find($idMedia);
+
+        if (!$media) {
+            return response()->json(['mtdTech' => null], 404);
+        }
 
         // Extract technical metadata
         $technicalMetadata = $mediaService->getTechnicalMetadata($media);
 
-        // Return technical metadata
-        return [
-                'mtdTech' => $technicalMetadata ? [
+        // Return technical metadata as JSON
+        return response()->json([
+            'mtdTech' => $technicalMetadata ? [
                 'mtd_tech_duree' => $technicalMetadata['duree_format'] ?? 'N/A',
                 'mtd_tech_fps' => $technicalMetadata['fps'] ?? 'N/A',
                 'mtd_tech_resolution' => $technicalMetadata['resolution'] ?? 'N/A',
@@ -352,6 +351,6 @@ class MediaController extends Controller
                 'mtd_tech_taille' => 'N/A',
                 'mtd_tech_bitrate' => 'N/A',
             ]
-        ];
+        ]);
     }
 }
