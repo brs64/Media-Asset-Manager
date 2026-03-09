@@ -11,6 +11,7 @@ use App\Models\Role;
 
 use App\Jobs\SyncMediaFromDiskJob;
 use App\Services\MediaService;
+use Database\Seeders\RoleSeeder;
 
 class MediaControllerTest extends TestCase
 {
@@ -31,7 +32,8 @@ class MediaControllerTest extends TestCase
     /** @test */
     public function store_creates_media_and_participations()
     {
-        $role = Role::factory()->create();
+        $this->seed(RoleSeeder::class);
+        $role = Role::first();
 
         $response = $this->post(route('medias.store'), [
             'mtd_tech_titre' => "Titre\ntest",
@@ -46,7 +48,7 @@ class MediaControllerTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('media', [
+        $this->assertDatabaseHas('medias', [
             'mtd_tech_titre' => 'Titre test',
         ]);
 
@@ -90,8 +92,10 @@ class MediaControllerTest extends TestCase
     /** @test */
     public function update_updates_media_and_participations()
     {
+        $this->seed(RoleSeeder::class);
+        $role = Role::first();
+
         $media = Media::factory()->create();
-        $role = Role::factory()->create();
 
         $response = $this->put(route('medias.update', $media->id), [
             'mtd_tech_titre' => "Nouveau\ntitre",
@@ -105,7 +109,7 @@ class MediaControllerTest extends TestCase
 
         $response->assertRedirect(route('medias.show', $media->id));
 
-        $this->assertDatabaseHas('media', [
+        $this->assertDatabaseHas('medias', [
             'id' => $media->id,
             'mtd_tech_titre' => 'Nouveau titre',
         ]);
@@ -135,9 +139,11 @@ class MediaControllerTest extends TestCase
     /** @test */
     public function sync_dispatches_jobs()
     {
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
         Queue::fake();
 
-        $response = $this->post(route('medias.sync'));
+        $response = $this->post(route('admin.media.sync'));
 
         Queue::assertPushed(SyncMediaFromDiskJob::class, 3);
 
@@ -148,12 +154,15 @@ class MediaControllerTest extends TestCase
     /** @test */
     public function sync_local_path_success()
     {
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
+
         $this->mock(MediaService::class)
             ->shouldReceive('syncLocalPath')
             ->once()
             ->andReturn(true);
 
-        $response = $this->postJson(route('medias.syncLocalPath'), [
+        $response = $this->postJson(route('admin.media.addLocalPath'), [
             'path' => '/test/path',
         ]);
 
@@ -166,12 +175,16 @@ class MediaControllerTest extends TestCase
     /** @test */
     public function sync_local_path_returns_404_when_not_found()
     {
+
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
+
         $this->mock(MediaService::class)
             ->shouldReceive('syncLocalPath')
             ->once()
             ->andReturn(false);
 
-        $response = $this->postJson(route('medias.syncLocalPath'), [
+        $response = $this->postJson(route('admin.media.addLocalPath'), [
             'path' => '/unknown/path',
         ]);
 
