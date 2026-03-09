@@ -47,9 +47,18 @@
                     </div>
                     <div class="flex flex-col overflow-hidden min-w-0"> 
                         <div class="font-bold text-gray-800 truncate" :title="filename" x-text="filename"></div>
-                        <div class="text-xs text-gray-500 truncate" :title="path">
-                            <span class="font-bold" :class="file.source === 'NAS_ARCH' ? 'text-blue-600' : 'text-orange-600'" x-text="file.source + ':'"></span>
-                            <span x-text="path"></span>
+                        
+                        <div class="flex flex-col mt-1 space-y-1">
+                            <template x-for="p in available_paths" :key="p.label">
+                                <div class="text-xs text-gray-500 truncate" :title="p.path">
+                                    <span 
+                                        class="font-bold" 
+                                        :class="p.label === 'NAS_ARCH' ? 'text-blue-600' : 'text-orange-600'" 
+                                        x-text="p.label + ' : '">
+                                    </span>
+                                    <span x-text="p.path"></span>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -154,8 +163,9 @@
         return {
             id: fileData.id,
             filename: fileData.filename,
-            path: fileData.path,
-            source: fileData.source,
+            path: fileData.path, 
+            disk: fileData.disk, 
+            available_paths: fileData.available_paths || [],
             job_id: fileData.job_id,
             progress: Number(fileData.progress) || 0,
             status: fileData.status,
@@ -163,33 +173,43 @@
             starting: false,
             fakeInterval: null,
             localPathSynced: false,
-            // New Flag for UI state
             isCancelled: (fileData.status === 'Annulé'), 
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
                 if (s.includes('termin') || s.includes('success')) return 'text-green-600'; 
                 if (s.includes('echou') || s.includes('error')) return 'text-red-600';
-                if (s.includes('annul')) return 'text-red-600'; // Make "Annulé" red
+                if (s.includes('annul')) return 'text-red-600'; 
                 return 'text-blue-600';
             },
 
-            init() { if (this.job_id && !this.finished) this.startPolling(); },
+            init() {
+                if (this.job_id && !this.finished) {
+                    this.startPolling();
+                }
+            },
 
             startJob() {
-                // Reset cancelled state when retrying
                 this.isCancelled = false; 
 
                 const container = document.querySelector('[data-limit]');
                 const maxConcurrent = container && container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 2;
                 const busyCount = document.querySelectorAll('[data-active="true"], [data-starting="true"]').length;
-                if (busyCount >= maxConcurrent) { this.$dispatch('open-limit-modal'); return; }
+                
+                if (busyCount >= maxConcurrent) {
+                    this.$dispatch('open-limit-modal');
+                    return; 
+                }
 
                 this.starting = true;
+
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ path: this.path, disk: (this.source === 'NAS_ARCH' ? 'nas_arch' : 'ftp_pad') })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ path: this.path, disk: this.disk })
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -200,9 +220,15 @@
                         this.progress = 0;
                         this.localPathSynced = false;
                         this.startPolling(); 
-                    } else { alert("Erreur: " + data.message); this.starting = false; }
+                    } else {
+                        alert("Erreur: " + data.message);
+                        this.starting = false;
+                    }
                 })
-                .catch(() => { alert("Erreur technique"); this.starting = false; });
+                .catch(err => {
+                    alert("Erreur technique");
+                    this.starting = false;
+                });
             },
 
             startPolling() {

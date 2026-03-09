@@ -55,42 +55,55 @@ class TransfertController extends Controller
 
         foreach ($query->cursor() as $media) {
             
-            if (!empty($media->URI_NAS_ARCH)) {
-                $finalPath = $media->URI_NAS_ARCH;
-                $finalDisk = 'nas_arch';
-                $displayExt = '.mp4';
-                $sourceLabel = 'NAS_ARCH';
-            } else {
-                $finalPath = $media->URI_NAS_PAD ?? ''; 
-                $finalDisk = 'ftp_pad';
+            $availablePaths = [];
+            $primaryPath = '';
+            $primaryDisk = '';
+            $displayExt = '.mp4';
+
+            if (!empty($media->URI_NAS_PAD)) {
+                $availablePaths[] = [
+                    'label' => 'NAS_PAD',
+                    'path' => $media->URI_NAS_PAD
+                ];
+                $primaryPath = $media->URI_NAS_PAD;
+                $primaryDisk = 'ftp_pad';
                 $displayExt = '.mxf';
-                $sourceLabel = 'NAS_PAD';
             }
 
-            if (empty($finalPath)) continue; 
+            if (!empty($media->URI_NAS_ARCH)) {
+                $availablePaths[] = [
+                    'label' => 'NAS_ARCH',
+                    'path' => $media->URI_NAS_ARCH
+                ];
+                $primaryPath = $media->URI_NAS_ARCH;
+                $primaryDisk = 'nas_arch';
+                $displayExt = '.mp4';
+            }
 
-            $nameWithoutExt = pathinfo($finalPath, PATHINFO_FILENAME);
+            if (empty($primaryPath)) continue; 
+
+            $nameWithoutExt = pathinfo($primaryPath, PATHINFO_FILENAME);
             if (empty($nameWithoutExt) || $nameWithoutExt === '.') {
                 $nameWithoutExt = $media->mtd_tech_titre ?? 'Video_' . $media->id;
             }
             $fullFilename = $nameWithoutExt . $displayExt;
 
             $item = [
-                'id'       => $media->id,
-                'filename' => $fullFilename,
-                'path'     => $finalPath,
-                'disk'     => $finalDisk,
-                'source'   => $sourceLabel,
-                'job_id'   => null,
-                'status'   => 'En attente',
-                'progress' => 0,
-                'finished' => false
+                'id'              => $media->id,
+                'filename'        => $fullFilename,
+                'path'            => $primaryPath, 
+                'disk'            => $primaryDisk, 
+                'available_paths' => $availablePaths,
+                'job_id'          => null,
+                'status'          => 'En attente',
+                'progress'        => 0,
+                'finished'        => false
             ];
 
             if (isset($activeMap[$nameWithoutExt])) {
                 $job = $activeMap[$nameWithoutExt];
                 $item['job_id']   = $job['id'];
-                $item['status']   = $job['status']; // Already French from Service
+                $item['status']   = $job['status']; 
                 $item['progress'] = $job['progress'];
                 $item['finished'] = $job['is_finished'];
             }
