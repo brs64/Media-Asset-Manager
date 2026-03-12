@@ -85,6 +85,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/eleves', [AdminController::class, 'createEleve'])->name('eleves.create');
     Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('eleves.delete');
 
+    // Permissions management
+    Route::post('/permissions/update', [AdminController::class, 'updatePermission'])->name('permissions.update');
+    Route::post('/roles/update', [AdminController::class, 'updateRole'])->name('roles.update');
+
     //transfert listes d'eleves en bd (depuis un csv par exemple)
     Route::post('/eleves/bulk', [AdminController::class, 'Ajouterelevedepuiscsv'])->name('eleves.bulk');
 

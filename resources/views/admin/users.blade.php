@@ -14,11 +14,8 @@
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"></th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Modifier la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Diffuser la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Supprimer la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Administrer le site</th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nom</th>
+                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Rôle</th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                         <span class="sr-only">Actions</span>
                     </th>
@@ -32,20 +29,24 @@
                     </td>
 
                     @php
-                    $isAdmin = $prof->role == 'admin'; // Adjust based on your Role logic
+                    $user = $prof->user;
+                    $isAdmin = $user && $user->hasRole('admin');
+                    $currentRole = '';
+                    if ($user) {
+                        if ($user->hasRole('admin')) $currentRole = 'admin';
+                        elseif ($user->hasRole('professeur')) $currentRole = 'professeur';
+                        elseif ($user->hasRole('eleve')) $currentRole = 'eleve';
+                    }
                     @endphp
 
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <select data-user-id="{{ $user->id ?? '' }}"
+                                class="role-select rounded border-gray-300 text-sm focus:border-orange-500 focus:ring-orange-500"
+                                onchange="updateRole(this)">
+                            <option value="admin" {{ $currentRole === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="professeur" {{ $currentRole === 'professeur' ? 'selected' : '' }}>Professeur</option>
+                            <option value="eleve" {{ $currentRole === 'eleve' ? 'selected' : '' }}>Élève</option>
+                        </select>
                     </td>
 
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -63,12 +64,12 @@
         </table>
     </div>
 
+    {{-- Formulaire d'ajout de professeur --}}
     <div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
         <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Ajouter un professeur</h3>
 
         <form action="{{ route('admin.professeurs.create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
             @csrf
-
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
                 <input type="text" name="nom" required
@@ -191,4 +192,52 @@
     </form>
     <p class="mt-2 text-xs text-gray-500 italic">Format : Un élève par ligne. Supporte "NOM Prénom" ou "NOM,Prénom".</p>
 </div>
+
+<script>
+function updateRole(select) {
+    const userId = select.dataset.userId;
+    const newRole = select.value;
+    const oldValue = select.dataset.oldValue || select.value;
+
+    if (!confirm('Êtes-vous sûr de vouloir changer le rôle de cet utilisateur ?')) {
+        select.value = oldValue;
+        return;
+    }
+
+    fetch('{{ route("admin.roles.update") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            role: newRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            select.dataset.oldValue = newRole;
+            // Recharger la page pour mettre à jour les permissions
+            location.reload();
+        } else {
+            alert('Erreur lors de la mise à jour du rôle');
+            select.value = oldValue;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur lors de la mise à jour du rôle');
+        select.value = oldValue;
+    });
+}
+
+// Enregistrer la valeur initiale de chaque select
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.role-select').forEach(select => {
+        select.dataset.oldValue = select.value;
+    });
+});
+</script>
 @endsection

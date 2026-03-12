@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\SecurityRole;
+use App\Models\SecurityPermission;
 
 class SecurityRoleSeeder extends Seeder
 {
@@ -12,6 +14,32 @@ class SecurityRoleSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // Réinitialiser le cache des permissions
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Créer les permissions
+        $permissions = [
+            'modifier video',
+            'diffuser video',
+            'supprimer video',
+            'administrer site',
+        ];
+
+        foreach ($permissions as $permission) {
+            SecurityPermission::create(['name' => $permission]);
+        }
+
+        // Créer les rôles et assigner les permissions
+
+        // Rôle Admin : toutes les permissions
+        $adminRole = SecurityRole::create(['name' => 'admin']);
+        $adminRole->givePermissionTo(SecurityPermission::all());
+
+        // Rôle Professeur : modifier uniquement
+        $professeurRole = SecurityRole::create(['name' => 'professeur']);
+        $professeurRole->givePermissionTo(['modifier video']);
+
+        // Rôle Élève : aucune permission par défaut
+        $eleveRole = SecurityRole::create(['name' => 'eleve']);
     }
 }
