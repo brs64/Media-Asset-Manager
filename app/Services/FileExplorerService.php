@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class FileExplorerService
 {
@@ -13,16 +12,13 @@ class FileExplorerService
      *  - les dossiers
      *  - les fichiers vidéos
      */
-    public static function scanDisk(string $diskName, string $directory): array
+    public function scanDisk(string $diskName, string $directory): array
     {
-        // On nettoie le chemin
         $directory = rtrim($directory, '/\\');
 
         // Cas particulier : disque local absolu (Windows / Linux)
         if ($diskName === 'external_local') {
-            if (!is_dir($directory)) {
-                return []; // chemin inexistant
-            }
+            if (!is_dir($directory)) return [];
 
             $results = [];
             foreach (scandir($directory) as $file) {
@@ -36,20 +32,18 @@ class FileExplorerService
                         'path' => $fullPath,
                         'disk' => $diskName,
                     ];
-                } elseif (self::isVideo($file)) {
+                } elseif ($this->isVideo($file)) {
                     $results[] = [
                         'type' => 'video',
                         'name' => $file,
                         'path' => $fullPath,
                         'disk' => $diskName,
-                        'id' => null,
+                        'id'   => null,
                     ];
                 }
             }
 
-            // Tri alphabétique
             usort($results, fn($a, $b) => strcasecmp($a['name'], $b['name']));
-
             return $results;
         }
 
@@ -60,7 +54,6 @@ class FileExplorerService
         try {
             $directories = $disk->directories($directory);
             sort($directories);
-
             foreach ($directories as $dirPath) {
                 $results[] = [
                     'type' => 'folder',
@@ -72,15 +65,10 @@ class FileExplorerService
 
             $files = $disk->files($directory);
             sort($files);
-
             foreach ($files as $filePath) {
                 $fileName = basename($filePath);
-
-                if ($fileName === '.gitkeep' || str_starts_with($fileName, '.')) {
-                    continue;
-                }
-
-                if (self::isVideo($fileName)) {
+                if ($fileName === '.gitkeep' || str_starts_with($fileName, '.')) continue;
+                if ($this->isVideo($fileName)) {
                     $results[] = [
                         'type' => 'video',
                         'name' => $fileName,
@@ -91,41 +79,32 @@ class FileExplorerService
                 }
             }
         } catch (\Throwable $e) {
-            // Si erreur FTP ou disque inaccessible, on renvoie vide
             return [];
         }
 
         return $results;
     }
 
-    public static function scanDiskRecursive(string $diskName, string $path = '/', callable $onItemFound = null)
+    public function scanDiskRecursive(string $diskName, string $path = '/', callable $onItemFound = null)
     {
-        ini_set('memory_limit', '512M'); 
-        ini_set('max_execution_time', 600); // 10 minutes
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 600);
 
         $allFiles = [];
-        
-        $items = self::scanDisk($diskName, $path);
+        $items = $this->scanDisk($diskName, $path);
 
         foreach ($items as $item) {
+            if ($onItemFound) $onItemFound($item);
 
-            if ($onItemFound) {
-                $onItemFound($item);
-            }
-    
             if ($item['type'] === 'folder') {
-
-                self::scanDiskRecursive($diskName, $item['path'], $onItemFound);
+                $this->scanDiskRecursive($diskName, $item['path'], $onItemFound);
             }
         }
 
         return $allFiles;
     }
 
-    /**
-     * Détection vidéo
-     */
-    public static function isVideo(string $filename): bool
+    public function isVideo(string $filename): bool
     {
         return preg_match('/\.(mp4|mov|avi|mkv|webm|m4v|mxf)$/i', $filename);
     }
