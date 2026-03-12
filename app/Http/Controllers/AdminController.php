@@ -14,6 +14,24 @@ use App\Models\Eleve;
 
 class AdminController extends Controller
 {
+    /**
+     * Constructeur - Vérifie les permissions
+     */
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!auth()->check()) {
+                abort(403, 'Vous devez être connecté pour accéder à cette page.');
+            }
+
+            $user = auth()->user();
+            if (!$user->hasRole('admin') && !$user->hasRole('professeur')) {
+                abort(403, 'Accès réservé aux administrateurs et professeurs.');
+            }
+
+            return $next($request);
+        });
+    }
 
     public function settings()
     {

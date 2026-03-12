@@ -35,11 +35,12 @@ class SecurityRoleSeeder extends Seeder
         $adminRole = SecurityRole::create(['name' => 'admin']);
         $adminRole->givePermissionTo(SecurityPermission::all());
 
-        // Rôle Professeur : modifier uniquement
+        // Rôle Professeur : toutes les permissions sauf supprimer
         $professeurRole = SecurityRole::create(['name' => 'professeur']);
-        $professeurRole->givePermissionTo(['modifier video']);
+        $professeurRole->givePermissionTo(['modifier video', 'diffuser video', 'administrer site']);
 
-        // Rôle Élève : aucune permission par défaut
+        // Rôle Élève : diffuser vidéo uniquement
         $eleveRole = SecurityRole::create(['name' => 'eleve']);
+        $eleveRole->givePermissionTo(['diffuser video']);
     }
 }
