@@ -15,26 +15,24 @@ use App\Models\Eleve;
 class AdminController extends Controller
 {
     /**
-     * Constructeur - Vérifie les permissions
+     * Vérifie que l'utilisateur a accès à l'admin
      */
-    public function __construct()
+    private function checkAdminAccess()
     {
-        $this->middleware(function ($request, $next) {
-            if (!auth()->check()) {
-                abort(403, 'Vous devez être connecté pour accéder à cette page.');
-            }
+        if (!auth()->check()) {
+            abort(403, 'Vous devez être connecté pour accéder à cette page.');
+        }
 
-            $user = auth()->user();
-            if (!$user->hasRole('admin') && !$user->hasRole('professeur')) {
-                abort(403, 'Accès réservé aux administrateurs et professeurs.');
-            }
-
-            return $next($request);
-        });
+        $user = auth()->user();
+        if (!$user->hasRole('admin') && !$user->hasRole('professeur')) {
+            abort(403, 'Accès réservé aux administrateurs et professeurs.');
+        }
     }
 
     public function settings()
     {
+        $this->checkAdminAccess();
+
         $settings = [
             // URIs
             'uri_nas_pad'       => config('btsplay.uris.nas_pad'),
@@ -93,6 +91,8 @@ class AdminController extends Controller
      */
     public function updateSettings(Request $request)
     {
+        $this->checkAdminAccess();
+
         // Map Form Inputs -> .ENV Variables
         $envUpdates = [
             'URI_RACINE_NAS_PAD' => $request->uri_nas_pad,
@@ -172,6 +172,8 @@ class AdminController extends Controller
 
     public function logs()
     {
+        $this->checkAdminAccess();
+
         $logPath = storage_path('logs/laravel.log');
         $logs = [];
 
@@ -188,6 +190,8 @@ class AdminController extends Controller
 
     public function users()
     {
+        $this->checkAdminAccess();
+
         // Only fetch users when on the Users tab
         $professeurs = Professeur::all();
 
