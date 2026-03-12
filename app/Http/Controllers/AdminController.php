@@ -206,6 +206,8 @@ class AdminController extends Controller
      */
     public function createProfesseur(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
@@ -239,6 +241,8 @@ class AdminController extends Controller
      */
     public function deleteProfesseur($id)
     {
+        $this->checkAdminAccess();
+
         $professeur = Professeur::findOrFail($id);
 
         if ($professeur->media()->count() > 0) {
@@ -254,6 +258,8 @@ class AdminController extends Controller
      */
     public function createEleve(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
@@ -268,6 +274,8 @@ class AdminController extends Controller
      */
     public function deleteEleve($id)
     {
+        $this->checkAdminAccess();
+
         $eleve = Eleve::findOrFail($id);
         $eleve->delete();
         return back()->with('success', 'Élève supprimé avec succès!');
@@ -278,6 +286,8 @@ class AdminController extends Controller
      */
     public function projets()
     {
+        $this->checkAdminAccess();
+
         $projets = \App\Models\Projet::withCount('media')->paginate(20);
         return view('admin.projets', compact('projets'));
     }
@@ -287,6 +297,8 @@ class AdminController extends Controller
      */
     public function createProjet(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'libelle' => 'required|string|max:255',
         ]);
@@ -301,6 +313,8 @@ class AdminController extends Controller
      */
     public function deleteProjet($id)
     {
+        $this->checkAdminAccess();
+
         $projet = \App\Models\Projet::findOrFail($id);
 
         if ($projet->media()->count() > 0) {
@@ -314,6 +328,8 @@ class AdminController extends Controller
 
     public function databaseView()
     {
+        $this->checkAdminAccess();
+
         // Read the log file to display in the view
         $logPath = storage_path('logs/backup.log');
         $backupLogs = [];
@@ -329,6 +345,8 @@ class AdminController extends Controller
 
     public function runBackup()
     {
+        $this->checkAdminAccess();
+
         try {
             // Trigger the command manually and get exit code
             $exitCode = Artisan::call('db:backup --type=manual');
@@ -354,6 +372,8 @@ class AdminController extends Controller
 
     public function saveBackupSettings(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'backup_time' => 'required',
             'backup_day' => 'required',
@@ -371,11 +391,15 @@ class AdminController extends Controller
 
     public function reconciliation()
     {
+        $this->checkAdminAccess();
+
         return view('admin.reconciliation');
     }
 
     public function runReconciliation()
     {
+        $this->checkAdminAccess();
+
         // Logic to sync files
 
         return back()->with('reconciliation_result', 'Réconciliation terminée. (Résultat simulé)');
@@ -383,6 +407,8 @@ class AdminController extends Controller
 
     public function downloadLogs()
     {
+        $this->checkAdminAccess();
+
         $path = storage_path('logs/laravel.log');
         if (File::exists($path)) {
             return response()->download($path);
@@ -392,6 +418,8 @@ class AdminController extends Controller
 
 public function Ajouterelevedepuiscsv(Request $request)
 {
+    $this->checkAdminAccess();
+
     set_time_limit(300);
 
     $request->validate([
@@ -446,6 +474,8 @@ public function Ajouterelevedepuiscsv(Request $request)
      */
     public function updatePermission(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'permission' => 'required|string',
@@ -473,6 +503,8 @@ public function Ajouterelevedepuiscsv(Request $request)
      */
     public function updateRole(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'role' => 'required|string|in:admin,professeur,eleve',
