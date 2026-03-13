@@ -189,7 +189,7 @@
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ path: this.path, disk: (this.source === 'NAS_ARCH' ? 'nas_arch' : 'ftp_pad') })
+                    body: JSON.stringify({ id: this.id, path: this.path, disk: (this.source === 'NAS_ARCH' ? 'nas_arch' : 'ftp_pad') })
                 })
                 .then(res => res.json())
                 .then(data => {

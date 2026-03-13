@@ -14,9 +14,25 @@ use App\Models\Eleve;
 
 class AdminController extends Controller
 {
+    /**
+     * Vérifie que l'utilisateur a accès à l'admin
+     */
+    private function checkAdminAccess()
+    {
+        if (!auth()->check()) {
+            abort(403, 'Vous devez être connecté pour accéder à cette page.');
+        }
+
+        $user = auth()->user();
+        if (!$user->hasRole('admin') && !$user->hasRole('professeur')) {
+            abort(403, 'Accès réservé aux administrateurs et professeurs.');
+        }
+    }
 
     public function settings()
     {
+        $this->checkAdminAccess();
+
         $settings = [
             // URIs
             'uri_nas_pad'       => config('btsplay.uris.nas_pad'),
@@ -75,6 +91,8 @@ class AdminController extends Controller
      */
     public function updateSettings(Request $request)
     {
+        $this->checkAdminAccess();
+
         // Map Form Inputs -> .ENV Variables
         $envUpdates = [
             'URI_RACINE_NAS_PAD' => $request->uri_nas_pad,
@@ -154,6 +172,8 @@ class AdminController extends Controller
 
     public function logs()
     {
+        $this->checkAdminAccess();
+
         $logPath = storage_path('logs/laravel.log');
         $logs = [];
 
@@ -170,6 +190,8 @@ class AdminController extends Controller
 
     public function users()
     {
+        $this->checkAdminAccess();
+
         // Only fetch users when on the Users tab
         $professeurs = Professeur::all();
 
@@ -184,15 +206,32 @@ class AdminController extends Controller
      */
     public function createProfesseur(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'identifiant' => 'required|string|unique:professeurs',
+            'identifiant' => 'required|string|unique:users,name',
             'mot_de_passe' => 'required|min:8',
         ]);
 
-        $validated['mot_de_passe'] = bcrypt($validated['mot_de_passe']);
-        Professeur::create($validated);
+        // Créer d'abord le compte utilisateur
+        $user = User::create([
+            'name' => $validated['identifiant'],
+            'password' => bcrypt($validated['mot_de_passe']),
+            'nom' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+        ]);
+
+        // Assigner le rôle professeur
+        $user->assignRole('professeur');
+
+        // Créer le profil professeur
+        Professeur::create([
+            'user_id' => $user->id,
+            'nom' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+        ]);
 
         return back()->with('success', 'Professeur créé avec succès!');
     }
@@ -202,6 +241,8 @@ class AdminController extends Controller
      */
     public function deleteProfesseur($id)
     {
+        $this->checkAdminAccess();
+
         $professeur = Professeur::findOrFail($id);
 
         if ($professeur->media()->count() > 0) {
@@ -217,6 +258,8 @@ class AdminController extends Controller
      */
     public function createEleve(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
@@ -231,6 +274,8 @@ class AdminController extends Controller
      */
     public function deleteEleve($id)
     {
+        $this->checkAdminAccess();
+
         $eleve = Eleve::findOrFail($id);
         $eleve->delete();
         return back()->with('success', 'Élève supprimé avec succès!');
@@ -241,6 +286,8 @@ class AdminController extends Controller
      */
     public function projets()
     {
+        $this->checkAdminAccess();
+
         $projets = \App\Models\Projet::withCount('media')->paginate(20);
         return view('admin.projets', compact('projets'));
     }
@@ -250,6 +297,8 @@ class AdminController extends Controller
      */
     public function createProjet(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'libelle' => 'required|string|max:255',
         ]);
@@ -264,6 +313,8 @@ class AdminController extends Controller
      */
     public function deleteProjet($id)
     {
+        $this->checkAdminAccess();
+
         $projet = \App\Models\Projet::findOrFail($id);
 
         if ($projet->media()->count() > 0) {
@@ -277,6 +328,8 @@ class AdminController extends Controller
 
     public function databaseView()
     {
+        $this->checkAdminAccess();
+
         // Read the log file to display in the view
         $logPath = storage_path('logs/backup.log');
         $backupLogs = [];
@@ -292,6 +345,8 @@ class AdminController extends Controller
 
     public function runBackup()
     {
+        $this->checkAdminAccess();
+
         try {
             // Trigger the command manually and get exit code
             $exitCode = Artisan::call('db:backup --type=manual');
@@ -317,6 +372,8 @@ class AdminController extends Controller
 
     public function saveBackupSettings(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'backup_time' => 'required',
             'backup_day' => 'required',
@@ -334,11 +391,15 @@ class AdminController extends Controller
 
     public function reconciliation()
     {
+        $this->checkAdminAccess();
+
         return view('admin.reconciliation');
     }
 
     public function runReconciliation()
     {
+        $this->checkAdminAccess();
+
         // Logic to sync files
 
         return back()->with('reconciliation_result', 'Réconciliation terminée. (Résultat simulé)');
@@ -346,6 +407,8 @@ class AdminController extends Controller
 
     public function downloadLogs()
     {
+        $this->checkAdminAccess();
+
         $path = storage_path('logs/laravel.log');
         if (File::exists($path)) {
             return response()->download($path);
@@ -355,6 +418,8 @@ class AdminController extends Controller
 
 public function Ajouterelevedepuiscsv(Request $request)
 {
+    $this->checkAdminAccess();
+
     set_time_limit(300);
 
     $request->validate([
@@ -403,4 +468,66 @@ public function Ajouterelevedepuiscsv(Request $request)
 
     return back()->with('success', "$countAdded nouveaux élèves ont été importés (les doublons ont été ignorés).");
 }
+
+    /**
+     * Mettre à jour les permissions d'un utilisateur
+     */
+    public function updatePermission(Request $request)
+    {
+        $this->checkAdminAccess();
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'permission' => 'required|string',
+            'grant' => 'required|boolean',
+        ]);
+
+        $user = User::findOrFail($validated['user_id']);
+
+        // Ne pas permettre la modification des permissions admin par cette interface
+        if ($user->hasRole('admin') && $validated['permission'] !== 'administrer site') {
+            return response()->json(['success' => false, 'message' => 'Cannot modify admin permissions']);
+        }
+
+        if ($validated['grant']) {
+            $user->givePermissionTo($validated['permission']);
+        } else {
+            $user->revokePermissionTo($validated['permission']);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Mettre à jour le rôle d'un utilisateur
+     */
+    public function updateRole(Request $request)
+    {
+        $this->checkAdminAccess();
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string|in:admin,professeur,eleve',
+        ]);
+
+        $user = User::findOrFail($validated['user_id']);
+
+        // Retirer tous les rôles actuels
+        $user->syncRoles([]);
+
+        // Assigner le nouveau rôle
+        $user->assignRole($validated['role']);
+
+        // Assigner les permissions par défaut selon le rôle
+        if ($validated['role'] === 'admin') {
+            $user->syncPermissions(['modifier video', 'diffuser video', 'supprimer video', 'administrer site']);
+        } elseif ($validated['role'] === 'professeur') {
+            $user->syncPermissions(['modifier video']);
+        } else {
+            // Élève : pas de permissions
+            $user->syncPermissions([]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

@@ -54,20 +54,20 @@ class TransfertController extends Controller
         $results = [];
 
         foreach ($query->cursor() as $media) {
-            
+
             if (!empty($media->URI_NAS_ARCH)) {
                 $finalPath = $media->URI_NAS_ARCH;
                 $finalDisk = 'nas_arch';
                 $displayExt = '.mp4';
                 $sourceLabel = 'NAS_ARCH';
             } else {
-                $finalPath = $media->URI_NAS_PAD ?? ''; 
+                $finalPath = $media->URI_NAS_PAD ?? '';
                 $finalDisk = 'ftp_pad';
                 $displayExt = '.mxf';
                 $sourceLabel = 'NAS_PAD';
             }
 
-            if (empty($finalPath)) continue; 
+            if (empty($finalPath)) continue;
 
             $nameWithoutExt = pathinfo($finalPath, PATHINFO_FILENAME);
             if (empty($nameWithoutExt) || $nameWithoutExt === '.') {
@@ -75,19 +75,36 @@ class TransfertController extends Controller
             }
             $fullFilename = $nameWithoutExt . $displayExt;
 
+            // Utiliser le statut persisté en base de données comme source de vérité
+            $dbStatus = $media->transcode_status ?? 'en_attente';
+            $dbProgress = $media->transcode_progress ?? 0;
+            $dbJobId = $media->transcode_job_id;
+
+            // Mapper le statut de la base vers le label français pour l'affichage
+            $statusLabelMap = [
+                'en_attente' => 'En attente',
+                'en_cours' => 'En cours',
+                'termine' => 'Terminé',
+                'echoue' => 'Echoué',
+                'annule' => 'Annulé',
+            ];
+            $displayStatus = $statusLabelMap[$dbStatus] ?? 'En attente';
+            $isFinished = in_array($dbStatus, ['termine', 'echoue', 'annule']);
+
             $item = [
                 'id'       => $media->id,
                 'filename' => $fullFilename,
                 'path'     => $finalPath,
                 'disk'     => $finalDisk,
                 'source'   => $sourceLabel,
-                'job_id'   => null,
-                'status'   => 'En attente',
-                'progress' => 0,
-                'finished' => false
+                'job_id'   => $dbJobId,
+                'status'   => $displayStatus,
+                'progress' => $dbProgress,
+                'finished' => $isFinished
             ];
 
-            if (isset($activeMap[$nameWithoutExt])) {
+            // Si le job est toujours actif dans FFAStrans, mettre à jour avec les données en temps réel
+            if (isset($activeMap[$nameWithoutExt]) && !$isFinished) {
                 $job = $activeMap[$nameWithoutExt];
                 $item['job_id']   = $job['id'];
                 $item['status']   = $job['status']; // Already French from Service
@@ -109,13 +126,14 @@ class TransfertController extends Controller
     {
         $filePath = $request->input('path');
         $disk = $request->input('disk');
-        $workflowId = config('btsplay.process.workflow_id'); 
+        $mediaId = $request->input('id'); // ID du media
+        $workflowId = config('btsplay.process.workflow_id');
 
         $windowsRoot = '';
         if ($disk === 'nas_arch') {
-            $windowsRoot = env('URI_NAS_ARCH_WIN'); 
+            $windowsRoot = env('URI_NAS_ARCH_WIN');
         } elseif ($disk === 'ftp_pad') {
-            $windowsRoot = env('URI_NAS_PAD_WIN'); 
+            $windowsRoot = env('URI_NAS_PAD_WIN');
         }
 
         $windowsRoot = str_replace('/', '\\', $windowsRoot);
@@ -131,8 +149,35 @@ class TransfertController extends Controller
 
         try {
             $response = $this->ffastrans->submitJob($uncInputFile, $workflowId, $variables);
-            return response()->json(['success' => true, 'job_id' => $response['job_id'] ?? 'unknown']);
+            $jobId = $response['job_id'] ?? 'unknown';
+
+            // Persister le statut en base de données
+            if ($mediaId) {
+                $media = Media::find($mediaId);
+                if ($media) {
+                    $media->update([
+                        'transcode_status' => 'en_cours',
+                        'transcode_job_id' => $jobId,
+                        'transcode_progress' => 0,
+                        'transcode_started_at' => now(),
+                        'transcode_error_message' => null,
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => true, 'job_id' => $jobId]);
         } catch (\Exception $e) {
+            // Marquer comme échoué en base
+            if ($mediaId) {
+                $media = Media::find($mediaId);
+                if ($media) {
+                    $media->update([
+                        'transcode_status' => 'echoue',
+                        'transcode_error_message' => $e->getMessage(),
+                    ]);
+                }
+            }
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -141,7 +186,7 @@ class TransfertController extends Controller
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
-            $rawState = $apiData['state'] ?? ''; 
+            $rawState = $apiData['state'] ?? '';
             $progress = $apiData['progress'] ?? 0;
 
             if ($progress == 0 && isset($apiData['variables']) && is_array($apiData['variables'])) {
@@ -154,27 +199,48 @@ class TransfertController extends Controller
                     }
                 }
             }
-            
+
             $stateLower = strtolower($rawState);
 
             // FORCE FRENCH LABELS
+            $dbStatus = 'en_cours'; // Valeur par défaut pour la base
             if (in_array($stateLower, ['success', 'finished', 'done', 'terminé'])) {
                 $label = 'Terminé';
                 $finished = true;
-                $progress = 100; 
-            } 
+                $progress = 100;
+                $dbStatus = 'termine';
+            }
             elseif (in_array($stateLower, ['error', 'failed', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
-            } 
+                $dbStatus = 'echoue';
+            }
             elseif (in_array($stateLower, ['cancelled', 'canceled', 'annulé'])) {
                 $label = 'Annulé';
                 $finished = true;
+                $dbStatus = 'annule';
             }
             else {
                 // If unknown or empty, assume running
-                $label = 'En cours'; 
+                $label = 'En cours';
                 $finished = false;
+                $dbStatus = 'en_cours';
+            }
+
+            // Mettre à jour le statut en base de données
+            $media = Media::where('transcode_job_id', $jobId)->first();
+            if ($media) {
+                $updateData = [
+                    'transcode_status' => $dbStatus,
+                    'transcode_progress' => $progress,
+                ];
+
+                // Si terminé, sauvegarder la date de fin
+                if ($finished) {
+                    $updateData['transcode_finished_at'] = now();
+                }
+
+                $media->update($updateData);
             }
 
             return response()->json([

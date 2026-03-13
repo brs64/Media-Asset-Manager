@@ -28,7 +28,12 @@ class EleveSeeder extends Seeder
             $user = \App\Models\User::create([
                 'name' => $eleveData['prenom'] . ' ' . $eleveData['nom'],
                 'password' => bcrypt('password'),
+                'nom' => $eleveData['nom'],
+                'prenom' => $eleveData['prenom'],
             ]);
+
+            // Assigner le rôle élève
+            $user->assignRole('eleve');
 
             // Créer le profil élève (enfant) lié à l'utilisateur
             \App\Models\Eleve::create([
