@@ -4,6 +4,7 @@
 .composer
 .env.backup
 .env.production
+.env.prod
 .phpactor.json
 .phpunit.result.cache
 .npm
