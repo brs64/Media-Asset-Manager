@@ -18,7 +18,7 @@ class TransfertController extends Controller
 
     public function index()
     {
-        $maxConcurrent = config('btsplay.process.max_concurrent_transferts');
+        $maxConcurrent = config('btsplay.process.max_videos');
         return view('admin.transferts', compact('maxConcurrent'));
     }
     
@@ -124,11 +124,19 @@ class TransfertController extends Controller
         $disk = $request->input('disk');
         $workflowId = config('btsplay.process.workflow_id'); 
 
+        if (!$disk || !$filePath) {
+            return response()->json(['success' => false, 'message' => 'Paramètres manquants (Disk/Path)'], 400);
+        }
+
         $windowsRoot = '';
         if ($disk === 'nas_arch') {
             $windowsRoot = env('URI_NAS_ARCH_WIN'); 
         } elseif ($disk === 'ftp_pad') {
             $windowsRoot = env('URI_NAS_PAD_WIN'); 
+        }
+
+        if (empty($windowsRoot)) {
+            return response()->json(['success' => false, 'message' => "Configuration introuvable pour le disque: $disk"], 500);
         }
 
         $windowsRoot = str_replace('/', '\\', $windowsRoot);
@@ -154,51 +162,39 @@ class TransfertController extends Controller
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
-            $rawState = $apiData['state'] ?? ''; 
-            $progress = $apiData['progress'] ?? 0;
-
-            if ($progress == 0 && isset($apiData['variables']) && is_array($apiData['variables'])) {
-                foreach ($apiData['variables'] as $var) {
-                    if (in_array($var['name'], ['progress', 'i_progress', 's_progress'])) {
-                        $progress = (int) $var['data'];
-                    }
-                    if (in_array($var['name'], ['status', 's_status'])) {
-                        $rawState = $var['data'];
-                    }
-                }
-            }
             
-            $stateLower = strtolower($rawState);
+            $source = $apiData['source'] ?? 'not_found';
+            $rawState = strtolower($apiData['state'] ?? '');
+            $progress = $apiData['progress'] ?? 0;
+            $finished = false;
+            $label = 'En cours';
 
-            // FORCE FRENCH LABELS
-            if (in_array($stateLower, ['success', 'finished', 'done', 'terminé'])) {
+            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || ($source === 'history' && !in_array($rawState, ['error', 'failed']))) {
                 $label = 'Terminé';
+                $progress = 100;
                 $finished = true;
-                $progress = 100; 
             } 
-            elseif (in_array($stateLower, ['error', 'failed', 'aborted', 'echoué'])) {
+            elseif (in_array($rawState, ['error', 'failed', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
             } 
-            elseif (in_array($stateLower, ['cancelled', 'canceled', 'annulé'])) {
-                $label = 'Annulé';
-                $finished = true;
+            elseif ($source === 'active') {
+                $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
+                $finished = false;
             }
             else {
-                // If unknown or empty, assume running
-                $label = 'En cours'; 
-                $finished = false;
+                $label = 'Recherche...';
             }
 
             return response()->json([
                 'progress' => $progress,
                 'label' => $label,
                 'finished' => $finished,
-                'debug_state' => $rawState
+                'raw_debug' => $apiData
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur de connexion'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

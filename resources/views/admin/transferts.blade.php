@@ -4,10 +4,9 @@
 <div 
     class="bg-white border border-gray-200 shadow-sm rounded-lg p-8 min-h-[500px] relative"
     x-data="transferList()"
-    x-init="fetchData()"
-    data-limit="{{ $maxConcurrent ?? '' }}"
+    x-init="init()"
+    data-limit="{{ $maxConcurrent ?? 2 }}"
     @open-cancel-modal="openModal($event.detail.id)"
-    @open-limit-modal="limitModalOpen = true"
 >
     <div class="relative w-full flex items-center justify-end mb-6 min-h-10">
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -35,9 +34,10 @@
         <template x-for="file in files" :key="file.id">
             <div 
                 x-data="transferRow(file)"
-                x-init="init()"
-                x-bind:data-active="job_id && !finished" 
-                x-bind:data-starting="starting" 
+                x-init="initRow()"
+                :id="'row-' + file.id"
+                :class="{'is-active-job': starting || (job_id && !finished), 'is-queued-job': isQueued}"
+                @execute-start="executeStart()"
                 @confirm-cancel-event.window="if($event.detail.id === job_id) executeCancel()"
                 class="flex flex-col md:flex-row items-center w-full py-4 border-b border-gray-100 last:border-0"
             >
@@ -47,15 +47,10 @@
                     </div>
                     <div class="flex flex-col overflow-hidden min-w-0"> 
                         <div class="font-bold text-gray-800 truncate" :title="filename" x-text="filename"></div>
-                        
                         <div class="flex flex-col mt-1 space-y-1">
                             <template x-for="p in available_paths" :key="p.label">
                                 <div class="text-xs text-gray-500 truncate" :title="p.path">
-                                    <span 
-                                        class="font-bold" 
-                                        :class="p.label === 'NAS_ARCH' ? 'text-blue-600' : 'text-orange-600'" 
-                                        x-text="p.label + ' : '">
-                                    </span>
+                                    <span class="font-bold" :class="p.label === 'NAS_ARCH' ? 'text-blue-600' : 'text-orange-600'" x-text="p.label + ' : '"></span>
                                     <span x-text="p.path"></span>
                                 </div>
                             </template>
@@ -65,26 +60,20 @@
 
                 <div class="w-full md:w-5/12 pl-4 flex items-center h-10 justify-end">
                     
-                    <template x-if="!job_id && !isCancelled">
+                    <template x-if="!job_id && !isCancelled && !isQueued && !starting">
                         <button 
-                            @click="startJob"
+                            @click="requestStart"
                             class="bg-[#2C3E50] hover:bg-[#34495e] text-white font-bold py-2 px-6 rounded shadow flex items-center transition whitespace-nowrap"
-                            :class="{'opacity-75 cursor-wait': starting}"
-                            :disabled="starting"
                         >
-                            <span x-show="!starting">Commencer Transcodage</span>
-                            <span x-show="starting" class="flex items-center">
-                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Lancement...
-                            </span>
+                            Commencer Transcodage
                         </button>
                     </template>
 
-                    <template x-if="isCancelled">
+                    <template x-if="isCancelled && !isQueued">
                         <div class="flex items-center space-x-3">
                             <span class="font-bold text-sm text-red-600 mr-4">Annulé</span>
                             <button 
-                                @click="startJob"
+                                @click="requestStart"
                                 class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1 px-3 text-sm rounded border border-gray-300 shadow-sm flex items-center transition"
                             >
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -93,12 +82,20 @@
                         </div>
                     </template>
 
-                    <template x-if="job_id">
+                    <template x-if="isQueued">
+                        <div class="flex items-center space-x-3 w-full justify-end">
+                            <svg class="animate-spin h-5 w-5 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span class="font-bold text-sm text-orange-500" x-text="status"></span>
+                            <button @click="askCancel" class="ml-4 text-xs text-red-600 hover:text-red-800 underline cursor-pointer">Retirer</button>
+                        </div>
+                    </template>
+
+                    <template x-if="(starting || job_id) && !isQueued">
                         <div class="w-full flex items-center space-x-4"> 
                             <div class="grow h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300 relative">
                                 <div 
                                     class="h-full bg-[#2C3E50] transition-all duration-500 ease-out flex items-center justify-end pr-2"
-                                    :class="{'bg-green-500': finished && status === 'Terminé', 'bg-red-500': finished && status === 'Echoué'}"
+                                    :class="{'bg-green-500': finished && status === 'Terminé', 'bg-red-500': finished && status.includes('Echoué')}"
                                     :style="`width: ${progress}%`"
                                 ></div>
                             </div>
@@ -108,13 +105,9 @@
                             </div>
 
                             <div class="w-28 text-right shrink-0 flex flex-col items-end">
-                                <span 
-                                    class="font-bold text-sm truncate w-full"
-                                    :class="statusColorClass"
-                                    x-text="status"
-                                ></span>
+                                <span class="font-bold text-sm truncate w-full" :class="statusColorClass" x-text="status" :title="status"></span>
 
-                                <template x-if="!finished">
+                                <template x-if="!finished && job_id">
                                     <button @click="askCancel" class="text-xs text-red-600 hover:text-red-800 underline cursor-pointer mt-1">Annuler</button>
                                 </template>
                             </div>
@@ -135,19 +128,33 @@
             </div>
         </div>
     </div>
-    <div x-show="limitModalOpen" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4" style="background-color: rgba(0, 0, 0, 0.5);" x-cloak>
-        <div class="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-md overflow-hidden p-6 text-center" @click.away="limitModalOpen = false">
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Limite atteinte</h3>
-            <p class="text-sm text-gray-500 mb-6">Limite de <strong>{{ env('MAX_CONCURRENT_TRANSFERS', 2) }}</strong> transferts simultanés atteinte.</p>
-            <button @click="limitModalOpen = false" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-50">D'accord</button>
-        </div>
-    </div>
 </div>
 
 <script>
     function transferList() {
         return {
-            loading: true, error: false, files: [], modalOpen: false, limitModalOpen: false, cancelId: null,
+            loading: true, error: false, files: [], modalOpen: false, cancelId: null, queueInterval: null,
+            
+            init() {
+                this.fetchData();
+                if (this.queueInterval) clearInterval(this.queueInterval);
+                
+                this.queueInterval = setInterval(() => {
+                    const container = document.querySelector('[data-limit]');
+                    const limit = container ? parseInt(container.getAttribute('data-limit')) || 2 : 2;
+                    
+                    // Count only jobs that are TRULY active (Starting or Running)
+                    const activeCount = document.querySelectorAll('.is-active-job').length;
+                    
+                    if (activeCount < limit) {
+                        const queuedItems = document.querySelectorAll('.is-queued-job');
+                        if (queuedItems.length > 0) {
+                            queuedItems[0].dispatchEvent(new CustomEvent('execute-start'));
+                        }
+                    }
+                }, 2000); // 2 seconds check for safety
+            },
+
             fetchData() {
                 this.loading = true; this.error = false;
                 fetch('{{ route("admin.transferts.list") }}').then(res => res.ok ? res.json() : Promise.reject(res))
@@ -164,7 +171,7 @@
             id: fileData.id,
             filename: fileData.filename,
             path: fileData.path, 
-            disk: fileData.disk, 
+            disk: fileData.disk, // FIXED: Changed from 'source' to 'disk' to match JSON
             available_paths: fileData.available_paths || [],
             job_id: fileData.job_id,
             progress: Number(fileData.progress) || 0,
@@ -172,36 +179,35 @@
             finished: fileData.finished,
             starting: false,
             fakeInterval: null,
+            poller: null,
             localPathSynced: false,
             isCancelled: (fileData.status === 'Annulé'), 
+            isQueued: false,
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
                 if (s.includes('termin') || s.includes('success')) return 'text-green-600'; 
-                if (s.includes('echou') || s.includes('error')) return 'text-red-600';
+                if (s.includes('echou') || s.includes('erreur')) return 'text-red-600';
                 if (s.includes('annul')) return 'text-red-600'; 
+                if (s.includes('attente') || s.includes('file')) return 'text-orange-500'; 
                 return 'text-blue-600';
             },
 
-            init() {
-                if (this.job_id && !this.finished) {
-                    this.startPolling();
-                }
+            initRow() {
+                if (this.job_id && !this.finished) this.startPolling();
             },
 
-            startJob() {
-                this.isCancelled = false; 
+            requestStart() {
+                this.isCancelled = false;
+                this.isQueued = true;
+                this.status = "En file d'attente";
+            },
 
-                const container = document.querySelector('[data-limit]');
-                const maxConcurrent = container && container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 2;
-                const busyCount = document.querySelectorAll('[data-active="true"], [data-starting="true"]').length;
-                
-                if (busyCount >= maxConcurrent) {
-                    this.$dispatch('open-limit-modal');
-                    return; 
-                }
-
+            executeStart() {
+                if (!this.isQueued) return;
+                this.isQueued = false;
                 this.starting = true;
+                this.status = "Démarrage...";
 
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
@@ -209,64 +215,82 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({ path: this.path, disk: this.disk })
+                    body: JSON.stringify({ path: this.path, disk: this.disk }) // 'this.disk' is now defined!
                 })
-                .then(res => res.json())
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.message || "Erreur");
+                    return data;
+                })
                 .then(data => {
                     if (data.success) {
                         this.job_id = data.job_id;
-                        this.status = "Démarrage...";
                         this.finished = false;
                         this.progress = 0;
-                        this.localPathSynced = false;
                         this.startPolling(); 
                     } else {
-                        alert("Erreur: " + data.message);
-                        this.starting = false;
+                        throw new Error(data.message);
                     }
                 })
                 .catch(err => {
-                    alert("Erreur technique");
                     this.starting = false;
+                    this.finished = true;
+                    this.status = "Echoué: " + err.message;
                 });
             },
 
             startPolling() {
                 if (this.fakeInterval) clearInterval(this.fakeInterval);
-                this.fakeInterval = setInterval(() => { if (!this.finished && this.progress < 90) this.progress += 0.5; }, 500);
+                this.fakeInterval = setInterval(() => { 
+                    if (!this.finished && this.progress < 15) { 
+                        this.progress += 0.5; 
+                    }
+                }, 500);
 
-                let poller = setInterval(() => {
-                    if (this.finished) { clearInterval(poller); clearInterval(this.fakeInterval); return; }
+                if (this.poller) clearInterval(this.poller);
+                this.poller = setInterval(() => {
+                    if (!document.getElementById('row-' + this.id) || this.finished) {
+                        clearInterval(this.poller); 
+                        clearInterval(this.fakeInterval); 
+                        return; 
+                    }
+
                     fetch(`/admin/transferts/status/${this.job_id}`)
-                        .then(res => res.json())
+                        .then(res => res.ok ? res.json() : Promise.reject())
                         .then(data => {
-                            let apiProgress = Number(data.progress);
-                            if (apiProgress > 0) this.progress = apiProgress;
+                            if (Number(data.progress) > 0) {
+                                this.progress = Number(data.progress);
+                                if (this.fakeInterval) {
+                                    clearInterval(this.fakeInterval);
+                                    this.fakeInterval = null;
+                                }
+                            }
+
                             this.status = data.label;
                             this.finished = data.finished;
 
-                            if (!this.localPathSynced && this.finished && (data.label === 'Terminé' || data.label === 'Success')) {
-                                this.progress = 100; this.starting = false; this.localPathSynced = true; this.syncLocalPath();
-                            } else if (this.finished) { this.starting = false; }
+                            if (this.finished && data.progress == 100) {
+                                this.progress = 100;
+                                this.starting = false;
+                                this.syncLocalPath();
+                            }
                         })
-                        .catch(() => { clearInterval(poller); clearInterval(this.fakeInterval); });
-                }, 1000); 
+                        .catch(() => {});
+                }, 3000); 
             },
-
-            askCancel() { this.$dispatch('open-cancel-modal', { id: this.job_id }); },
+            
+            askCancel() { 
+                if (this.isQueued) { this.isQueued = false; this.status = "Annulé"; this.isCancelled = true; return; }
+                this.$dispatch('open-cancel-modal', { id: this.job_id }); 
+            },
 
             executeCancel() {
                 fetch(`/admin/transferts/cancel/${this.job_id}`, {
                     method: 'POST',
                     headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
                 }).then(() => {
-                    // Update UI State for Cancellation
-                    this.status = "Annulé";
-                    this.isCancelled = true; 
-                    this.finished = true;
-                    this.job_id = null; // Removing ID hides the bar and shows buttons
-                    this.progress = 0;
-                    this.starting = false;
+                    this.status = "Annulé"; this.isCancelled = true; this.finished = true;
+                    this.job_id = null; this.progress = 0; this.starting = false;
                     if (this.fakeInterval) clearInterval(this.fakeInterval);
                 });
             },
@@ -276,7 +300,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
                     body: JSON.stringify({ path: this.path })
-                }).then(res => res.json()).catch(err => console.error(err));
+                }).catch(err => console.error(err));
             }
         }
     }
