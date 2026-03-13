@@ -249,7 +249,17 @@ class AdminController extends Controller
             return back()->withErrors('Impossible de supprimer un professeur référent de médias.');
         }
 
+        // Récupérer le user associé avant de supprimer le professeur
+        $user = $professeur->user;
+
+        // Supprimer le profil professeur
         $professeur->delete();
+
+        // Supprimer également le compte utilisateur si il existe
+        if ($user) {
+            $user->delete();
+        }
+
         return back()->with('success', 'Professeur supprimé avec succès!');
     }
 
