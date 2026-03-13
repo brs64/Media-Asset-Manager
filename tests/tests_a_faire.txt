@@ -1,0 +1,93 @@
+1. Authentification et Accès
+
+    SCRUM-37 : Connexion à la plateforme
+
+        Test : Requête POST sur /login avec email et password.
+
+        Assertion : $this->assertAuthenticated() et vérification de la redirection vers le dashboard. - A TESTER
+
+2. Gestion du Stockage (NAS)
+
+    SCRUM-24 : Stockage des médias sur le NAS
+
+        Test : Vérification de l'existence du fichier via le Driver Storage dédié au NAS.
+
+        Assertion : Storage::disk('nas')->exists('video.mp4'). - A TESTER
+
+    SCRUM-25 : Archivage des vidéos
+
+        Test : Déplacement d'un fichier du dossier "PAD" vers le dossier "ARCH".
+
+        Assertion : Storage::disk('nas')->assertExists('archive/video.mp4'). - A TESTER
+
+3. Consultation et Modification
+
+    SCRUM-26/27 : Consultation (Étudiant/Prof)
+
+        Test : Requête GET sur /videos.
+
+        Assertion : $response->assertStatus(200) et $response->assertSee($video->title). - A TESTER
+
+    SCRUM-28 : Modification métadonnées (Prof)
+
+        Test : Requête PUT sur /videos/{id} avec de nouvelles données.
+
+        Assertion : $this->assertDatabaseHas('videos', ['title' => 'Nouveau Titre']). - A TESTER
+
+    SCRUM-29 : Indexation manuelle (Prof)
+
+        Test : Appel de la méthode scan() ou index() du contrôleur.
+
+        Assertion : Vérification que le nombre d'entrées en BDD a augmenté après le scan. - A TESTER
+
+4. Flux de Travail et Suppression
+
+    SCRUM-30 : Suppression vidéo (Prof)
+
+        Test : Requête DELETE sur /videos/{id}.
+
+        Assertion : $this->assertDatabaseMissing('videos', ['id' => $id]). - A TESTER
+
+    SCRUM-31 : Déplacement vers Diffusion
+
+        Test : Simulation du transfert vers le serveur de diffusion public.
+
+        Assertion : Vérification du statut en base de données : is_public => true. - A TESTER
+
+5. Administration (MAM & FFAStrans)
+
+    SCRUM-32 : Gestion serveurs/comptes (Admin)
+
+        Test : Modification des paramètres config en BDD pour les accès NAS.
+
+        Assertion : Vérification de la persistance des nouveaux paramètres. - A TESTER
+
+    SCRUM-33 : Sauvegarde BDD (Admin)
+
+        Test : Exécution de la commande php artisan db:backup ou équivalent.
+
+        Assertion : File::exists(storage_path('backups/sql_file.sql')). - A TESTER
+
+    SCRUM-34 : Réconciliation NAS (Admin)
+
+        Test : Comparaison des fichiers présents sur PAD et ARCH.
+
+        Assertion : Vérification de l'intégrité des chemins de fichiers.
+
+    SCRUM-35 : Consultation des logs (Admin)
+
+        Test : Lecture du fichier laravel.log via l'interface Admin.
+
+        Assertion : $response->assertSee('LOG_ENTRY_TEST').
+
+    SCRUM-36 : Visualisation tâches FFAStrans
+
+        Test : Appel API vers le serveur FFAStrans.
+
+        Assertion : Vérification de la réception d'un JSON contenant l'état "Running".
+
+    SCRUM-38 : Création champ métadonnée (Admin)
+
+        Test : Ajout d'une colonne dynamique à la table videos.
+
+        Assertion : Schema::hasColumn('videos', 'nouveau_champ').

@@ -8,6 +8,7 @@ use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThumbnailController;
 use App\Http\Controllers\FileExplorerController;
+use App\Http\Controllers\DocumentationController;
 
 use App\Http\Controllers\StreamController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,30 @@ Route::resource('medias', MediaController::class);
 Route::get('/recherche', [SearchController::class, 'index'])->name('search');
 Route::get('/search', [SearchController::class, 'search'])->name('search.results');
 
+// Documentation
+Route::prefix('documentation')->name('docs.')->group(function () {
+    Route::get('/', [DocumentationController::class, 'index'])->name('index');
+    Route::get('/demarrage', [DocumentationController::class, 'gettingStarted'])->name('getting-started');
+
+    // Interface
+    Route::prefix('interface')->name('interface.')->group(function () {
+        Route::get('/page-accueil', [DocumentationController::class, 'interfaceHomePage'])->name('home');
+        Route::get('/barre-navigation', [DocumentationController::class, 'interfaceNavbar'])->name('navbar');
+        Route::get('/lecteur-video', [DocumentationController::class, 'interfaceVideoPlayer'])->name('video-player');
+        Route::get('/recherche', [DocumentationController::class, 'interfaceSearch'])->name('search');
+    });
+
+    // Administration (protégé pour les professeurs et admins uniquement)
+    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+        Route::get('/vue-ensemble', [DocumentationController::class, 'adminOverview'])->name('overview');
+        Route::get('/base-donnees', [DocumentationController::class, 'adminDatabase'])->name('database');
+        Route::get('/transferts', [DocumentationController::class, 'adminTransfers'])->name('transfers');
+        Route::get('/reconciliation', [DocumentationController::class, 'adminReconciliation'])->name('reconciliation');
+        Route::get('/parametres', [DocumentationController::class, 'adminSettings'])->name('settings');
+        Route::get('/utilisateurs', [DocumentationController::class, 'adminUsers'])->name('users');
+    });
+});
+
 // Routes protégées par authentification (Breeze)
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard (redirige vers home)
@@ -44,7 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
 });
 
-// Routes admin (uniquement pour les professeurs)
+// Routes admin (uniquement pour les professeurs et admins)
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -64,8 +89,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/scan/start', [FileExplorerController::class, 'startScan'])->name('scan.start');
     Route::get('/scan/{scanId}/status', [FileExplorerController::class, 'scanStatus'])->name('scan.status');
     Route::get('/scan/{scanId}/results', [FileExplorerController::class, 'scanResults'])->name('scan.results');
-
-
 
     // --- TAB 3: RECONCILIATION ---
     Route::get('/reconciliation', [AdminController::class, 'reconciliation'])->name('reconciliation');
@@ -87,17 +110,22 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/eleves', [AdminController::class, 'createEleve'])->name('eleves.create');
     Route::delete('/eleves/{id}', [AdminController::class, 'deleteEleve'])->name('eleves.delete');
 
+    // Permissions management
+    Route::post('/permissions/update', [AdminController::class, 'updatePermission'])->name('permissions.update');
+    Route::post('/roles/update', [AdminController::class, 'updateRole'])->name('roles.update');
+
+    //transfert listes d'eleves en bd (depuis un csv par exemple)
+    Route::post('/eleves/bulk', [AdminController::class, 'Ajouterelevedepuiscsv'])->name('eleves.bulk');
+
     // --- BACKUP ACTIONS ---
     Route::post('/backup/run', [AdminController::class, 'runBackup'])->name('backup.run');
     Route::post('/backup/save', [AdminController::class, 'saveBackupSettings'])->name('backup.save');
-
-
 });
 
-    Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
-        ->name('explorer.scan');
-    Route::get('/explorer', [FileExplorerController::class, 'index'])
-        ->name('explorer.index');
+Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
+    ->name('explorer.scan');
+Route::get('/explorer', [FileExplorerController::class, 'index'])
+    ->name('explorer.index');
 
 
 
@@ -126,4 +154,4 @@ Route::get('/test-connection', function (FfastransService $service) {
 });*/
 
 // Routes d'authentification Breeze
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

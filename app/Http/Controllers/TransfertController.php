@@ -24,136 +24,75 @@ class TransfertController extends Controller
     
     public function list(FfastransService $ffastrans)
     {
-        $activeMap = [];
-        try {
-            $allJobs = $ffastrans->getFullStatusList();
-            
-            foreach ($allJobs as $job) {
-                if (isset($job['filename'])) {
-                    $key = pathinfo($job['filename'], PATHINFO_FILENAME);
-                   
-                    if ($job['is_finished'] === false) {
-                        $activeMap[$key] = $job;
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error("FFAStrans Status Check Failed: " . $e->getMessage());
-            $activeMap = [];
-        }
+        // Get all videos that have NO local file yet
+        $query = Media::whereNull('chemin_local')->get();
 
-        $padRoot = rtrim(config('btsplay.uris.nas_pad'), '/');
-        $archRoot = rtrim(config('btsplay.uris.nas_arch'), '/');
-
-        $query = Media::whereNull('chemin_local')
-            ->where(function ($q) use ($padRoot, $archRoot) {
-                if ($padRoot) $q->where('URI_NAS_PAD', 'LIKE', "{$padRoot}%");
-                if ($archRoot) $q->orWhere('URI_NAS_ARCH', 'LIKE', "{$archRoot}%");
-            });
-
-        $results = [];
-
-        foreach ($query->cursor() as $media) {
-            
+        $results = $query->map(function ($media) {
             $availablePaths = [];
-            $primaryPath = '';
-            $primaryDisk = '';
-            $displayExt = '.mp4';
+            if (!empty($media->URI_NAS_PAD)) $availablePaths[] = ['label' => 'NAS_PAD', 'path' => $media->URI_NAS_PAD];
+            if (!empty($media->URI_NAS_ARCH)) $availablePaths[] = ['label' => 'NAS_ARCH', 'path' => $media->URI_NAS_ARCH];
 
-            if (!empty($media->URI_NAS_PAD)) {
-                $availablePaths[] = [
-                    'label' => 'NAS_PAD',
-                    'path' => $media->URI_NAS_PAD
-                ];
-                $primaryPath = $media->URI_NAS_PAD;
-                $primaryDisk = 'ftp_pad';
-                $displayExt = '.mxf';
-            }
+            $primaryPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
+            $primaryDisk = (!empty($media->URI_NAS_ARCH)) ? 'nas_arch' : 'ftp_pad';
 
-            if (!empty($media->URI_NAS_ARCH)) {
-                $availablePaths[] = [
-                    'label' => 'NAS_ARCH',
-                    'path' => $media->URI_NAS_ARCH
-                ];
-                $primaryPath = $media->URI_NAS_ARCH;
-                $primaryDisk = 'nas_arch';
-                $displayExt = '.mp4';
-            }
+            // DB status mapping
+            $dbStatus = $media->transcode_status ?? 'disponible';
+            $statusLabelMap = [
+                'en_attente' => "En file d'attente",
+                'en_cours'   => 'Démarrage...',
+                'termine'    => 'Terminé',
+                'echoue'     => 'Echoué',
+                'annule'     => 'Annulé',
+                'disponible' => 'En attente'
+            ];
 
-            if (empty($primaryPath)) continue; 
-
-            $nameWithoutExt = pathinfo($primaryPath, PATHINFO_FILENAME);
-            if (empty($nameWithoutExt) || $nameWithoutExt === '.') {
-                $nameWithoutExt = $media->mtd_tech_titre ?? 'Video_' . $media->id;
-            }
-            $fullFilename = $nameWithoutExt . $displayExt;
-
-            $item = [
+            return [
                 'id'              => $media->id,
-                'filename'        => $fullFilename,
+                'filename'        => basename($primaryPath),
                 'path'            => $primaryPath, 
                 'disk'            => $primaryDisk, 
                 'available_paths' => $availablePaths,
-                'job_id'          => null,
-                'status'          => 'En attente',
-                'progress'        => 0,
-                'finished'        => false
+                'job_id'          => $media->transcode_job_id, 
+                'status'          => $statusLabelMap[$dbStatus] ?? 'En attente',
+                'progress'        => ($dbStatus === 'termine') ? 100 : 0,
+                'finished'        => in_array($dbStatus, ['termine', 'echoue', 'annule']),
+                'is_queued'       => ($dbStatus === 'en_attente')
             ];
+        });
 
-            if (isset($activeMap[$nameWithoutExt])) {
-                $job = $activeMap[$nameWithoutExt];
-                $item['job_id']   = $job['id'];
-                $item['status']   = $job['status']; 
-                $item['progress'] = $job['progress'];
-                $item['finished'] = $job['is_finished'];
-            }
-
-            $results[] = $item;
-        }
-
-        return response()->json([
-            'status' => 'done',
-            'count' => count($results),
-            'results' => $results
-        ]);
+        return response()->json(['results' => $results]);
     }
 
     public function startJob(Request $request)
     {
+        $media = Media::find($request->input('id'));
+        if (!$media) return response()->json(['success' => false, 'message' => 'Media introuvable'], 404);
+
+        if ($request->input('action') === 'queue') {
+            $media->update(['transcode_status' => 'en_attente']);
+            return response()->json(['success' => true]);
+        }
+
         $filePath = $request->input('path');
         $disk = $request->input('disk');
-        $workflowId = config('btsplay.process.workflow_id'); 
+        $workflowId = config('btsplay.process.workflow_id');  
 
-        if (!$disk || !$filePath) {
-            return response()->json(['success' => false, 'message' => 'Paramètres manquants (Disk/Path)'], 400);
-        }
-
-        $windowsRoot = '';
-        if ($disk === 'nas_arch') {
-            $windowsRoot = env('URI_NAS_ARCH_WIN'); 
-        } elseif ($disk === 'ftp_pad') {
-            $windowsRoot = env('URI_NAS_PAD_WIN'); 
-        }
-
-        if (empty($windowsRoot)) {
-            return response()->json(['success' => false, 'message' => "Configuration introuvable pour le disque: $disk"], 500);
-        }
-
-        $windowsRoot = str_replace('/', '\\', $windowsRoot);
-        $directoryPart = dirname($filePath);
-        $winRelativeDir  = str_replace('/', '\\', $directoryPart);
-        $winRelativeFile = str_replace('/', '\\', $filePath);
-        $uncInputFile = rtrim($windowsRoot, '\\') . '\\' . ltrim($winRelativeFile, '\\');
-        $variableData = ltrim($winRelativeDir, '\\') . '\\';
-
-        $variables = [
-            ['name' => 's_project_path', 'data' => $variableData]
-        ];
+        $windowsRoot = ($disk === 'nas_arch') ? env('URI_NAS_ARCH_WIN') : env('URI_NAS_PAD_WIN');
+        $uncInputFile = rtrim(str_replace('/', '\\', $windowsRoot), '\\') . '\\' . ltrim(str_replace('/', '\\', $filePath), '\\');
+        $variableData = ltrim(str_replace('/', '\\', dirname($filePath)), '\\') . '\\';
 
         try {
-            $response = $this->ffastrans->submitJob($uncInputFile, $workflowId, $variables);
-            return response()->json(['success' => true, 'job_id' => $response['job_id'] ?? 'unknown']);
+            $response = $this->ffastrans->submitJob($uncInputFile, $workflowId, [['name' => 's_project_path', 'data' => $variableData]]);
+            $jobId = $response['job_id'] ?? 'unknown';
+
+            $media->update([
+                'transcode_status' => 'en_cours',
+                'transcode_job_id' => $jobId
+            ]);
+
+            return response()->json(['success' => true, 'job_id' => $jobId]);
         } catch (\Exception $e) {
+            $media->update(['transcode_status' => 'echoue']);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -162,37 +101,40 @@ class TransfertController extends Controller
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
-            
             $source = $apiData['source'] ?? 'not_found';
             $rawState = strtolower($apiData['state'] ?? '');
+            
             $progress = $apiData['progress'] ?? 0;
             $finished = false;
             $label = 'En cours';
+
+            // Find the media record to update its status in the DB during polling
+            $media = Media::where('transcode_job_id', $jobId)->first();
 
             if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || ($source === 'history' && !in_array($rawState, ['error', 'failed']))) {
                 $label = 'Terminé';
                 $progress = 100;
                 $finished = true;
+                if ($media) $media->update(['transcode_status' => 'termine']);
             } 
             elseif (in_array($rawState, ['error', 'failed', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
+                if ($media) $media->update(['transcode_status' => 'echoue']);
             } 
             elseif ($source === 'active') {
                 $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
                 $finished = false;
-            }
-            else {
-                $label = 'Recherche...';
+                if ($media && $media->transcode_status !== 'en_cours') {
+                    $media->update(['transcode_status' => 'en_cours']);
+                }
             }
 
             return response()->json([
                 'progress' => $progress,
                 'label' => $label,
-                'finished' => $finished,
-                'raw_debug' => $apiData
+                'finished' => $finished
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -202,9 +144,9 @@ class TransfertController extends Controller
     {
         $success = $this->ffastrans->cancelJob($jobId);
         if ($success) {
-            return back()->with('success', 'La demande d\'annulation a été envoyée.');
-        } else {
-            return back()->with('error', 'Impossible d\'annuler le job.');
+            Media::where('transcode_job_id', $jobId)->update(['transcode_status' => 'annule']);
+            return response()->json(['success' => true]);
         }
+        return response()->json(['success' => false], 500);
     }
 }

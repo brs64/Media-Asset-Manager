@@ -13,14 +13,28 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
+            // Direction
             ['libelle' => 'Réalisateur'],
-            ['libelle' => 'Scénariste'],
-            ['libelle' => 'Chef opérateur'],
-            ['libelle' => 'Monteur'],
-            ['libelle' => 'Acteur'],
-            ['libelle' => 'Sound Designer'],
-            ['libelle' => 'Producteur'],
             ['libelle' => 'Assistant réalisateur'],
+            ['libelle' => 'Scénariste'],
+            ['libelle' => 'Producteur'],
+
+            // Image
+            ['libelle' => 'Directeur de la photographie'],
+            ['libelle' => 'Chef opérateur'],
+            ['libelle' => 'Cadreur'],
+            ['libelle' => 'Assistant caméra'],
+            ['libelle' => 'Étalonneur'],
+
+            // Son
+            ['libelle' => 'Ingénieur du son'],
+            ['libelle' => 'Perchman'],
+            ['libelle' => 'Sound Designer'],
+            ['libelle' => 'Mixeur son'],
+
+            // Montage
+            ['libelle' => 'Monteur'],
+            ['libelle' => 'Assistant monteur'],
         ];
 
         foreach ($roles as $role) {

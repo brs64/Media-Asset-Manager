@@ -139,30 +139,43 @@
                 this.fetchData();
                 if (this.queueInterval) clearInterval(this.queueInterval);
                 
+                // THE QUEUE MANAGER: Auto-starts the next video in line
                 this.queueInterval = setInterval(() => {
                     const container = document.querySelector('[data-limit]');
-                    const limit = container ? parseInt(container.getAttribute('data-limit')) || 2 : 2;
+                    const limit = container ? parseInt(container.getAttribute('data-limit')) : 2;
                     
-                    // Count only jobs that are TRULY active (Starting or Running)
                     const activeCount = document.querySelectorAll('.is-active-job').length;
                     
                     if (activeCount < limit) {
                         const queuedItems = document.querySelectorAll('.is-queued-job');
                         if (queuedItems.length > 0) {
+                            // Trigger the 'execute-start' event on the component
                             queuedItems[0].dispatchEvent(new CustomEvent('execute-start'));
                         }
                     }
-                }, 2000); // 2 seconds check for safety
+                }, 2000); 
             },
 
             fetchData() {
                 this.loading = true; this.error = false;
-                fetch('{{ route("admin.transferts.list") }}').then(res => res.ok ? res.json() : Promise.reject(res))
-                .then(data => { this.files = data.results ?? []; this.loading = false; })
-                .catch(() => { this.error = true; this.loading = false; });
+                fetch('{{ route("admin.transferts.list") }}')
+                    .then(res => res.ok ? res.json() : Promise.reject())
+                    .then(data => { 
+                        this.files = data.results ?? []; 
+                        this.loading = false; 
+                    })
+                    .catch(() => { 
+                        this.error = true; 
+                        this.loading = false; 
+                    });
             },
+
             openModal(id) { this.cancelId = id; this.modalOpen = true; },
-            confirmCancel() { this.modalOpen = false; window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } })); }
+            
+            confirmCancel() { 
+                this.modalOpen = false; 
+                window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } })); 
+            }
         }
     }
 
@@ -171,9 +184,9 @@
             id: fileData.id,
             filename: fileData.filename,
             path: fileData.path, 
-            disk: fileData.disk, // FIXED: Changed from 'source' to 'disk' to match JSON
+            disk: fileData.disk, 
             available_paths: fileData.available_paths || [],
-            job_id: fileData.job_id,
+            job_id: fileData.job_id, // Stored FFAStrans ID
             progress: Number(fileData.progress) || 0,
             status: fileData.status,
             finished: fileData.finished,
@@ -182,7 +195,7 @@
             poller: null,
             localPathSynced: false,
             isCancelled: (fileData.status === 'Annulé'), 
-            isQueued: false,
+            isQueued: fileData.is_queued, // Persisted from DB status 'en_attente'
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
@@ -194,10 +207,20 @@
             },
 
             initRow() {
-                if (this.job_id && !this.finished) this.startPolling();
+                // If the DB says it's already running (job_id exists), start polling immediately
+                if (this.job_id && !this.finished) {
+                    this.startPolling();
+                }
             },
 
             requestStart() {
+                // PERSISTENCE: Tell the DB this video is now "en_attente"
+                fetch('{{ route("admin.transferts.start") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                    body: JSON.stringify({ id: this.id, action: 'queue' })
+                });
+
                 this.isCancelled = false;
                 this.isQueued = true;
                 this.status = "En file d'attente";
@@ -205,17 +228,15 @@
 
             executeStart() {
                 if (!this.isQueued) return;
+                
                 this.isQueued = false;
                 this.starting = true;
                 this.status = "Démarrage...";
 
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ path: this.path, disk: this.disk }) // 'this.disk' is now defined!
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                    body: JSON.stringify({ id: this.id, path: this.path, disk: this.disk }) 
                 })
                 .then(async res => {
                     const data = await res.json();
@@ -224,12 +245,10 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        this.job_id = data.job_id;
+                        this.job_id = data.job_id; // Store the new FFAStrans ID
                         this.finished = false;
                         this.progress = 0;
                         this.startPolling(); 
-                    } else {
-                        throw new Error(data.message);
                     }
                 })
                 .catch(err => {
@@ -240,15 +259,15 @@
             },
 
             startPolling() {
+                // Brief simulation until real data arrives
                 if (this.fakeInterval) clearInterval(this.fakeInterval);
                 this.fakeInterval = setInterval(() => { 
-                    if (!this.finished && this.progress < 15) { 
-                        this.progress += 0.5; 
-                    }
+                    if (!this.finished && this.progress < 15) this.progress += 0.5; 
                 }, 500);
 
                 if (this.poller) clearInterval(this.poller);
                 this.poller = setInterval(() => {
+                    // Safety: Stop if row is gone or job is done
                     if (!document.getElementById('row-' + this.id) || this.finished) {
                         clearInterval(this.poller); 
                         clearInterval(this.fakeInterval); 
@@ -258,6 +277,7 @@
                     fetch(`/admin/transferts/status/${this.job_id}`)
                         .then(res => res.ok ? res.json() : Promise.reject())
                         .then(data => {
+                            // Switch to Real Progress from FFAStrans
                             if (Number(data.progress) > 0) {
                                 this.progress = Number(data.progress);
                                 if (this.fakeInterval) {
@@ -269,7 +289,7 @@
                             this.status = data.label;
                             this.finished = data.finished;
 
-                            if (this.finished && data.progress == 100) {
+                            if (this.finished && (data.progress == 100 || data.label === 'Terminé')) {
                                 this.progress = 100;
                                 this.starting = false;
                                 this.syncLocalPath();
@@ -280,7 +300,17 @@
             },
             
             askCancel() { 
-                if (this.isQueued) { this.isQueued = false; this.status = "Annulé"; this.isCancelled = true; return; }
+                if (this.isQueued) {
+                    // Update DB to mark as cancelled even if not yet in FFAStrans
+                    fetch(`/admin/transferts/cancel/queue-${this.id}`, { 
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
+                    });
+                    this.isQueued = false; 
+                    this.status = "Annulé"; 
+                    this.isCancelled = true; 
+                    return; 
+                }
                 this.$dispatch('open-cancel-modal', { id: this.job_id }); 
             },
 
@@ -289,9 +319,14 @@
                     method: 'POST',
                     headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
                 }).then(() => {
-                    this.status = "Annulé"; this.isCancelled = true; this.finished = true;
-                    this.job_id = null; this.progress = 0; this.starting = false;
+                    this.status = "Annulé";
+                    this.isCancelled = true; 
+                    this.finished = true;
+                    this.job_id = null; 
+                    this.progress = 0;
+                    this.starting = false;
                     if (this.fakeInterval) clearInterval(this.fakeInterval);
+                    if (this.poller) clearInterval(this.poller);
                 });
             },
 
