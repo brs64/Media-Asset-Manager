@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+
 use App\Models\Media;
 use App\Models\Projet;
 use App\Models\Professeur;
@@ -83,7 +84,23 @@ class MediaService
             'mtdEdito' => [
                 'projet' => $media->projets->pluck('libelle')->implode(', ') ?: 'N/A',
                 'professeur' => $media->professeur ? ($media->professeur->prenom . ' ' . $media->professeur->nom) : 'N/A',
+           // NOUVEAU : Récupération des élèves avec leurs rôles
+                'eleves' => $media->participations->map(function($p) {
+                    return $p->eleve->prenom . ' ' . $p->eleve->nom . ' (' . ($p->role->libelle ?? 'Rôle non défini') . ')';
+                })->implode(', ') ?: 'N/A',
             ],
+
+            // Métadonnées personnalisées
+            'mtdCustom' => collect($media->properties ?? [])
+                ->map(fn ($value, $key) => [
+                    'label' => $this->sanitizeForDisplay($key),
+                    'value' => $this->sanitizeForDisplay(
+                        is_array($value) ? json_encode($value) : (string) $value
+                    ),
+                ])
+                ->values()
+                ->toArray(),
+
 
             // Roles
             'mtdRoles' => $this->formatParticipations($media->participations),
@@ -200,34 +217,32 @@ class MediaService
     /**
      * Search media with filters (Title, Description, Project Name)
      */
-    public function searchMedia(array $filtres): \Illuminate\Pagination\LengthAwarePaginator
-    {
-        //dd($filtres); 
-        $query = Media::query()->with(['projets', 'professeur', 'participations.eleve', 'participations.role']);
+  public function searchMedia(array $filtres)
+{
+    $query = Media::query();
 
-        // --- 1. GLOBAL SEARCH BAR (Input name="description") ---
-        // This acts as a "General Search" across Title, Description, AND Project Name
-        if (!empty($filtres['description'])) {
-            $term = '%' . $filtres['description'] . '%';
+    if (!empty($filtres['keyword'])) {
+        $kw = $filtres['keyword'];
 
-            // We group these conditions in a closure: (A OR B OR C)
-            $query->where(function($q) use ($term) {
-                
-                // A. Search in Title
-                $q->where('mtd_tech_titre', 'like', $term)
-                
-                // B. Search in Description
-                  ->orWhere('description', 'like', $term)
-                  
-                // C. Search in Related Project Name
-                // This checks the 'projets' table via the relationship
-                  ->orWhereHas('projets', function ($queryProjet) use ($term) {
-                      // Note: I assumed the column is 'libelle'. 
-                      // If your column in the projets table is 'intitule' or 'nom', change it here.
-                      $queryProjet->where('libelle', 'like', $term);
-                  });
+        $query->where(function($q) use ($kw) {
+            $q->where('mtd_tech_titre', 'like', "%{$kw}%")//filtre titre
+              ->orWhere('description', 'like', "%{$kw}%")//filtre description
+              ->orWhere('theme', 'like', "%{$kw}%")  // filtre thheme
+              ->orWhere('promotion', 'like', "%{$kw}%")//filtre promotion
+              ->orWhere('type', 'like', "%{$kw}%");    // filtre type
+            
+            // Si on veut aussi chercher par nom + prenom de prof
+            $q->orWhereHas('professeur', function($sq) use ($kw) {
+                $sq->where('nom', 'like', "%{$kw}%")
+                ->orWhere('prenom', 'like', "%{$kw}%")
+                ->orWhere(DB::raw("CONCAT(prenom, ' ', nom)"), 'like', "%{$kw}%")
+                ->orWhere(DB::raw("CONCAT(nom, ' ', prenom)"), 'like', "%{$kw}%");
             });
-        }
+        });
+    }
+
+    return $query->paginate(12);
+
 
         // --- 2. SPECIFIC DROPDOWN FILTERS (Strict AND conditions) ---
 
@@ -608,4 +623,39 @@ class MediaService
         }
         return preg_replace('/[\r\n]+/', ' ', trim($value));
     }
+
+    /**
+     * Synchronise un chemin local avec un media existant
+     * IMPORTANT : Ne crée jamais de media dans le cas ou aucune correspondance n'est faite en BDD
+     */
+    public function syncLocalPath(string $path): bool
+    {
+        $title = pathinfo($path, PATHINFO_FILENAME);
+        $fullPath = $path;
+        $normalizedTitle = mb_strtolower(trim($title));
+
+        $media = Media::whereRaw(
+            'LOWER(mtd_tech_titre) = ?',
+            [$normalizedTitle]
+        )->first();
+
+        if (!$media) {
+            Log::warning('syncLocalPath: Media non trouvé', [
+                'path' => $fullPath,
+                'title' => $normalizedTitle,
+            ]);
+            return false;
+        }
+
+        $media->chemin_local = $fullPath;
+        $media->save();
+
+        Log::info('syncLocalPath: Chemin local mis à jour', [
+            'media_id' => $media->id,
+            'path' => $fullPath,
+        ]);
+
+        return true;
+    }
+
 }

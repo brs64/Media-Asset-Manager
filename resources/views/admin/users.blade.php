@@ -2,23 +2,20 @@
 
 @section('tab_content')
 <div class="space-y-6">
-    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les utilisateurs</h2>
+    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les professeurs</h2>
 
     @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            {{ session('success') }}
-        </div>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        {{ session('success') }}
+    </div>
     @endif
 
     <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"></th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Modifier la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Diffuser la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Supprimer la vidéo</th>
-                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Administrer le site</th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nom</th>
+                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Rôle</th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                         <span class="sr-only">Actions</span>
                     </th>
@@ -31,21 +28,25 @@
                         {{ $prof->nom }} {{ $prof->prenom }}
                     </td>
 
-                    @php 
-                        $isAdmin = $prof->role == 'admin'; // Adjust based on your Role logic
+                    @php
+                    $user = $prof->user;
+                    $isAdmin = $user && $user->hasRole('admin');
+                    $currentRole = '';
+                    if ($user) {
+                        if ($user->hasRole('admin')) $currentRole = 'admin';
+                        elseif ($user->hasRole('professeur')) $currentRole = 'professeur';
+                        elseif ($user->hasRole('eleve')) $currentRole = 'eleve';
+                    }
                     @endphp
 
                     <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                        <input type="checkbox" {{ $isAdmin ? 'disabled checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                    </td>
-                    <td class="text-center px-3 py-4 text-sm text-gray-500">
-                         <input type="checkbox" {{ $isAdmin ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                        <select data-user-id="{{ $user->id ?? '' }}"
+                                class="role-select rounded border-gray-300 text-sm focus:border-orange-500 focus:ring-orange-500"
+                                onchange="updateRole(this)">
+                            <option value="admin" {{ $currentRole === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="professeur" {{ $currentRole === 'professeur' ? 'selected' : '' }}>Professeur</option>
+                            <option value="eleve" {{ $currentRole === 'eleve' ? 'selected' : '' }}>Élève</option>
+                        </select>
                     </td>
 
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -63,34 +64,34 @@
         </table>
     </div>
 
+    {{-- Formulaire d'ajout de professeur --}}
     <div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
         <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Ajouter un professeur</h3>
-        
+
         <form action="{{ route('admin.professeurs.create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
             @csrf
-            
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
-                <input type="text" name="nom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="nom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Prénom</label>
-                <input type="text" name="prenom" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="prenom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Identifiant</label>
-                <input type="text" name="identifiant" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="text" name="identifiant" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
-                <input type="password" name="mot_de_passe" required 
-                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+                <input type="password" name="mot_de_passe" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
             </div>
 
             <div class="flex flex-col">
@@ -101,4 +102,142 @@
         </form>
     </div>
 </div>
+<hr class="my-10 border-gray-300">
+
+<div class="space-y-6 mt-10">
+    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Gérer les élèves</h2>
+
+    <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nom & Prénom</th>
+                    <th scope="col" class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Nombre de participations</th>
+                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span class="sr-only">Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                @foreach($eleves as $eleve)
+                <tr class="{{ $loop->even ? 'bg-gray-50' : '' }}">
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                        {{ $eleve->nom }} {{ $eleve->prenom }}
+                    </td>
+                    <td class="text-center px-3 py-4 text-sm text-gray-500">
+                        {{ $eleve->participations_count ?? 0 }}
+                    </td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <form action="{{ route('admin.eleves.delete', $eleve->id) }}" method="POST" onsubmit="return confirm('Supprimer cet élève ? Cela ne supprimera pas les vidéos associées.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Formulaire d'ajout d'élève --}}
+    <div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
+        <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Ajouter un élève</h3>
+
+        <form action="{{ route('admin.eleves.create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            @csrf
+            <div class="flex flex-col">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
+                <input type="text" name="nom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+            </div>
+
+            <div class="flex flex-col">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Prénom</label>
+                <input type="text" name="prenom" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 h-10">
+            </div>
+
+            <div class="flex flex-col">
+                <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 h-10 shadow transition-colors">
+                    Ajouter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{{-- Importation par fichier CSV - Même style que l'ajout manuel --}}
+<div class="mt-8 p-6 bg-gray-50 border rounded-lg shadow-sm">
+    <h3 class="text-lg font-bold mb-6 text-gray-800 border-b pb-2">Importation groupée (Fichier CSV)</h3>
+    
+    <form action="{{ route('admin.eleves.bulk') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        @csrf
+        <div class="flex flex-col md:col-span-2">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Sélectionner le fichier (.csv ou .txt)</label>
+            <input type="file" name="fichier_csv" accept=".csv,.txt" required 
+                   class="block w-full text-sm text-gray-500 
+                          file:mr-4 file:py-2 file:px-4 
+                          file:rounded-md file:border-0 
+                          file:text-sm file:font-semibold 
+                          file:bg-orange-100 file:text-orange-700 
+                          hover:file:bg-orange-200
+                          border border-gray-300 rounded-md shadow-sm h-10">
+        </div>
+
+        <div class="flex flex-col">
+            <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 h-10 shadow transition-colors">
+                Importer le fichier
+            </button>
+        </div>
+    </form>
+    <p class="mt-2 text-xs text-gray-500 italic">Format : Un élève par ligne. Supporte "NOM Prénom" ou "NOM,Prénom".</p>
+</div>
+
+<script>
+function updateRole(select) {
+    const userId = select.dataset.userId;
+    const newRole = select.value;
+    const oldValue = select.dataset.oldValue || select.value;
+
+    if (!confirm('Êtes-vous sûr de vouloir changer le rôle de cet utilisateur ?')) {
+        select.value = oldValue;
+        return;
+    }
+
+    fetch('{{ route("admin.roles.update") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            role: newRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            select.dataset.oldValue = newRole;
+            // Recharger la page pour mettre à jour les permissions
+            location.reload();
+        } else {
+            alert('Erreur lors de la mise à jour du rôle');
+            select.value = oldValue;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur lors de la mise à jour du rôle');
+        select.value = oldValue;
+    });
+}
+
+// Enregistrer la valeur initiale de chaque select
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.role-select').forEach(select => {
+        select.dataset.oldValue = select.value;
+    });
+});
+</script>
 @endsection

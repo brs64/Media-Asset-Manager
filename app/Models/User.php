@@ -2,30 +2,30 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// Spatie
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Champs assignables en masse
      */
     protected $fillable = [
-        'name',
+        'name',       // login ou identifiant
         'password',
+        'nom',        // pour professeur ou élève
+        'prenom',     // idem
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Champs cachés pour la sérialisation
      */
     protected $hidden = [
         'password',
@@ -33,9 +33,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Casts
      */
     protected function casts(): array
     {
@@ -44,28 +42,24 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Relation vers le profil professeur (si l'utilisateur est un professeur)
-     */
-    public function professeur()
+    // ---------------------------------------------------
+    // Relation média (pour professeur)
+    // ---------------------------------------------------
+    public function media(): HasMany
     {
-        return $this->hasOne(Professeur::class);
+        return $this->hasMany(Media::class, 'professeur_id');
     }
 
-    /**
-     * Relation vers le profil élève (si l'utilisateur est un élève)
-     */
-    public function eleve()
-    {
-        return $this->hasOne(Eleve::class);
-    }
+    // ---------------------------------------------------
+    // Helpers pour type utilisateur
+    // ---------------------------------------------------
 
     /**
      * Vérifie si l'utilisateur est un professeur
      */
     public function isProfesseur(): bool
     {
-        return $this->professeur()->exists();
+        return $this->hasRole('professeur');
     }
 
     /**
@@ -73,14 +67,44 @@ class User extends Authenticatable
      */
     public function isEleve(): bool
     {
-        return $this->eleve()->exists();
+        return $this->hasRole('eleve');
     }
 
     /**
-     * Obtient le profil (professeur ou élève) de l'utilisateur
+     * Obtient le profil (ici c'est juste nom/prenom stocké sur User)
      */
-    public function getProfile()
+    public function getProfile(): array
     {
-        return $this->professeur ?? $this->eleve;
+        return [
+            'nom' => $this->nom,
+            'prenom' => $this->prenom,
+        ];
+    }
+
+    // ---------------------------------------------------
+    // Gestion des droits sur le front
+    // ---------------------------------------------------
+
+    /**
+     * Vérifie si l'utilisateur peut modifier une vidéo
+     */
+    public function canModifierVideo(): bool
+    {
+        return $this->can('modifier video');
+    }
+
+    public function canDiffuserVideo(): bool
+    {
+        return $this->can('diffuser video');
+    }
+
+    public function canSupprimerVideo(): bool
+    {
+        return $this->can('supprimer video');
+    }
+
+    public function canAdministrerSite(): bool
+    {
+        return $this->can('administrer site');
     }
 }

@@ -96,6 +96,11 @@
                         <td><strong>Professeur référent</strong></td>
                         <td>{{ $mtdEdito["professeur"] }}</td>
                     </tr>
+                    {{-- NOUVEAU : Affichage des élèves --}}
+<tr>
+    <td><strong>Élève(s)</strong></td>
+    <td>{{ $mtdEdito["eleves"] ?? 'N/A' }}</td>
+</tr>
 
                     {{-- Rôles --}}
                     @if($mtdRoles && count($mtdRoles) > 0)
@@ -108,6 +113,22 @@
                     @endif
                 </table>
             </div>
+
+            {{-- Champs personalisées --}}
+            @if(!empty($mtdCustom))
+                <div class="metadata_detaillee" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #f09520; padding-bottom: 10px;">Informations personnalisées</h3>
+
+                    <table>
+                        @foreach($mtdCustom as $item)
+                            <tr>
+                                <td><strong>{{ $item['label'] }}</strong></td>
+                                <td>{{ $item['value'] ?: '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </table>
+                </div>
+            @endif
 
             {{-- Métadonnées techniques --}}
             <div class="metadata_detaillee" style="margin-top: 30px;">

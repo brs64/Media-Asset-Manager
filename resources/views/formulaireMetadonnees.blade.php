@@ -118,47 +118,98 @@
                            value="{{ old('theme', $media->theme ?? '') }}">
                 </div>
 
-                {{-- Participations --}}
+{{-- Participations (Élèves & Rôles) --}}
+<div class="form-field">
+    <label class="form-label">Participations (Élèves & Rôles)</label>
+    <div id="participations-container">
+        @php
+            $oldParticipations = old('participations', []);
+            if (isset($media) && empty($oldParticipations)) {
+                $oldParticipations = $media->participations->map(fn($p) => [
+                    'eleve_nom' => trim(($p->eleve->nom ?? '') . ' ' . ($p->eleve->prenom ?? '')),
+                    'role_id' => $p->role_id
+                ])->toArray();
+            }
+        @endphp
+
+        @forelse($oldParticipations as $index => $participation)
+            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                {{-- Input text avec datalist pour permettre la saisie de nouveaux noms --}}
+                <input type="text"
+                       name="participations[{{ $index }}][eleve_nom]"
+                       class="form-select"
+                       style="flex: 1;"
+                       list="eleves-list"
+                       placeholder="Nom de l'élève"
+                       value="{{ $participation['eleve_nom'] ?? '' }}"
+                       required>
+
+                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
+                    <option value="">-- Rôle --</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}" {{ ($participation['role_id'] ?? '') == $role->id ? 'selected' : '' }}>
+                            {{ $role->libelle }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+            </div>
+        @empty
+            {{-- Laisser vide, le bouton ajouter créera la première ligne --}}
+        @endforelse
+    </div>
+    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
+</div>
+
+{{-- Liste de suggestions (à placer juste ici) --}}
+<datalist id="eleves-list">
+    @foreach($eleves as $eleve)
+        <option value="{{ $eleve->nom }} {{ $eleve->prenom }}">
+    @endforeach
+</datalist>
+                {{-- Propriétés libres --}}
                 <div class="form-field">
-                    <label class="form-label">Participations (Élèves & Rôles)</label>
-                    <div id="participations-container">
+                    <label class="form-label">Propriétés personnalisées</label>
+
+                    <div id="properties-container">
                         @php
-                            $oldParticipations = old('participations', []);
-                            if (isset($media) && empty($oldParticipations)) {
-                                $oldParticipations = $media->participations->map(fn($p) => [
-                                    'eleve_id' => $p->eleve_id,
-                                    'role_id' => $p->role_id
-                                ])->toArray();
+                            $oldProperties = old('properties', []);
+
+                            if (isset($media) && empty($oldProperties)) {
+                                $oldProperties = collect($media->properties ?? [])
+                                    ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                                    ->values()
+                                    ->toArray();
                             }
                         @endphp
 
-                        @forelse($oldParticipations as $index => $participation)
-                            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
-                                <select name="participations[{{ $index }}][eleve_id]" class="form-select" style="flex: 1;" required>
-                                    <option value="">-- Élève --</option>
-                                    @foreach($eleves as $eleve)
-                                        <option value="{{ $eleve->id }}" {{ $participation['eleve_id'] == $eleve->id ? 'selected' : '' }}>
-                                            {{ $eleve->nom }} {{ $eleve->prenom }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        @foreach($oldProperties as $index => $property)
+                            <div class="property-item" style="display:flex; gap:10px; margin-bottom:10px;">
+                                <input
+                                        type="text"
+                                        name="properties[{{ $index }}][key]"
+                                        class="form-input"
+                                        placeholder="Nom du champ"
+                                        value="{{ $property['key'] ?? '' }}"
+                                >
 
-                                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
-                                    <option value="">-- Rôle --</option>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ $participation['role_id'] == $role->id ? 'selected' : '' }}>
-                                            {{ $role->libelle }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <input
+                                        type="text"
+                                        name="properties[{{ $index }}][value]"
+                                        class="form-input"
+                                        placeholder="Valeur"
+                                        value="{{ $property['value'] ?? '' }}"
+                                >
 
-                                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+                                <button type="button" class="remove-property">×</button>
                             </div>
-                        @empty
-                            {{-- Empty state --}}
-                        @endforelse
+                        @endforeach
                     </div>
-                    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
+
+                    <button type="button" id="add-property" class="form-button">
+                        + Ajouter une propriété
+                    </button>
                 </div>
 
             </div>{{-- Close flex column --}}
@@ -216,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ==== PARTICIPATIONS ====
+ // ==== PARTICIPATIONS ====
     const participationsContainer = document.getElementById('participations-container');
     const addParticipationButton = document.getElementById('add-participation');
 
@@ -228,10 +279,9 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
 
         item.innerHTML = `
-            <select name="participations[${participationIndex}][eleve_id]" class="form-select" style="flex: 1;" required>
-                <option value="">-- Élève --</option>
-                ${eleves.map(e => `<option value="${e.id}">${e.nom} ${e.prenom}</option>`).join('')}
-            </select>
+            <input type="text" name="participations[${participationIndex}][eleve_nom]"
+                   list="eleves-list" class="form-select" style="flex: 1;"
+                   placeholder="Nom de l'élève" required>
 
             <select name="participations[${participationIndex}][role_id]" class="form-select" style="flex: 1;" required>
                 <option value="">-- Rôle --</option>
@@ -244,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
         participationsContainer.appendChild(item);
         participationIndex++;
     });
-
     // Remove participation (delegated event)
     participationsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-participation')) {
@@ -252,5 +301,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+const propertiesContainer = document.getElementById('properties-container');
+const addPropertyButton = document.getElementById('add-property');
+
+let propertyIndex = {{ count($oldProperties ?? []) }};
+
+addPropertyButton.addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.className = 'property-item';
+    div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
+
+    div.innerHTML = `
+        <input type="text"
+               name="properties[${propertyIndex}][key]"
+               class="form-input"
+               placeholder="Nom libre">
+
+        <input type="text"
+               name="properties[${propertyIndex}][value]"
+               class="form-input"
+               placeholder="Valeur libre">
+
+        <button type="button" class="remove-property">×</button>
+    `;
+
+    propertiesContainer.appendChild(div);
+    propertyIndex++;
+});
+
+propertiesContainer.addEventListener('click', e => {
+    if (e.target.classList.contains('remove-property')) {
+        e.target.closest('.property-item').remove();
+    }
+});
+
 </script>
 @endpush

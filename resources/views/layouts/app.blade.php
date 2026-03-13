@@ -31,6 +31,19 @@
                 @endif
             </main>
         </div>
+
+        <!-- Floating Documentation Button -->
+        <a href="{{ route('docs.index') }}"
+           style="position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; z-index: 9999;"
+           class="bg-[#f09520] hover:bg-[#d68420] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+           title="Documentation">
+            <i class="fa-solid fa-book text-xl"></i>
+            <span style="position: absolute; right: 100%; margin-right: 12px; white-space: nowrap; pointer-events: none;"
+                  class="bg-gray-800 text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                Documentation
+            </span>
+        </a>
+
         <!-- This allows child views to inject custom JS here -->
         @stack('scripts')
     </body>

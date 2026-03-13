@@ -12,6 +12,22 @@ class ProfesseurSeeder extends Seeder
      */
     public function run(): void
     {
+        // Créer un administrateur
+        $adminUser = \App\Models\User::create([
+            'name' => 'admin',
+            'password' => bcrypt('admin'),
+            'nom' => 'Admin',
+            'prenom' => 'Système',
+        ]);
+        $adminUser->assignRole('admin');
+
+        \App\Models\Professeur::create([
+            'user_id' => $adminUser->id,
+            'nom' => 'Admin',
+            'prenom' => 'Système',
+        ]);
+
+        // Créer des professeurs classiques
         $professeurs = [
             ['nom' => 'Dupont', 'prenom' => 'Jean'],
             ['nom' => 'Martin', 'prenom' => 'Sophie'],
@@ -23,7 +39,12 @@ class ProfesseurSeeder extends Seeder
             $user = \App\Models\User::create([
                 'name' => $profData['prenom'] . ' ' . $profData['nom'],
                 'password' => bcrypt('password'),
+                'nom' => $profData['nom'],
+                'prenom' => $profData['prenom'],
             ]);
+
+            // Assigner le rôle professeur
+            $user->assignRole('professeur');
 
             // Créer le profil professeur (enfant) lié à l'utilisateur
             \App\Models\Professeur::create([
