@@ -24,7 +24,6 @@ class TransfertController extends Controller
     
     public function list(FfastransService $ffastrans)
     {
-        // Get all videos that have NO local file yet
         $query = Media::whereNull('chemin_local')->get();
 
         $results = $query->map(function ($media) {
@@ -34,16 +33,15 @@ class TransfertController extends Controller
 
             $primaryPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
             $primaryDisk = (!empty($media->URI_NAS_ARCH)) ? 'nas_arch' : 'ftp_pad';
-
-            // DB status mapping
             $dbStatus = $media->transcode_status ?? 'disponible';
+            
             $statusLabelMap = [
                 'en_attente' => "En file d'attente",
                 'en_cours'   => 'Démarrage...',
                 'termine'    => 'Terminé',
                 'echoue'     => 'Echoué',
                 'annule'     => 'Annulé',
-                'disponible' => 'En attente'
+                'disponible' => 'Disponible'
             ];
 
             return [
@@ -53,7 +51,7 @@ class TransfertController extends Controller
                 'disk'            => $primaryDisk, 
                 'available_paths' => $availablePaths,
                 'job_id'          => $media->transcode_job_id, 
-                'status'          => $statusLabelMap[$dbStatus] ?? 'En attente',
+                'status'          => $statusLabelMap[$dbStatus] ?? 'Disponible',
                 'progress'        => ($dbStatus === 'termine') ? 100 : 0,
                 'finished'        => in_array($dbStatus, ['termine', 'echoue', 'annule']),
                 'is_queued'       => ($dbStatus === 'en_attente')

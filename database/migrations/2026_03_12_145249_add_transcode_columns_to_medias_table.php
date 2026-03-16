@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('medias', function (Blueprint $table) {
             // Statut du transcodage (en_attente, en_cours, termine, echoue, annule)
-            $table->string('transcode_status')->nullable()->default('en_attente');
+            $table->string('transcode_status')->nullable()->default('disponible');
 
             // ID du job FFAStrans
             $table->string('transcode_job_id')->nullable();
