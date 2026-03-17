@@ -208,16 +208,20 @@ class MediaService
         try {
             $media = Media::findOrFail($idMedia);
 
-            // Construction des chemins à cibler
-            $fullVideoPath = "/mnt/archivage/H264/" . $media->chemin_local;
-            $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp3") . ".jpg";
+            if ($media->chemin_local) {
+                // Construction des chemins à cibler
+                $fullVideoPath = "/mnt/archivage/H264/" . $media->chemin_local;
+                $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp3") . ".jpg";
 
-            // Suppression du fichier vidéo local
-            Storage::delete($fullVideoPath);
+                // Suppression du fichier vidéo local
+                Storage::delete($fullVideoPath);
 
-            // Suppression du fichier miniature local
-            Storage::delete($fullThumbnailPath);
-
+                // Suppression du fichier miniature local
+                Storage::delete($fullThumbnailPath);
+            }
+            else {
+                Log::info("Media #$idMedia has no local files");
+            }
             return true;
         }
         catch (\Exception $e) {
