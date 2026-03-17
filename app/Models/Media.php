@@ -28,18 +28,12 @@ class Media extends Model
         'properties',
         'transcode_status',
         'transcode_job_id',
-        'transcode_progress',
-        'transcode_started_at',
-        'transcode_finished_at',
-        'transcode_error_message',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'properties' => 'array',
-        'transcode_started_at' => 'datetime',
-        'transcode_finished_at' => 'datetime',
     ];
 
      /*=======================

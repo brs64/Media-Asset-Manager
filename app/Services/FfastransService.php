@@ -133,7 +133,7 @@ class FfastransService
             $allJobs[] = [
                 'id' => $job['job_id'] ?? $job['guid'],
                 'filename' => basename($job['source'] ?? 'Fichier Inconnu'),
-                'status' => $frenchStatus, // <--- FORCED FRENCH TRANSLATION
+                'status' => $frenchStatus,
                 'progress' => 100,
                 'date' => $job['end_time'] ?? date('Y-m-d H:i:s'),
                 'is_finished' => true
@@ -154,23 +154,34 @@ class FfastransService
 
         if ($response->successful()) {
             $data = $response->json();
-            return $data;
-        }
-
-        if ($response->status() === 404) {
-            $historyEndpoint = "{$this->baseUrl}/api/json/v2/history/{$jobId}";
-            $historyResponse = $this->client()->get($historyEndpoint);
-
-            if ($historyResponse->successful()) {
-                $historyData = $historyResponse->json();
+            
+            if (!empty($data['jobs'])) {
+                $job = $data['jobs'][0];
                 return [
-                    'state'    => $historyData['result'] ?? 'Success', 
-                    'progress' => 100, 
-                    'message'  => $historyData['msg'] ?? ''
+                    'source'   => 'active',
+                    'progress' => $job['progress'] ?? 0,
+                    'state'    => $job['state'] ?? 'Running',
+                    'status'   => $job['status'] ?? '',
+                    'steps'    => $job['steps'] ?? '',
+                    'proc'     => $job['proc'] ?? ''
                 ];
             }
         }
-        return ['state' => 'Error', 'msg' => 'Job not found'];
+
+        $historyEndpoint = "{$this->baseUrl}/api/json/v2/history/{$jobId}";
+        $historyResponse = $this->client()->get($historyEndpoint);
+
+        if ($historyResponse->successful()) {
+            $historyData = $historyResponse->json();
+            return [
+                'source'   => 'history',
+                'state'    => $historyData['result'] ?? 'Success',
+                'progress' => 100,
+                'message'  => $historyData['msg'] ?? ''
+            ];
+        }
+
+        return ['source' => 'not_found', 'state' => 'Error'];
     }
 
     public function cancelJob(string $jobId)

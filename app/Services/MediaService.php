@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\Participation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Media management service
@@ -198,6 +199,29 @@ class MediaService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Error deleting media: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function clearLocalFiles(int $idMedia): bool
+    {
+        try {
+            $media = Media::findOrFail($idMedia);
+
+            // Construction des chemins à cibler
+            $fullVideoPath = "/mnt/archivage/H264/" . $media->chemin_local;
+            $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp3") . ".jpg";
+
+            // Suppression du fichier vidéo local
+            Storage::delete($fullVideoPath);
+
+            // Suppression du fichier miniature local
+            Storage::delete($fullThumbnailPath);
+
+            return true;
+        }
+        catch (\Exception $e) {
+            Log::error("Error cleaning local files of media " . $idMedia . " : " . $e->getMessage());
             return false;
         }
     }
