@@ -278,9 +278,11 @@ class MediaController extends Controller
      */
     public function destroy(string $id)
     {
-        $success = $this->mediaService->deleteMedia($id);
+        $success_local = $this->mediaService->clearLocalFiles($id);
 
-        if ($success) {
+        $success_db = $this->mediaService->deleteMedia($id);
+
+        if ($success_db && $success_local) {
             return redirect()->route('medias.index')
                 ->with('success', 'Media deleted successfully!');
         }
