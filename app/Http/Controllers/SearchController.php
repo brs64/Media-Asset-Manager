@@ -23,21 +23,23 @@ class SearchController extends Controller
      */
 public function index(Request $request)
 {
-    $filtres = [];
+    // 1. On récupère TOUT ce qui arrive (utile pour les tests)
+    $filtres = $request->all();
 
-    // recup du mot saisi
+    // 2. On gère ton cas actuel : le mot saisi dans la barre de recherche
     $searchTerm = $request->input('description') ?? $request->input('motCle');
 
     if ($searchTerm) {
-        //envoie le mot-clé au service
         $filtres['keyword'] = $searchTerm;
     }
 
+    // 3. On envoie TOUT le tableau $filtres au service
+    // S'il y a un 'keyword', le service cherchera partout.
+    // S'il y a un 'projet' (envoyé par le test), le service filtrera par projet.
     $medias = $this->mediaService->searchMedia($filtres);
 
     $medias->appends($request->all());
 
-    //défini les variables pour éviter les erreurs dans la vue
     $description = $searchTerm;
     $listeProjet = Projet::orderBy('libelle')->get();
     $listeProf = Professeur::orderBy('nom')->get();
