@@ -211,13 +211,15 @@ class MediaService
             if ($media->chemin_local) {
                 // Construction des chemins à cibler
                 $fullVideoPath = "/mnt/archivage/H264/" . $media->chemin_local;
-                $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp3") . ".jpg";
+                $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp4") . ".jpg";
 
                 // Suppression du fichier vidéo local
                 Storage::delete($fullVideoPath);
+                Log::info($fullVideoPath . ' deleted');
 
                 // Suppression du fichier miniature local
                 Storage::delete($fullThumbnailPath);
+                Log::info($fullThumbnailPath . ' deleted');
             }
             else {
                 Log::info("Media #$idMedia has no local files");
