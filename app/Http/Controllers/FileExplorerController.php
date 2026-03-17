@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Cache;
 
 class FileExplorerController extends Controller
 {
+    protected FileExplorerService $fileExplorer;
+
+    public function __construct(FileExplorerService $fileExplorer)
+    {
+        $this->fileExplorer = $fileExplorer;
+    }
+
     /**
      * Affiche la racine de l’explorateur
      */
@@ -20,7 +27,7 @@ class FileExplorerController extends Controller
         $disk = 'external_local'; // ou depuis config / auth / param
         $path = '/';
 
-        $items = FileExplorerService::scanDisk($disk, $path);
+        $items = $this->fileExplorer->scanDisk($disk, $path);
 
         return view('explorer.index', compact('items'));
     }
@@ -30,17 +37,17 @@ class FileExplorerController extends Controller
      */
     public function scan(Request $request)
     {
-        $disk = $request->query('disk');
-        $path = $request->query('path', '/');
+        // Récupération sécurisée des paramètres
+        $disk = $request->input('disk'); // GET ou POST
+        $path = $request->input('path') ?? '/';
 
-        abort_unless(
-            in_array($disk, array_keys(config('filesystems.disks'))),
-            403,
-            'Disque interdit'
-        );
+        // Vérification du disque avant tout accès
+        if (!$disk || !array_key_exists($disk, config('filesystems.disks'))) {
+            abort(403, 'Disque interdit');
+        }
 
         // scan filesystem
-        $items = FileExplorerService::scanDisk($disk, $path);
+        $items = $this->fileExplorer->scanDisk($disk, $path);
 
         // chemins vidéos
         $videoPaths = collect($items)
@@ -57,7 +64,6 @@ class FileExplorerController extends Controller
         };
 
         $medias = collect();
-
         if ($column && $videoPaths->isNotEmpty()) {
             $medias = Media::whereIn($column, $videoPaths)
                 ->get()
@@ -72,6 +78,7 @@ class FileExplorerController extends Controller
             return $item;
         });
 
+        // Retour HTML pour ton front (AJAX)
         return view('explorer.tree-item', [
             'items' => $items,
         ])->render();
@@ -83,7 +90,7 @@ class FileExplorerController extends Controller
 
         $envPath = env('URI_RACINE_NAS_PAD');
         $path = $request->input('path') ?: $envPath ?: '/';
-        
+
         $forceRefresh = $request->boolean('force');
         $cacheKey = "scan_lock:" . md5($disk . $path);
 
@@ -126,7 +133,6 @@ class FileExplorerController extends Controller
 
     public function scanResults(string $scanId, FfastransService $ffastrans)
     {
-        // Check Status
         $status = Cache::get("scan:{$scanId}:status", 'unknown');
 
         if ($status !== 'done') {
@@ -138,13 +144,12 @@ class FileExplorerController extends Controller
         }
 
         $rawFiles = Cache::get("scan:{$scanId}:results", []);
-        
         $allScannedPaths = array_column($rawFiles, 'path');
-        
+
         $archivedPaths = Media::whereIn('chemin_local', $allScannedPaths)
-                            ->pluck('chemin_local')
-                            ->flip()
-                            ->toArray();
+            ->pluck('chemin_local')
+            ->flip()
+            ->toArray();
 
         $activeMap = [];
         try {
@@ -165,7 +170,7 @@ class FileExplorerController extends Controller
             $path = $file['path'];
 
             if (isset($archivedPaths[$path])) {
-                continue; // Skip archived files
+                continue;
             }
 
             if (isset($activeMap[$filename])) {
@@ -195,7 +200,7 @@ class FileExplorerController extends Controller
         return response()->json([
             'status' => 'done',
             'count'  => count($unifiedList),
-            'results'=> $unifiedList, 
+            'results'=> $unifiedList,
         ]);
     }
 }
