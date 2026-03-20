@@ -50,7 +50,12 @@ class MediaThumbnailServiceTest extends TestCase
         return $service;
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec une miniature déjà existante sur le disque
+     * WHEN : on génère la miniature sans forcer la régénération
+     * THEN : le chemin de la miniature existante est retourné sans régénération
+     */
     public function it_returns_existing_thumbnail_without_regenerating_when_force_is_false()
     {
         $media = Media::factory()->create();
@@ -64,7 +69,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertEquals($thumbnailPath, $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un fichier vidéo local existant et ffmpeg mocké
+     * WHEN : on force la génération de la miniature
+     * THEN : une miniature est générée et son chemin contient l'identifiant du média
+     */
     public function it_generates_thumbnail_from_local_video_file_when_forced()
     {
         $media = Media::factory()->create(['chemin_local' => 'videos/test.mp4']);
@@ -86,7 +96,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertStringContainsString($media->id . '_miniature.jpg', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média sans aucun chemin vidéo (local, archive, PAD)
+     * WHEN : on tente de générer une miniature
+     * THEN : le résultat est null
+     */
     public function it_returns_null_when_no_video_path_is_available()
     {
         $media = Media::factory()->create([
@@ -102,7 +117,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec des chemins archive et PAD, et une configuration FTP archive
+     * WHEN : on construit l'URL FTP pour le chemin archive
+     * THEN : l'URL contient les identifiants et le chemin correct
+     */
     public function it_correctly_builds_ftp_url_from_arch_and_pad_disks()
     {
         $media = Media::factory()->create([
@@ -127,7 +147,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertStringContainsString('ftp://archuser:archpass@arch.local/videos/arch.mp4', $ftpUrl);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec une miniature existante sur le disque
+     * WHEN : on supprime la miniature
+     * THEN : la suppression retourne true et le fichier n'existe plus
+     */
     public function it_deletes_existing_thumbnail_file_successfully()
     {
         $media = Media::factory()->create();
@@ -142,7 +167,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertFileDoesNotExist($thumbnailPath);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média sans miniature existante sur le disque
+     * WHEN : on tente de supprimer la miniature
+     * THEN : la suppression retourne true (pas d'erreur)
+     */
     public function it_returns_true_when_deleting_thumbnail_that_does_not_exist()
     {
         $media = Media::factory()->create();
@@ -154,7 +184,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : deux médias dont un avec miniature existante et un sans
+     * WHEN : on régénère les miniatures manquantes
+     * THEN : une miniature est générée et l'autre est ignorée (skipped)
+     */
     public function it_regenerates_missing_thumbnails_and_skips_existing_ones()
     {
         $media1 = Media::factory()->create(['chemin_local' => 'videos/test1.mp4']);
@@ -179,7 +214,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertEquals(['success' => 1, 'failed' => 0, 'skipped' => 1], $stats);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un chemin local inexistant mais un chemin FTP archive disponible
+     * WHEN : on force la génération de la miniature
+     * THEN : la miniature est générée via le chemin archive
+     */
     public function it_uses_archive_path_when_local_path_not_exists()
     {
         $media = Media::factory()->create([
@@ -208,7 +248,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertStringContainsString($media->id . '_miniature.jpg', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec uniquement un chemin FTP PAD disponible
+     * WHEN : on force la génération de la miniature
+     * THEN : la miniature est générée via le chemin PAD
+     */
     public function it_uses_pad_path_when_archive_not_available()
     {
         $media = Media::factory()->create([
@@ -237,7 +282,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNotNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des durées vidéo au format HH:MM:SS.ss
+     * WHEN : on calcule le timecode (50% de la durée)
+     * THEN : le timecode retourné correspond à la moitié de la durée en secondes
+     */
     public function it_calculates_correct_timecode_from_duration()
     {
         $service = $this->initializeService(new MediaThumbnailService());
@@ -255,7 +305,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertEquals(150, $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un chemin archive et ffmpeg configuré pour échouer
+     * WHEN : on force la génération de la miniature
+     * THEN : le résultat est null car ffmpeg a échoué
+     */
     public function it_returns_null_when_ffmpeg_execution_fails()
     {
         $media = Media::factory()->create([
@@ -282,7 +337,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un chemin archive et une durée indéterminable (null)
+     * WHEN : on force la génération de la miniature
+     * THEN : ffmpeg est appelé avec le timecode par défaut (5 secondes)
+     */
     public function it_uses_default_timecode_when_duration_cannot_be_determined()
     {
         $media = Media::factory()->create([
@@ -314,7 +374,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNotNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un chemin vidéo personnalisé passé en paramètre
+     * WHEN : on force la génération de la miniature avec ce chemin personnalisé
+     * THEN : la miniature est générée avec succès
+     */
     public function it_generates_thumbnail_with_custom_video_path()
     {
         $media = Media::factory()->create();
@@ -341,7 +406,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNotNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un chemin archive mais sans configuration FTP
+     * WHEN : on force la génération de la miniature
+     * THEN : le résultat est null car la configuration FTP est absente
+     */
     public function it_returns_null_when_ftp_config_is_missing()
     {
         $media = Media::factory()->create([
@@ -357,7 +427,12 @@ class MediaThumbnailServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : deux médias sans miniature, dont un sans chemin vidéo et un avec un fichier local
+     * WHEN : on régénère les miniatures manquantes
+     * THEN : les statistiques contiennent les compteurs de succès et d'échecs
+     */
     public function regenerateMissingThumbnails_tracks_failed_generations()
     {
         $media1 = Media::factory()->create(['chemin_local' => null, 'URI_NAS_ARCH' => null, 'URI_NAS_PAD' => null]);

@@ -21,7 +21,12 @@ class TransfertControllerTest extends TestCase
         config()->set('btsplay.process.workflow_id', 'test-workflow');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié
+     * WHEN : on accède à la page des transferts
+     * THEN : la page s'affiche avec la variable maxConcurrent
+     */
     public function index_displays_transfert_page()
     {
         $response = $this->actingAs($this->user)->get(route('admin.transferts'));
@@ -31,7 +36,12 @@ class TransfertControllerTest extends TestCase
         $response->assertViewHas('maxConcurrent');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des médias sur NAS sans chemin local et un média avec chemin local
+     * WHEN : on récupère la liste des transferts
+     * THEN : seuls les médias sans chemin local sont retournés
+     */
     public function list_returns_media_without_local_paths()
     {
         // Create media with NAS paths but no local path
@@ -73,7 +83,12 @@ class TransfertControllerTest extends TestCase
         $this->assertEquals(2, $json['count']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média sans chemin local et un job FFAStrans actif correspondant
+     * WHEN : on récupère la liste des transferts
+     * THEN : le média est associé aux informations du job en cours
+     */
     public function list_matches_active_jobs_with_media()
     {
         $media = Media::factory()->create([
@@ -107,7 +122,12 @@ class TransfertControllerTest extends TestCase
         $this->assertFalse($result['finished']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média sans chemin local et une erreur de connexion FFAStrans
+     * WHEN : on récupère la liste des transferts
+     * THEN : les résultats sont retournés avec le statut 'En attente'
+     */
     public function list_handles_ffastrans_error_gracefully()
     {
         Media::factory()->create([
@@ -130,7 +150,12 @@ class TransfertControllerTest extends TestCase
         $this->assertEquals('En attente', $json['results'][0]['status']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec à la fois un chemin NAS_ARCH et NAS_PAD
+     * WHEN : on récupère la liste des transferts
+     * THEN : le disque NAS_ARCH est utilisé en priorité
+     */
     public function list_prioritizes_arch_over_pad()
     {
         $media = Media::factory()->create([
@@ -153,7 +178,12 @@ class TransfertControllerTest extends TestCase
         $this->assertStringEndsWith('.mp4', $result['filename']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec uniquement un chemin NAS_PAD
+     * WHEN : on récupère la liste des transferts
+     * THEN : le disque NAS_PAD est utilisé comme source
+     */
     public function list_uses_pad_when_arch_not_available()
     {
         $media = Media::factory()->create([
@@ -176,7 +206,12 @@ class TransfertControllerTest extends TestCase
         $this->assertStringEndsWith('.mxf', $result['filename']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un service FFAStrans mocké prêt à accepter un job
+     * WHEN : on soumet un job de transfert avec un chemin et un disque
+     * THEN : le job est créé et l'identifiant est retourné
+     */
     public function startJob_submits_job_to_ffastrans()
     {
         $this->mock(FfastransService::class)
@@ -196,7 +231,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un service FFAStrans mocké qui lève une exception
+     * WHEN : on tente de soumettre un job de transfert
+     * THEN : une erreur 500 est retournée avec le message d'erreur
+     */
     public function startJob_handles_ffastrans_error()
     {
         $this->mock(FfastransService::class)
@@ -216,7 +256,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job FFAStrans en cours de traitement à 75%
+     * WHEN : on vérifie le statut du job
+     * THEN : la progression et le statut 'En cours' sont retournés
+     */
     public function checkStatus_returns_job_progress()
     {
         $this->mock(FfastransService::class)
@@ -238,7 +283,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job FFAStrans terminé avec succès
+     * WHEN : on vérifie le statut du job
+     * THEN : le statut 'Terminé' est retourné avec finished à true
+     */
     public function checkStatus_detects_success_state()
     {
         $this->mock(FfastransService::class)
@@ -258,7 +308,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job FFAStrans en état d'erreur
+     * WHEN : on vérifie le statut du job
+     * THEN : le statut 'Echoué' est retourné avec finished à true
+     */
     public function checkStatus_detects_error_state()
     {
         $this->mock(FfastransService::class)
@@ -277,7 +332,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job FFAStrans annulé
+     * WHEN : on vérifie le statut du job
+     * THEN : le statut 'Annulé' est retourné avec finished à true
+     */
     public function checkStatus_detects_cancelled_state()
     {
         $this->mock(FfastransService::class)
@@ -296,7 +356,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job FFAStrans avec la progression dans les variables
+     * WHEN : on vérifie le statut du job
+     * THEN : la progression est extraite des variables du job
+     */
     public function checkStatus_extracts_progress_from_variables()
     {
         $this->mock(FfastransService::class)
@@ -318,7 +383,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un service FFAStrans qui lève une exception de connexion
+     * WHEN : on vérifie le statut d'un job
+     * THEN : une erreur 500 avec le message 'Erreur de connexion' est retournée
+     */
     public function checkStatus_handles_connection_error()
     {
         $this->mock(FfastransService::class)
@@ -334,7 +404,12 @@ class TransfertControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un service FFAStrans prêt à annuler un job
+     * WHEN : on annule le job
+     * THEN : une redirection avec un message de succès est retournée
+     */
     public function cancel_cancels_job_successfully()
     {
         $this->mock(FfastransService::class)
@@ -349,7 +424,12 @@ class TransfertControllerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un service FFAStrans qui échoue à annuler un job
+     * WHEN : on tente d'annuler le job
+     * THEN : une redirection avec un message d'erreur est retournée
+     */
     public function cancel_handles_failure()
     {
         $this->mock(FfastransService::class)

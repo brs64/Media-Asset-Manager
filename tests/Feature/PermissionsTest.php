@@ -18,7 +18,12 @@ class PermissionsTest extends TestCase
         \Spatie\Permission\Models\Role::create(['name' => 'professeur']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur avec le rôle professeur
+     * WHEN : il accède à la page des réglages admin
+     * THEN : l'accès est autorisé (statut 200)
+     */
     public function un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages()
     {
         $user = User::factory()->create();
@@ -31,7 +36,12 @@ class PermissionsTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur sans aucun rôle assigné
+     * WHEN : il tente d'accéder à la page des réglages admin
+     * THEN : l'accès est refusé (statut 403)
+     */
     public function un_utilisateur_sans_role_ne_peut_pas_acceder_a_ladmin()
     {
         $user = User::factory()->create();
@@ -41,7 +51,12 @@ class PermissionsTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur avec le rôle admin
+     * WHEN : il accède à la page des réglages admin
+     * THEN : l'accès est autorisé (statut 200)
+     */
     public function l_admin_peut_acceder_aux_reglages()
     {
         $adminUser = User::factory()->create();

@@ -29,7 +29,12 @@ class AdminControllerTest extends TestCase
         $this->user->assignRole('admin');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il accède à la page des réglages
+     * THEN : la page s'affiche avec les paramètres de configuration
+     */
     public function settings_page_displays_configuration()
     {
         $response = $this->actingAs($this->user)->get(route('admin.settings'));
@@ -39,7 +44,12 @@ class AdminControllerTest extends TestCase
         $response->assertViewHas('settings');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier de log existant avec des entrées
+     * WHEN : l'administrateur accède à la page des logs
+     * THEN : la page s'affiche avec les logs récents
+     */
     public function logs_page_displays_recent_logs()
     {
         // Create a test log file
@@ -57,7 +67,12 @@ class AdminControllerTest extends TestCase
         File::delete($logPath);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun fichier de log n'existe
+     * WHEN : l'administrateur accède à la page des logs
+     * THEN : la page s'affiche avec une liste de logs vide
+     */
     public function logs_page_handles_missing_log_file()
     {
         $logPath = storage_path('logs/laravel.log');
@@ -71,7 +86,12 @@ class AdminControllerTest extends TestCase
         $response->assertViewHas('logs', []);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des professeurs et des élèves existent en base
+     * WHEN : l'administrateur accède à la page des utilisateurs
+     * THEN : la page affiche les listes de professeurs et d'élèves
+     */
     public function users_page_displays_professeurs_and_eleves()
     {
         Professeur::factory()->count(3)->create();
@@ -85,7 +105,12 @@ class AdminControllerTest extends TestCase
         $response->assertViewHas('eleves');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié avec des données valides
+     * WHEN : il soumet le formulaire de création d'un professeur
+     * THEN : le professeur et son utilisateur sont créés en base
+     */
     public function createProfesseur_creates_new_professor()
     {
         $response = $this->actingAs($this->user)->post(route('admin.professeurs.create'), [
@@ -105,7 +130,12 @@ class AdminControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il soumet le formulaire de création sans données
+     * THEN : des erreurs de validation sont retournées pour les champs obligatoires
+     */
     public function createProfesseur_validates_required_fields()
     {
         $response = $this->actingAs($this->user)->post(route('admin.professeurs.create'), []);
@@ -113,7 +143,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHasErrors(['nom', 'prenom', 'identifiant', 'mot_de_passe']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur avec l'identifiant 'jdupont' existe déjà
+     * WHEN : on tente de créer un professeur avec le même identifiant
+     * THEN : une erreur de validation est retournée pour l'identifiant
+     */
     public function createProfesseur_validates_unique_identifiant()
     {
         User::factory()->create(['name' => 'jdupont']);
@@ -128,7 +163,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHasErrors('identifiant');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un professeur sans médias associés
+     * WHEN : l'administrateur supprime ce professeur
+     * THEN : le professeur est supprimé de la base
+     */
     public function deleteProfesseur_deletes_professor_without_media()
     {
         $prof = Professeur::factory()->create();
@@ -140,7 +180,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseMissing('professeurs', ['id' => $prof->id]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un professeur ayant des médias associés
+     * WHEN : l'administrateur tente de le supprimer
+     * THEN : la suppression est refusée et le professeur reste en base
+     */
     public function deleteProfesseur_prevents_deletion_if_has_media()
     {
         $user = User::factory()->create();
@@ -154,7 +199,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('professeurs', ['id' => $prof->id]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié avec des données valides
+     * WHEN : il soumet le formulaire de création d'un élève
+     * THEN : l'élève est créé en base avec les bonnes informations
+     */
     public function createEleve_creates_new_student()
     {
         $response = $this->actingAs($this->user)->post(route('admin.eleves.create'), [
@@ -171,7 +221,12 @@ class AdminControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il soumet le formulaire de création d'un élève sans données
+     * THEN : des erreurs de validation sont retournées pour nom et prénom
+     */
     public function createEleve_validates_required_fields()
     {
         $response = $this->actingAs($this->user)->post(route('admin.eleves.create'), []);
@@ -179,7 +234,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHasErrors(['nom', 'prenom']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un élève existant en base
+     * WHEN : l'administrateur supprime cet élève
+     * THEN : l'élève est supprimé de la base
+     */
     public function deleteEleve_deletes_student()
     {
         $eleve = Eleve::factory()->create();
@@ -194,7 +254,12 @@ class AdminControllerTest extends TestCase
     // NOTE: Project management routes don't exist in routes/web.php
     // Tests removed as these features are not implemented
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier de log de sauvegarde existant
+     * WHEN : l'administrateur accède à la page de base de données
+     * THEN : la page affiche les logs de sauvegarde
+     */
     public function databaseView_displays_backup_logs()
     {
         $logPath = storage_path('logs/backup.log');
@@ -210,7 +275,12 @@ class AdminControllerTest extends TestCase
         File::delete($logPath);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié et la commande de sauvegarde disponible
+     * WHEN : il lance une sauvegarde manuelle
+     * THEN : la commande s'exécute avec succès et un message de confirmation s'affiche
+     */
     public function runBackup_executes_backup_command_successfully()
     {
         // Mock Artisan call
@@ -229,7 +299,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier de log existant avec du contenu
+     * WHEN : l'administrateur demande le téléchargement des logs
+     * THEN : le fichier est téléchargé avec succès
+     */
     public function downloadLogs_downloads_log_file()
     {
         $logPath = storage_path('logs/laravel.log');
@@ -244,7 +319,12 @@ class AdminControllerTest extends TestCase
         File::delete($logPath);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun fichier de log n'existe
+     * WHEN : l'administrateur demande le téléchargement des logs
+     * THEN : une erreur est retournée avec redirection
+     */
     public function downloadLogs_returns_error_when_file_missing()
     {
         $logPath = storage_path('logs/laravel.log');
@@ -258,7 +338,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier CSV contenant trois élèves
+     * WHEN : l'administrateur importe le fichier CSV
+     * THEN : les trois élèves sont créés en base avec les noms en majuscules
+     */
     public function Ajouterelevedepuiscsv_imports_students_from_csv()
     {
         $csvContent = "nom,prenom\nDupont,Jean\nMartin,Sophie\nDurand,Pierre";
@@ -276,7 +361,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('eleves', ['nom' => 'DURAND', 'prenom' => 'Pierre']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier texte avec des noms séparés par des espaces
+     * WHEN : l'administrateur importe le fichier
+     * THEN : les élèves sont créés correctement malgré le format différent
+     */
     public function Ajouterelevedepuiscsv_handles_space_separated_format()
     {
         $csvContent = "Dupont Jean\nMartin Sophie";
@@ -293,7 +383,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('eleves', ['nom' => 'MARTIN', 'prenom' => 'Sophie']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un élève 'DUPONT Jean' existe déjà en base
+     * WHEN : on importe un CSV contenant ce même élève et un nouveau
+     * THEN : seul le nouvel élève est ajouté, le doublon est ignoré
+     */
     public function Ajouterelevedepuiscsv_ignores_duplicates()
     {
         Eleve::factory()->create(['nom' => 'DUPONT', 'prenom' => 'Jean']);
@@ -313,7 +408,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('eleves', ['nom' => 'MARTIN', 'prenom' => 'Sophie']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier PDF (type non autorisé)
+     * WHEN : l'administrateur tente de l'importer comme fichier d'élèves
+     * THEN : une erreur de validation est retournée pour le type de fichier
+     */
     public function Ajouterelevedepuiscsv_validates_file_type()
     {
         $file = UploadedFile::fake()->create('eleves.pdf', 100);
@@ -325,7 +425,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHasErrors('fichier_csv');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un fichier CSV contenant des lignes vides intercalées
+     * WHEN : l'administrateur importe le fichier
+     * THEN : les lignes vides sont ignorées et les élèves sont créés correctement
+     */
     public function Ajouterelevedepuiscsv_handles_empty_lines()
     {
         $csvContent = "nom,prenom\n\nDupont,Jean\n\n\nMartin,Sophie\n";
@@ -340,7 +445,12 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('eleves', ['nom' => 'MARTIN', 'prenom' => 'Sophie']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il accède à la page de réconciliation
+     * THEN : la page s'affiche correctement
+     */
     public function reconciliation_page_displays()
     {
         $response = $this->actingAs($this->user)->get(route('admin.reconciliation'));
@@ -349,7 +459,12 @@ class AdminControllerTest extends TestCase
         $response->assertViewIs('admin.reconciliation');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il lance la réconciliation
+     * THEN : la synchronisation s'exécute et le résultat est stocké en session
+     */
     public function runReconciliation_executes_sync()
     {
         $response = $this->actingAs($this->user)->post(route('admin.reconciliation.run'));
@@ -358,7 +473,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHas('reconciliation_result');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur avec des paramètres de sauvegarde valides
+     * WHEN : il enregistre la configuration de sauvegarde
+     * THEN : les paramètres sont mis à jour avec succès
+     */
     public function saveBackupSettings_updates_backup_configuration()
     {
         $response = $this->actingAs($this->user)->post(route('admin.backup.save'), [
@@ -371,7 +491,12 @@ class AdminControllerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un administrateur authentifié
+     * WHEN : il soumet le formulaire de sauvegarde sans données
+     * THEN : des erreurs de validation sont retournées pour les champs obligatoires
+     */
     public function saveBackupSettings_validates_required_fields()
     {
         $response = $this->actingAs($this->user)->post(route('admin.backup.save'), []);

@@ -14,7 +14,12 @@ class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun paramètre de recherche fourni
+     * WHEN : on accède à la page de recherche
+     * THEN : la page s'affiche avec les variables de vue nécessaires
+     */
     public function index_displays_search_page_without_results_when_no_query()
     {
         $response = $this->get(route('search'));
@@ -24,7 +29,12 @@ class SearchControllerTest extends TestCase
         $response->assertViewHas(['medias', 'listeProjet', 'listeProf', 'description']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec une description unique et trois autres médias
+     * WHEN : on recherche par le mot 'unique' dans la description
+     * THEN : seul le média correspondant est retourné
+     */
     public function index_searches_with_description_parameter()
     {
         $media = Media::factory()->create(['description' => 'Test description unique']);
@@ -40,7 +50,12 @@ class SearchControllerTest extends TestCase
         $this->assertEquals($media->id, $medias->first()->id);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un titre spécifique et trois autres médias
+     * WHEN : on recherche par mot-clé correspondant au titre
+     * THEN : seul le média correspondant est retourné
+     */
     public function index_searches_with_motCle_parameter()
     {
         $media = Media::factory()->create(['mtd_tech_titre' => 'VideoTest123']);
@@ -55,7 +70,12 @@ class SearchControllerTest extends TestCase
         $this->assertEquals($media->id, $medias->first()->id);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec une description correspondant au terme de recherche
+     * WHEN : on fournit à la fois description et motCle comme paramètres
+     * THEN : la description est prioritaire sur le mot-clé
+     */
     public function index_prioritizes_description_over_motCle()
     {
         $media = Media::factory()->create(['description' => 'SearchTerm']);
@@ -69,7 +89,12 @@ class SearchControllerTest extends TestCase
         $this->assertEquals('SearchTerm', $description);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 3 projets et 5 professeurs en base de données
+     * WHEN : on accède à la page de recherche
+     * THEN : les listes de projets et professeurs sont disponibles dans la vue
+     */
     public function index_loads_projets_and_professeurs_for_filters()
     {
         Projet::factory()->count(3)->create();
@@ -86,7 +111,12 @@ class SearchControllerTest extends TestCase
         $this->assertCount(5, $profs);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 25 médias avec la même description
+     * WHEN : on recherche cette description
+     * THEN : les résultats sont paginés via LengthAwarePaginator
+     */
     public function index_paginates_results()
     {
         Media::factory()->count(25)->create(['description' => 'Common description']);
@@ -97,7 +127,12 @@ class SearchControllerTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $medias);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 25 médias avec la même description
+     * WHEN : on recherche cette description et on consulte la pagination
+     * THEN : les paramètres de recherche sont conservés dans les liens de pagination
+     */
     public function index_appends_query_parameters_to_pagination()
     {
         Media::factory()->count(25)->create(['description' => 'Test']);
@@ -108,7 +143,12 @@ class SearchControllerTest extends TestCase
         $this->assertStringContainsString('description=Test', $medias->url(2));
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : trois médias dont deux avec un titre commençant par 'Documentaire'
+     * WHEN : on lance l'autocomplétion avec le terme 'Documentaire'
+     * THEN : seuls les deux médias correspondants sont retournés
+     */
     public function autocomplete_returns_matching_titles()
     {
         $user = User::factory()->create();
@@ -124,7 +164,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonFragment(['DocumentaireHistoire']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 15 médias avec le même titre
+     * WHEN : on lance l'autocomplétion avec un terme correspondant
+     * THEN : le résultat est limité à 10 éléments maximum
+     */
     public function autocomplete_limits_results_to_10()
     {
         $user = User::factory()->create();
@@ -136,7 +181,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonCount(10);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 5 médias sans titre correspondant au terme recherché
+     * WHEN : on lance l'autocomplétion avec un terme inexistant
+     * THEN : un tableau vide est retourné
+     */
     public function autocomplete_returns_empty_array_when_no_matches()
     {
         $user = User::factory()->create();
@@ -148,7 +198,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonCount(0);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 15 médias en base de données
+     * WHEN : on lance l'autocomplétion avec un terme vide
+     * THEN : jusqu'à 10 résultats sont retournés
+     */
     public function autocomplete_handles_empty_term()
     {
         $user = User::factory()->create();
@@ -161,7 +216,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonCount(10);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un titre en casse mixte
+     * WHEN : on recherche le même titre en minuscules
+     * THEN : le média est trouvé malgré la différence de casse
+     */
     public function autocomplete_is_case_insensitive()
     {
         $user = User::factory()->create();
@@ -173,7 +233,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonFragment(['VideoTest']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média avec un titre long
+     * WHEN : on recherche une sous-chaîne du titre
+     * THEN : le média est trouvé par correspondance partielle
+     */
     public function autocomplete_searches_partial_matches()
     {
         $user = User::factory()->create();
@@ -185,7 +250,12 @@ class SearchControllerTest extends TestCase
         $response->assertJsonFragment(['MyLongVideoTitle']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un MediaService mocké configuré pour répondre à une recherche
+     * WHEN : on effectue une recherche par description
+     * THEN : le service est appelé et la page s'affiche correctement
+     */
     public function index_uses_media_service_for_search()
     {
         $media = Media::factory()->create(['mtd_tech_titre' => 'ServiceTest']);
@@ -205,7 +275,12 @@ class SearchControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : 10 médias en base de données
+     * WHEN : on accède à la recherche sans terme de recherche
+     * THEN : tous les médias sont retournés
+     */
     public function index_returns_all_medias_when_no_search_term()
     {
         Media::factory()->count(10)->create();

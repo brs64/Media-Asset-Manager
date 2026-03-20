@@ -24,7 +24,12 @@ class FfastransServiceTest extends TestCase
         $this->service = new FfastransService();
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un chemin Linux valide configuré avec un path_local
+     * WHEN : on appelle translatePath avec ce chemin
+     * THEN : le chemin est converti en format Windows UNC
+     */
     public function translatePath_converts_linux_to_windows_path()
     {
         $linuxPath = '/var/www/storage/app/videos/2024/MonVideo.mp4';
@@ -34,7 +39,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('\\\\server\\share\\videos\\2024\\MonVideo.mp4', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun path_local configuré et un chemin relatif
+     * WHEN : on appelle translatePath avec un chemin relatif
+     * THEN : le chemin est préfixé par le path_remote et converti en backslashes
+     */
     public function translatePath_handles_relative_paths()
     {
         Config::set('services.ffastrans.path_local', null);
@@ -46,7 +56,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('\\\\server\\share\\videos\\test.mp4', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun path_remote configuré
+     * WHEN : on appelle translatePath avec un chemin quelconque
+     * THEN : le chemin est retourné avec les slashes convertis en backslashes uniquement
+     */
     public function translatePath_returns_original_if_no_remote_root()
     {
         Config::set('services.ffastrans.path_remote', null);
@@ -57,7 +72,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('\\some\\path\\video.mp4', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un chemin déjà au format Windows
+     * WHEN : on appelle translatePath avec ce chemin
+     * THEN : la structure du chemin Windows est préservée
+     */
     public function translatePath_preserves_windows_paths()
     {
         $windowsPath = 'C:\\Videos\\test.mp4';
@@ -68,7 +88,12 @@ class FfastransServiceTest extends TestCase
         $this->assertStringContainsString('C:\\Videos\\test.mp4', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un chemin contenant des slashes Linux
+     * WHEN : on appelle translatePath avec ce chemin
+     * THEN : tous les slashes sont remplacés par des backslashes
+     */
     public function translatePath_replaces_forward_slashes_with_backslashes()
     {
         $result = $this->service->translatePath('/var/www/storage/app/videos/test.mp4');
@@ -77,7 +102,12 @@ class FfastransServiceTest extends TestCase
         $this->assertStringContainsString('\\', $result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : une API FFAStrans simulée qui retourne un job_id
+     * WHEN : on soumet un job avec un fichier, un workflow et des variables
+     * THEN : le payload envoyé contient les bons paramètres et le job_id est retourné
+     */
     public function submitJob_sends_correct_payload_to_api()
     {
         Http::fake([
@@ -104,7 +134,12 @@ class FfastransServiceTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un chemin UNC Windows et une API simulée
+     * WHEN : on soumet un job avec ce chemin UNC
+     * THEN : le chemin UNC est envoyé tel quel dans le champ inputfile
+     */
     public function submitJob_preserves_unc_paths()
     {
         Http::fake([
@@ -119,7 +154,12 @@ class FfastransServiceTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : une API FFAStrans qui retourne une erreur 400
+     * WHEN : on soumet un job
+     * THEN : une exception est levée avec le code d'erreur
+     */
     public function submitJob_throws_exception_on_failed_response()
     {
         Http::fake([
@@ -132,7 +172,12 @@ class FfastransServiceTest extends TestCase
         $this->service->submitJob('/path/to/video.mp4', 'workflow-456');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job actif et un job dans l'historique sur l'API
+     * WHEN : on appelle getFullStatusList
+     * THEN : les deux jobs sont retournés avec les bons statuts et noms de fichiers
+     */
     public function getFullStatusList_combines_active_and_history_jobs()
     {
         Http::fake([
@@ -175,7 +220,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('finished.mp4', $historyJob['filename']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : deux jobs dans l'historique avec des dates différentes
+     * WHEN : on appelle getFullStatusList
+     * THEN : les jobs sont triés du plus récent au plus ancien
+     */
     public function getFullStatusList_sorts_by_date_descending()
     {
         Http::fake([
@@ -204,7 +254,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('old-job', $result[1]['id']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des jobs avec différents statuts anglais (Success, Error, Cancelled, Failed)
+     * WHEN : on appelle getFullStatusList
+     * THEN : les statuts sont traduits en français (Terminé, Echoué, Annulé, En cours)
+     */
     public function getFullStatusList_translates_statuses_to_french()
     {
         Http::fake([
@@ -229,7 +284,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('En cours', collect($result)->firstWhere('id', 'job-5')['status']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : une API FFAStrans qui retourne des erreurs 500
+     * WHEN : on appelle getFullStatusList
+     * THEN : un tableau vide est retourné sans lever d'exception
+     */
     public function getFullStatusList_handles_api_errors_gracefully()
     {
         Http::fake([
@@ -243,7 +303,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEmpty($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job actif en cours de traitement à 75%
+     * WHEN : on appelle getJobStatus avec son identifiant
+     * THEN : le statut et la progression du job sont retournés
+     */
     public function getJobStatus_returns_active_job_status()
     {
         Http::fake([
@@ -261,7 +326,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals(75, $result['progress']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job absent des actifs mais présent dans l'historique
+     * WHEN : on appelle getJobStatus avec son identifiant
+     * THEN : le statut est récupéré depuis l'historique avec une progression à 100%
+     */
     public function getJobStatus_falls_back_to_history_if_not_active()
     {
         Http::fake([
@@ -280,7 +350,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('Job completed successfully', $result['message']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job qui n'existe ni dans les actifs ni dans l'historique
+     * WHEN : on appelle getJobStatus avec son identifiant
+     * THEN : un statut d'erreur 'Job not found' est retourné
+     */
     public function getJobStatus_returns_error_when_job_not_found()
     {
         Http::fake([
@@ -294,7 +369,12 @@ class FfastransServiceTest extends TestCase
         $this->assertEquals('Job not found', $result['msg']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un job actif et une API qui accepte la suppression
+     * WHEN : on appelle cancelJob avec son identifiant
+     * THEN : une requête DELETE est envoyée et true est retourné
+     */
     public function cancelJob_deletes_job_successfully()
     {
         Http::fake([
@@ -311,7 +391,12 @@ class FfastransServiceTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : une API qui retourne une erreur 500 lors de l'annulation
+     * WHEN : on appelle cancelJob
+     * THEN : false est retourné
+     */
     public function cancelJob_returns_false_on_failure()
     {
         Http::fake([
@@ -323,7 +408,12 @@ class FfastransServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : une erreur réseau lors de l'appel à l'API
+     * WHEN : on appelle cancelJob
+     * THEN : false est retourné sans lever d'exception
+     */
     public function cancelJob_handles_exceptions()
     {
         Http::fake(function () {
@@ -335,7 +425,12 @@ class FfastransServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur et un mot de passe configurés pour FFAStrans
+     * WHEN : on effectue un appel à l'API
+     * THEN : le header Authorization est présent dans la requête
+     */
     public function client_uses_basic_auth_when_configured()
     {
         Http::fake([
@@ -349,7 +444,12 @@ class FfastransServiceTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun identifiant d'authentification configuré
+     * WHEN : on effectue un appel à l'API
+     * THEN : la requête est envoyée sans authentification et fonctionne
+     */
     public function client_works_without_auth_when_not_configured()
     {
         Config::set('services.ffastrans.user', null);
