@@ -18,12 +18,13 @@ class TransfertControllerTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
+        config()->set('btsplay.process.workflow_id', 'test-workflow');
     }
 
     /** @test */
     public function index_displays_transfert_page()
     {
-        $response = $this->actingAs($this->user)->get(route('transferts.index'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.transferts');
@@ -57,7 +58,7 @@ class TransfertControllerTest extends TestCase
             ->once()
             ->andReturn([]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.list'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -95,7 +96,7 @@ class TransfertControllerTest extends TestCase
                 ]
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.list'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $json = $response->json();
         $result = collect($json['results'])->firstWhere('id', $media->id);
@@ -119,7 +120,7 @@ class TransfertControllerTest extends TestCase
             ->once()
             ->andThrow(new \Exception('FFAStrans connection error'));
 
-        $response = $this->actingAs($this->user)->get(route('transferts.list'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $response->assertStatus(200);
         $json = $response->json();
@@ -142,7 +143,7 @@ class TransfertControllerTest extends TestCase
             ->shouldReceive('getFullStatusList')
             ->andReturn([]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.list'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $json = $response->json();
         $result = $json['results'][0];
@@ -165,7 +166,7 @@ class TransfertControllerTest extends TestCase
             ->shouldReceive('getFullStatusList')
             ->andReturn([]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.list'));
+        $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $json = $response->json();
         $result = $json['results'][0];
@@ -183,7 +184,7 @@ class TransfertControllerTest extends TestCase
             ->once()
             ->andReturn(['job_id' => 'job-456']);
 
-        $response = $this->actingAs($this->user)->postJson(route('transferts.start'), [
+        $response = $this->actingAs($this->user)->postJson(route('admin.transferts.start'), [
             'path' => '/nas/arch/video.mp4',
             'disk' => 'nas_arch',
         ]);
@@ -203,7 +204,7 @@ class TransfertControllerTest extends TestCase
             ->once()
             ->andThrow(new \Exception('Failed to submit job'));
 
-        $response = $this->actingAs($this->user)->postJson(route('transferts.start'), [
+        $response = $this->actingAs($this->user)->postJson(route('admin.transferts.start'), [
             'path' => '/nas/arch/video.mp4',
             'disk' => 'nas_arch',
         ]);
@@ -227,7 +228,7 @@ class TransfertControllerTest extends TestCase
                 'progress' => 75,
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -248,7 +249,7 @@ class TransfertControllerTest extends TestCase
                 'progress' => 100,
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertJson([
             'progress' => 100,
@@ -268,7 +269,7 @@ class TransfertControllerTest extends TestCase
                 'progress' => 50,
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertJson([
             'label' => 'Echoué',
@@ -287,7 +288,7 @@ class TransfertControllerTest extends TestCase
                 'progress' => 25,
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertJson([
             'label' => 'Annulé',
@@ -310,7 +311,7 @@ class TransfertControllerTest extends TestCase
                 ],
             ]);
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertJson([
             'progress' => 80,
@@ -325,7 +326,7 @@ class TransfertControllerTest extends TestCase
             ->once()
             ->andThrow(new \Exception('Connection failed'));
 
-        $response = $this->actingAs($this->user)->get(route('transferts.status', 'job-123'));
+        $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertStatus(500);
         $response->assertJson([
@@ -342,7 +343,7 @@ class TransfertControllerTest extends TestCase
             ->with('job-123')
             ->andReturn(true);
 
-        $response = $this->actingAs($this->user)->post(route('transferts.cancel', 'job-123'));
+        $response = $this->actingAs($this->user)->post(route('admin.transfers.cancel', 'job-123'));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -357,7 +358,7 @@ class TransfertControllerTest extends TestCase
             ->with('job-123')
             ->andReturn(false);
 
-        $response = $this->actingAs($this->user)->post(route('transferts.cancel', 'job-123'));
+        $response = $this->actingAs($this->user)->post(route('admin.transfers.cancel', 'job-123'));
 
         $response->assertRedirect();
         $response->assertSessionHas('error');

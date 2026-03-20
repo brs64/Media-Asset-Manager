@@ -247,11 +247,11 @@ class MediaThumbnailServiceTest extends TestCase
         $method->setAccessible(true);
 
         // 50% de 120 secondes = 60 secondes
-        $result = $method->invoke($service, 120);
+        $result = $method->invoke($service, '00:02:00.00');
         $this->assertEquals(60, $result);
 
         // 50% de 300 secondes = 150 secondes
-        $result = $method->invoke($service, 300);
+        $result = $method->invoke($service, '00:05:00.00');
         $this->assertEquals(150, $result);
     }
 

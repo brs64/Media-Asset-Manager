@@ -18,8 +18,6 @@ class FileExplorerControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();

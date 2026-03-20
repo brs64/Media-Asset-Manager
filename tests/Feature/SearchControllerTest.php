@@ -17,7 +17,7 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function index_displays_search_page_without_results_when_no_query()
     {
-        $response = $this->get(route('recherche.index'));
+        $response = $this->get(route('search'));
 
         $response->assertStatus(200);
         $response->assertViewIs('recherche');
@@ -30,7 +30,7 @@ class SearchControllerTest extends TestCase
         $media = Media::factory()->create(['description' => 'Test description unique']);
         Media::factory()->count(3)->create();
 
-        $response = $this->get(route('recherche.index', ['description' => 'unique']));
+        $response = $this->get(route('search', ['description' => 'unique']));
 
         $response->assertStatus(200);
         $response->assertViewIs('recherche');
@@ -46,7 +46,7 @@ class SearchControllerTest extends TestCase
         $media = Media::factory()->create(['mtd_tech_titre' => 'VideoTest123']);
         Media::factory()->count(3)->create();
 
-        $response = $this->get(route('recherche.index', ['motCle' => 'VideoTest123']));
+        $response = $this->get(route('search', ['motCle' => 'VideoTest123']));
 
         $response->assertStatus(200);
 
@@ -60,7 +60,7 @@ class SearchControllerTest extends TestCase
     {
         $media = Media::factory()->create(['description' => 'SearchTerm']);
 
-        $response = $this->get(route('recherche.index', [
+        $response = $this->get(route('search', [
             'description' => 'SearchTerm',
             'motCle' => 'OtherTerm',
         ]));
@@ -75,7 +75,7 @@ class SearchControllerTest extends TestCase
         Projet::factory()->count(3)->create();
         Professeur::factory()->count(5)->create();
 
-        $response = $this->get(route('recherche.index'));
+        $response = $this->get(route('search'));
 
         $response->assertStatus(200);
 
@@ -91,7 +91,7 @@ class SearchControllerTest extends TestCase
     {
         Media::factory()->count(25)->create(['description' => 'Common description']);
 
-        $response = $this->get(route('recherche.index', ['description' => 'Common']));
+        $response = $this->get(route('search', ['description' => 'Common']));
 
         $medias = $response->viewData('medias');
         $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $medias);
@@ -102,7 +102,7 @@ class SearchControllerTest extends TestCase
     {
         Media::factory()->count(25)->create(['description' => 'Test']);
 
-        $response = $this->get(route('recherche.index', ['description' => 'Test']));
+        $response = $this->get(route('search', ['description' => 'Test']));
 
         $medias = $response->viewData('medias');
         $this->assertStringContainsString('description=Test', $medias->url(2));
@@ -111,11 +111,12 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_returns_matching_titles()
     {
+        $user = User::factory()->create();
         Media::factory()->create(['mtd_tech_titre' => 'DocumentaireNature']);
         Media::factory()->create(['mtd_tech_titre' => 'DocumentaireHistoire']);
         Media::factory()->create(['mtd_tech_titre' => 'FictionDrame']);
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => 'Documentaire']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => 'Documentaire']));
 
         $response->assertStatus(200);
         $response->assertJsonCount(2);
@@ -126,9 +127,10 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_limits_results_to_10()
     {
+        $user = User::factory()->create();
         Media::factory()->count(15)->create(['mtd_tech_titre' => 'TestVideo']);
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => 'Test']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => 'Test']));
 
         $response->assertStatus(200);
         $response->assertJsonCount(10);
@@ -137,9 +139,10 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_returns_empty_array_when_no_matches()
     {
+        $user = User::factory()->create();
         Media::factory()->count(5)->create();
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => 'NonExistentTerm']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => 'NonExistentTerm']));
 
         $response->assertStatus(200);
         $response->assertJsonCount(0);
@@ -148,9 +151,10 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_handles_empty_term()
     {
+        $user = User::factory()->create();
         Media::factory()->count(15)->create(['mtd_tech_titre' => 'Video']);
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => '']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => '']));
 
         $response->assertStatus(200);
         // Should return up to 10 results
@@ -160,9 +164,10 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_is_case_insensitive()
     {
+        $user = User::factory()->create();
         Media::factory()->create(['mtd_tech_titre' => 'VideoTest']);
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => 'videotest']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => 'videotest']));
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['VideoTest']);
@@ -171,9 +176,10 @@ class SearchControllerTest extends TestCase
     /** @test */
     public function autocomplete_searches_partial_matches()
     {
+        $user = User::factory()->create();
         Media::factory()->create(['mtd_tech_titre' => 'MyLongVideoTitle']);
 
-        $response = $this->getJson(route('recherche.autocomplete', ['term' => 'Long']));
+        $response = $this->actingAs($user)->getJson(route('search.autocomplete', ['term' => 'Long']));
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['MyLongVideoTitle']);
@@ -194,7 +200,7 @@ class SearchControllerTest extends TestCase
                 20
             ));
 
-        $response = $this->get(route('recherche.index', ['description' => 'ServiceTest']));
+        $response = $this->get(route('search', ['description' => 'ServiceTest']));
 
         $response->assertStatus(200);
     }
@@ -204,7 +210,7 @@ class SearchControllerTest extends TestCase
     {
         Media::factory()->count(10)->create();
 
-        $response = $this->get(route('recherche.index'));
+        $response = $this->get(route('search'));
 
         $medias = $response->viewData('medias');
         $this->assertEquals(10, $medias->total());

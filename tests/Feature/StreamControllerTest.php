@@ -78,6 +78,7 @@ class StreamControllerTest extends TestCase
     public function it_streams_video_from_ftp_arch_disk()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/test.mp4',
         ]);
 
@@ -93,6 +94,7 @@ class StreamControllerTest extends TestCase
     public function it_streams_video_from_ftp_pad_disk_when_arch_not_available()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => null,
             'URI_NAS_PAD' => 'videos/test.mp4',
         ]);
@@ -108,6 +110,7 @@ class StreamControllerTest extends TestCase
     public function it_returns_404_when_ftp_file_is_missing()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/missing.mp4',
         ]);
 
@@ -120,6 +123,7 @@ class StreamControllerTest extends TestCase
     public function it_supports_http_range_requests()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/test.mp4',
         ]);
 
@@ -137,6 +141,7 @@ class StreamControllerTest extends TestCase
     public function it_streams_hls_playlist_when_extension_is_m3u8()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/playlist.m3u8',
         ]);
 
@@ -152,12 +157,13 @@ class StreamControllerTest extends TestCase
     public function it_streams_hls_segment()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/playlist.m3u8',
         ]);
 
         Storage::disk('ftp_arch')->put('videos/segment1.ts', 'segmentdata');
 
-        $response = $this->get("/stream/segment/{$media->id}/segment1.ts");
+        $response = $this->get("/stream/{$media->id}/segment/segment1.ts");
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'video/mp2t');
@@ -167,10 +173,11 @@ class StreamControllerTest extends TestCase
     public function it_returns_404_when_hls_segment_is_missing()
     {
         $media = Media::factory()->create([
+            'chemin_local' => null,
             'URI_NAS_ARCH' => 'videos/playlist.m3u8',
         ]);
 
-        $response = $this->get("/stream/segment/{$media->id}/missing.ts");
+        $response = $this->get("/stream/{$media->id}/segment/missing.ts");
 
         $response->assertStatus(404);
     }
