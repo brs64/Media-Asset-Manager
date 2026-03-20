@@ -23,7 +23,10 @@ class AdminControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        \Spatie\Permission\Models\Role::create(['name' => 'admin']);
+        \Spatie\Permission\Models\Role::create(['name' => 'professeur']);
         $this->user = User::factory()->create();
+        $this->user->assignRole('admin');
     }
 
     /** @test */
@@ -85,8 +88,6 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function createProfesseur_creates_new_professor()
     {
-        $userData = User::factory()->create();
-
         $response = $this->actingAs($this->user)->post(route('admin.professeurs.create'), [
             'nom' => 'Dupont',
             'prenom' => 'Jean',
@@ -97,10 +98,10 @@ class AdminControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
+        $this->assertDatabaseHas('users', ['name' => 'jdupont']);
         $this->assertDatabaseHas('professeurs', [
             'nom' => 'Dupont',
             'prenom' => 'Jean',
-            'identifiant' => 'jdupont',
         ]);
     }
 
@@ -115,7 +116,7 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function createProfesseur_validates_unique_identifiant()
     {
-        $prof = Professeur::factory()->create(['identifiant' => 'jdupont']);
+        User::factory()->create(['name' => 'jdupont']);
 
         $response = $this->actingAs($this->user)->post(route('admin.professeurs.create'), [
             'nom' => 'Autre',
