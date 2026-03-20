@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/transferts/start', [TransfertController::class, 'startJob'])->name('transferts.start');
     Route::get('/transferts/status/{jobId}', [TransfertController::class, 'checkStatus'])->name('transfers.status');
     Route::post('/transferts/cancel/{jobId}', [TransfertController::class, 'cancel'])->name('transfers.cancel');
+    Route::get('/transferts/db-status/{id}', [TransfertController::class, 'getDbStatus'])->name('transferts.dbStatus');
 
     Route::post('/scan/start', [FileExplorerController::class, 'startScan'])->name('scan.start');
     Route::get('/scan/{scanId}/status', [FileExplorerController::class, 'scanStatus'])->name('scan.status');

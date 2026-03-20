@@ -71,14 +71,15 @@
 
                     <template x-if="isCancelled && !isQueued">
                         <div class="flex items-center space-x-3">
-                            <span class="font-bold text-sm text-red-600 mr-4">Annulé</span>
                             <button 
                                 @click="requestStart"
-                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1 px-3 text-sm rounded border border-gray-300 shadow-sm flex items-center transition"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1 px-3 text-sm rounded border border-gray-300 shadow-sm flex items-center transition mr-4"
                             >
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                 Recommencer
                             </button>
+                            
+                            <span class="font-bold text-sm text-red-600" x-text="status"></span>
                         </div>
                     </template>
 
@@ -90,7 +91,7 @@
                         </div>
                     </template>
 
-                    <template x-if="(starting || job_id) && !isQueued">
+                    <template x-if="(starting || job_id) && !isQueued&& !isCancelled">
                         <div class="w-full flex items-center space-x-4"> 
                             <div class="grow h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300 relative">
                                 <div 
@@ -133,45 +134,23 @@
 <script>
     function transferList() {
         return {
-            loading: true, error: false, files: [], modalOpen: false, cancelId: null, queueInterval: null,
+            loading: true, error: false, files: [], modalOpen: false, cancelId: null,
             
             init() {
                 this.fetchData();
-                if (this.queueInterval) clearInterval(this.queueInterval);
-                
-                // THE QUEUE MANAGER: Auto-starts the next video in line
-                this.queueInterval = setInterval(() => {
-                    const container = document.querySelector('[data-limit]');
-                    const limit = container ? parseInt(container.getAttribute('data-limit')) : 2;
-                    
-                    const activeCount = document.querySelectorAll('.is-active-job').length;
-                    
-                    if (activeCount < limit) {
-                        const queuedItems = document.querySelectorAll('.is-queued-job');
-                        if (queuedItems.length > 0) {
-                            // Trigger the 'execute-start' event on the component
-                            queuedItems[0].dispatchEvent(new CustomEvent('execute-start'));
-                        }
-                    }
-                }, 2000); 
             },
 
             fetchData() {
-                this.loading = true; this.error = false;
                 fetch('{{ route("admin.transferts.list") }}')
                     .then(res => res.ok ? res.json() : Promise.reject())
                     .then(data => { 
                         this.files = data.results ?? []; 
                         this.loading = false; 
                     })
-                    .catch(() => { 
-                        this.error = true; 
-                        this.loading = false; 
-                    });
+                    .catch(() => { this.error = true; this.loading = false; });
             },
 
             openModal(id) { this.cancelId = id; this.modalOpen = true; },
-            
             confirmCancel() { 
                 this.modalOpen = false; 
                 window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } })); 
@@ -186,113 +165,109 @@
             path: fileData.path, 
             disk: fileData.disk, 
             available_paths: fileData.available_paths || [],
-            job_id: fileData.job_id, // Stored FFAStrans ID
+            job_id: fileData.job_id,
             progress: Number(fileData.progress) || 0,
             status: fileData.status,
             finished: fileData.finished,
             starting: false,
-            fakeInterval: null,
+            syncTimer: null,
             poller: null,
-            localPathSynced: false,
-            isCancelled: (fileData.status === 'Annulé'), 
-            isQueued: fileData.is_queued, // Persisted from DB status 'en_attente'
+            isCancelled: (String(fileData.status).toLowerCase().includes('annul')), 
+            isQueued: fileData.is_queued, 
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
                 if (s.includes('termin') || s.includes('success')) return 'text-green-600'; 
-                if (s.includes('echou') || s.includes('erreur')) return 'text-red-600';
-                if (s.includes('annul')) return 'text-red-600'; 
+                if (s.includes('echou') || s.includes('erreur') || s.includes('annul')) return 'text-red-600';
                 if (s.includes('attente') || s.includes('file')) return 'text-orange-500'; 
                 return 'text-blue-600';
             },
 
             initRow() {
-                // If the DB says it's already running (job_id exists), start polling immediately
-                if (this.job_id && !this.finished) {
-                    this.startPolling();
+                if (this.isCancelled) { this.job_id = null; }
+                
+                if (this.job_id && !this.finished) { 
+                    this.startPolling(); // Ask FFAStrans for %
+                } else if (this.isQueued && !this.finished) {
+                    this.waitForJobId(); // Ask DB for Job ID
                 }
             },
 
+            waitForJobId() {
+                if (this.syncTimer) {
+                    console.log("Sync: Already monitoring Media " + this.id);
+                    return; 
+                }
+
+                console.log("Sync: Monitoring Media " + this.id);
+                
+                this.syncTimer = setInterval(() => {
+                    if (!document.getElementById('row-' + this.id)) {
+                        clearInterval(this.syncTimer);
+                        this.syncTimer = null;
+                        return;
+                    }
+
+                    if (this.job_id && !this.finished) {
+                        console.log("Sync: ID found for Media " + this.id + ". Transitioning...");
+                        this.isQueued = false;
+                        this.startPolling(); 
+                        clearInterval(this.syncTimer);
+                        this.syncTimer = null;
+                        return;
+                    }
+
+                    fetch(`/admin/transferts/db-status/${this.id}`)
+                        .then(res => res.ok ? res.json() : Promise.reject())
+                        .then(data => {
+                            if (data.job_id) {
+                                this.job_id = data.job_id;
+                                this.status = data.status;
+                            }
+                        })
+                        .catch(err => console.warn("Sync: Retrying Media " + this.id));
+                }, 5000); 
+            },
+
             requestStart() {
-                // PERSISTENCE: Tell the DB this video is now "en_attente"
+                // Reset state to ensure we look for a FRESH start
+                this.job_id = null;
+                this.finished = false;
+                this.isCancelled = false;
+                this.isQueued = true;
+                this.status = "En file d'attente";
+
                 fetch('{{ route("admin.transferts.start") }}', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
                     body: JSON.stringify({ id: this.id, action: 'queue' })
                 });
 
-                this.isCancelled = false;
-                this.isQueued = true;
-                this.status = "En file d'attente";
-            },
-
-            executeStart() {
-                if (!this.isQueued) return;
-                
-                this.isQueued = false;
-                this.starting = true;
-                this.status = "Démarrage...";
-
-                fetch('{{ route("admin.transferts.start") }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ id: this.id, path: this.path, disk: this.disk }) 
-                })
-                .then(async res => {
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.message || "Erreur");
-                    return data;
-                })
-                .then(data => {
-                    if (data.success) {
-                        this.job_id = data.job_id; // Store the new FFAStrans ID
-                        this.finished = false;
-                        this.progress = 0;
-                        this.startPolling(); 
-                    }
-                })
-                .catch(err => {
-                    this.starting = false;
-                    this.finished = true;
-                    this.status = "Echoué: " + err.message;
-                });
+                this.waitForJobId();
             },
 
             startPolling() {
-                // Brief simulation until real data arrives
-                if (this.fakeInterval) clearInterval(this.fakeInterval);
-                this.fakeInterval = setInterval(() => { 
-                    if (!this.finished && this.progress < 15) this.progress += 0.5; 
-                }, 500);
-
                 if (this.poller) clearInterval(this.poller);
                 this.poller = setInterval(() => {
-                    // Safety: Stop if row is gone or job is done
                     if (!document.getElementById('row-' + this.id) || this.finished) {
-                        clearInterval(this.poller); 
-                        clearInterval(this.fakeInterval); 
-                        return; 
+                        clearInterval(this.poller); return; 
                     }
 
                     fetch(`/admin/transferts/status/${this.job_id}`)
                         .then(res => res.ok ? res.json() : Promise.reject())
                         .then(data => {
-                            // Switch to Real Progress from FFAStrans
-                            if (Number(data.progress) > 0) {
-                                this.progress = Number(data.progress);
-                                if (this.fakeInterval) {
-                                    clearInterval(this.fakeInterval);
-                                    this.fakeInterval = null;
-                                }
-                            }
-
+                            this.progress = Number(data.progress);
                             this.status = data.label;
                             this.finished = data.finished;
 
                             if (this.finished && (data.progress == 100 || data.label === 'Terminé')) {
                                 this.progress = 100;
-                                this.starting = false;
-                                this.syncLocalPath();
+                                // Sync path once finished
+                                fetch('/admin/media/sync-local-path', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                                    body: JSON.stringify({ path: this.path })
+                                });
                             }
                         })
                         .catch(() => {});
@@ -301,41 +276,26 @@
             
             askCancel() { 
                 if (this.isQueued) {
-                    // Update DB to mark as cancelled even if not yet in FFAStrans
-                    fetch(`/admin/transferts/cancel/queue-${this.id}`, { 
-                        method: 'POST',
-                        headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
-                    });
-                    this.isQueued = false; 
-                    this.status = "Annulé"; 
-                    this.isCancelled = true; 
+                    this.executeCancel(); 
                     return; 
                 }
                 this.$dispatch('open-cancel-modal', { id: this.job_id }); 
             },
 
             executeCancel() {
-                fetch(`/admin/transferts/cancel/${this.job_id}`, {
+                const cancelId = this.job_id || `queue-${this.id}`;
+                fetch(`/admin/transferts/cancel/${cancelId}`, {
                     method: 'POST',
                     headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
                 }).then(() => {
                     this.status = "Annulé";
-                    this.isCancelled = true; 
+                    this.isQueued = false;
+                    this.isCancelled = true;
                     this.finished = true;
                     this.job_id = null; 
                     this.progress = 0;
-                    this.starting = false;
-                    if (this.fakeInterval) clearInterval(this.fakeInterval);
                     if (this.poller) clearInterval(this.poller);
                 });
-            },
-
-            syncLocalPath() {
-                fetch('/admin/media/sync-local-path', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ path: this.path })
-                }).catch(err => console.error(err));
             }
         }
     }
