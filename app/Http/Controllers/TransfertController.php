@@ -11,17 +11,44 @@ class TransfertController extends Controller
 {
     protected $ffastrans;
 
+    /**
+     * @brief Initialise le contrôleur avec le service FFAStrans.
+     *
+     * Permet d'interagir avec l’API FFAStrans pour gérer les jobs de transcodage.
+     *
+     * @param FfastransService $ffastrans Service pour la communication avec FFAStrans
+     */
     public function __construct(FfastransService $ffastrans)
     {
         $this->ffastrans = $ffastrans;
     }
 
+    /**
+     * @brief Affiche la vue principale des transferts.
+     *
+     * Charge la configuration du nombre maximum de transferts concurrents
+     * et transmet ces informations à la vue pour affichage.
+     *
+     * @return \Illuminate\View\View Vue contenant le tableau de bord des transferts
+     */
     public function index()
     {
         $maxConcurrent = config('btsplay.process.max_concurrent_transferts');
         return view('admin.transferts', compact('maxConcurrent'));
     }
-    
+
+    /**
+     * @brief Liste tous les médias en cours ou en attente de transcodage.
+     *
+     * Fonctionnalités :
+     * - Récupère l’état des jobs actifs via FFAStrans
+     * - Filtre les médias présents en base mais non encore téléchargés localement
+     * - Mappe le statut des jobs en français pour l’affichage
+     * - Retourne la liste enrichie en JSON
+     *
+     * @param FfastransService $ffastrans Service pour récupérer les statuts des jobs
+     * @return \Illuminate\Http\JsonResponse Liste des médias avec statut, progression et info job
+     */
     public function list(FfastransService $ffastrans)
     {
         $activeMap = [];
@@ -125,6 +152,22 @@ class TransfertController extends Controller
         ]);
     }
 
+    /**
+     * @brief Lance un job FFAStrans pour un fichier donné.
+     *
+     * Fonctionnalités :
+     * - Transforme le chemin source en chemin compatible Windows si nécessaire
+     * - Prépare les variables pour le workflow FFAStrans
+     * - Soumet le job à FFAStrans
+     * - Persiste le statut et l’ID du job dans la base de données
+     *
+     * @param Request $request Requête contenant :
+     *   - 'path' : chemin du fichier à transcoder
+     *   - 'disk' : disque source (nas_arch ou ftp_pad)
+     *   - 'id'   : ID du média en base (optionnel)
+     *
+     * @return \Illuminate\Http\JsonResponse Succès ou échec de la création du job avec l’ID
+     */
     public function startJob(Request $request)
     {
         $filePath = $request->input('path');
@@ -185,6 +228,17 @@ class TransfertController extends Controller
         }
     }
 
+    /**
+     * @brief Vérifie le statut d’un job FFAStrans.
+     *
+     * Fonctionnalités :
+     * - Interroge FFAStrans pour récupérer l’état et la progression
+     * - Traduit le statut en libellé français ('En cours', 'Terminé', 'Echoué', 'Annulé')
+     * - Met à jour la base de données pour le média associé
+     *
+     * @param string $jobId ID du job FFAStrans
+     * @return \Illuminate\Http\JsonResponse Progression, label français et indicateur de fin
+     */
     public function checkStatus($jobId)
     {
         try {
@@ -258,6 +312,16 @@ class TransfertController extends Controller
         }
     }
 
+    /**
+     * @brief Annule un job FFAStrans en cours.
+     *
+     * Fonctionnalités :
+     * - Appelle le service FFAStrans pour envoyer la requête d’annulation
+     * - Retourne à la vue précédente avec message de succès ou d’erreur
+     *
+     * @param string $jobId ID du job FFAStrans à annuler
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de statut
+     */
     public function cancel($jobId)
     {
         $success = $this->ffastrans->cancelJob($jobId);
