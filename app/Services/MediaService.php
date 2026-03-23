@@ -259,7 +259,8 @@ public function searchMedia(array $filtres)
             $q->where('mtd_tech_titre', 'like', "%{$kw}%")
               ->orWhere('description', 'like', "%{$kw}%")
               ->orWhere('theme', 'like', "%{$kw}%")
-              ->orWhere('promotion', 'like', "%{$kw}%");
+              ->orWhere('promotion', 'like', "%{$kw}%")
+              ->andWhere('chemin_local', 'exists', true);
 
             // Recherche dans le nom du PROFESSEUR
             $q->orWhereHas('professeur', function($sq) use ($kw) {
@@ -277,7 +278,8 @@ public function searchMedia(array $filtres)
     // Garde quand même les filtres spécifiques "au cas où" (pour les tests)
     if (!empty($filtres['projet'])) {
         $query->whereHas('projets', function ($q) use ($filtres) {
-            $q->where('projets.id', $filtres['projet']);
+            $q->where('projets.id', $filtres['projet'])
+              ->andWhere('chemin_local', 'exists', true);
         });
     }
     

@@ -11,7 +11,29 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class StreamController extends Controller
 {
     /**
-     * Stream video from FTP or local storage
+     * @brief Point d'entrée principal pour le streaming d’un média.
+     *
+     * Cette méthode détermine automatiquement la source la plus appropriée
+     * pour servir la vidéo en fonction du contexte et des données disponibles.
+     *
+     * Ordre de priorité :
+     * 1. Environnement local → fichiers locaux (dev)
+     * 2. Fichier transcodé local (chemin_local)
+     * 3. NAS via FTP (ARCH ou PAD)
+     *
+     * Supporte :
+     * - Streaming MP4 avec gestion des requêtes HTTP Range (seek vidéo)
+     * - Streaming HLS (.m3u8)
+     *
+     * Inclut un fallback en environnement de développement si la base de données
+     * est inaccessible ou si le média n’est pas trouvé.
+     *
+     * @param Request $request Requête HTTP entrante
+     * @param int|string $mediaId Identifiant du média à streamer
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le média ou la source vidéo est introuvable
      */
     public function stream(Request $request, $mediaId)
     {
@@ -75,7 +97,22 @@ class StreamController extends Controller
     }
 
     /**
-     * Stream MP4 files with range support
+     * @brief Stream un fichier vidéo MP4 depuis un stockage distant avec support HTTP Range.
+     *
+     * Permet une lecture fluide et optimisée en supportant :
+     * - les requêtes partielles (seek vidéo)
+     * - le streaming progressif
+     *
+     * Le fichier est lu en flux (stream) depuis un disque Laravel (FTP),
+     * avec gestion manuelle des offsets et des buffers.
+     *
+     * @param string $ftpDisk Nom du disque Laravel configuré (ex: ftp_arch, ftp_pad)
+     * @param string $videoPath Chemin du fichier vidéo sur le stockage distant
+     * @param Request $request Requête HTTP (utilisée pour détecter les headers Range)
+     * @return StreamedResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le fichier est introuvable ou en cas d'erreur de streaming
      */
     private function streamMP4($ftpDisk, $videoPath, Request $request)
     {
@@ -151,7 +188,17 @@ class StreamController extends Controller
     }
 
     /**
-     * Stream HLS files
+     * @brief Stream une playlist HLS (.m3u8) depuis un stockage distant.
+     *
+     * Retourne le contenu brut de la playlist avec le Content-Type approprié
+     * pour permettre au client (lecteur vidéo) de charger les segments associés.
+     *
+     * @param string $ftpDisk Nom du disque Laravel configuré
+     * @param string $m3u8Path Chemin vers le fichier playlist (.m3u8)
+     * @return \Illuminate\Http\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si la playlist est introuvable ou inaccessible
      */
     private function streamHLS($ftpDisk, $m3u8Path)
     {
@@ -176,7 +223,18 @@ class StreamController extends Controller
     }
 
     /**
-     * Stream local video files
+     * @brief Stream un fichier vidéo local avec support des requêtes HTTP Range.
+     *
+     * Utilise le disque "external_local" pour accéder aux fichiers stockés localement.
+     * Implémente un streaming optimisé avec gestion des offsets pour permettre
+     * la navigation dans la vidéo (seek).
+     *
+     * @param string $videoPath Chemin relatif du fichier vidéo
+     * @param Request $request Requête HTTP (gestion des headers Range)
+     * @return StreamedResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le fichier local est introuvable
      */
     private function streamLocalVideo($videoPath, Request $request)
     {
@@ -248,7 +306,23 @@ class StreamController extends Controller
     }
 
     /**
-     * Stream local video based on media model
+     * @brief Tente de résoudre et streamer une vidéo locale à partir d’un modèle Media.
+     *
+     * Cette méthode applique plusieurs stratégies pour retrouver un fichier local :
+     * - Nom technique exact du média
+     * - Nom sans extension avec ajout ".mp4"
+     * - Nom avec espaces remplacés par des underscores
+     * - Nom extrait depuis les URI disponibles
+     *
+     * En cas d’échec, un fallback est appliqué en sélectionnant le premier
+     * fichier MP4 disponible dans le dossier cible.
+     *
+     * @param Media $media Instance du modèle Media
+     * @param Request $request Requête HTTP
+     * @return StreamedResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si aucun fichier vidéo local ne peut être trouvé
      */
     private function streamLocalMediaVideo(Media $media, Request $request)
     {
@@ -296,8 +370,22 @@ class StreamController extends Controller
         abort(404, 'Vidéo locale non trouvée');
     }
 
+
     /**
-     * Stream local video by mapping ID to test videos
+     * @brief Stream une vidéo locale de test en fonction d’un mapping d’ID (dev uniquement).
+     *
+     * Utilisé comme fallback lorsque la base de données est inaccessible.
+     * Associe un identifiant de média à un fichier vidéo local prédéfini.
+     *
+     * Si aucun mapping n’est trouvé, un fallback est appliqué en sélectionnant
+     * le premier fichier MP4 disponible.
+     *
+     * @param int|string $mediaId Identifiant du média
+     * @param Request $request Requête HTTP
+     * @return StreamedResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si aucune vidéo locale n’est disponible
      */
     private function streamLocalVideoByMapping($mediaId, Request $request)
     {
@@ -336,7 +424,21 @@ class StreamController extends Controller
     }
 
     /**
-     * Stream HLS segments (.ts files)
+     * @brief Stream un segment vidéo HLS (.ts).
+     *
+     * Construit dynamiquement le chemin du segment à partir des informations
+     * du média, puis récupère le fichier depuis le stockage distant (FTP).
+     *
+     * Cette méthode est utilisée par les lecteurs HLS pour charger
+     * les segments vidéo référencés dans la playlist (.m3u8).
+     *
+     * @param Request $request Requête HTTP
+     * @param int|string $mediaId Identifiant du média
+     * @param string $segment Nom du fichier segment (.ts)
+     * @return \Illuminate\Http\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le segment ou le média est introuvable
      */
     public function segment(Request $request, $mediaId, $segment)
     {

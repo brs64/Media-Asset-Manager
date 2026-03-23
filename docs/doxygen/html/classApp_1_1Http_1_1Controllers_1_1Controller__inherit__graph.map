@@ -1,0 +1,31 @@
+<map id="App\Http\Controllers\Controller" name="App\Http\Controllers\Controller">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1535,5,1681,85"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1AdminController.html" title=" " alt="" coords="5,133,203,527"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1521,50,1211,55,801,68,601,79,425,94,291,113,245,124,216,136,204,144,201,140,213,131,244,118,290,107,425,89,600,74,801,63,1211,50,1521,45"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1Auth_1_1AuthenticatedSessionController.html" title=" " alt="" coords="227,263,485,397"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1521,52,1269,61,949,78,794,90,659,103,556,118,520,127,497,136,462,161,432,194,407,229,387,264,383,261,403,226,428,190,459,157,495,131,519,122,555,113,659,98,794,84,949,73,1269,56,1521,47"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Http_1_1Controllers_1_1Auth_1_1NewPasswordController.html" title=" " alt="" coords="509,280,715,380"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1521,48,1333,50,1100,61,985,72,880,87,792,108,757,121,729,136,694,166,666,203,645,243,629,281,624,279,640,241,662,200,690,162,727,131,755,116,791,103,879,82,984,66,1100,55,1333,44,1521,43"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController.html" title=" " alt="" coords="740,290,937,370"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1521,51,1378,58,1210,72,1129,83,1056,97,995,115,951,136,915,169,886,210,866,252,852,291,847,289,861,250,882,207,911,165,948,131,993,110,1054,92,1128,78,1210,67,1378,53,1520,46"/>
+<area shape="rect" id="Node000006" href="$classApp_1_1Http_1_1Controllers_1_1Auth_1_1RegisteredUserController.html" title=" " alt="" coords="961,280,1177,380"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1522,59,1432,72,1336,89,1249,110,1215,122,1191,136,1156,167,1128,205,1105,244,1089,281,1084,279,1101,242,1123,202,1152,163,1188,131,1213,118,1248,105,1335,83,1431,66,1521,54"/>
+<area shape="rect" id="Node000007" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html" title=" " alt="" coords="1202,170,1385,490"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1522,70,1458,96,1427,114,1399,135,1367,171,1363,168,1396,131,1424,109,1456,91,1520,65"/>
+<area shape="rect" id="Node000008" href="$classApp_1_1Http_1_1Controllers_1_1FileExplorerController.html" title=" " alt="" coords="1409,196,1609,464"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1592,100,1558,196,1553,195,1587,98"/>
+<area shape="rect" id="Node000009" href="$classApp_1_1Http_1_1Controllers_1_1HomeController.html" title=" " alt="" coords="1633,290,1780,370"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1629,98,1696,289,1691,291,1624,99"/>
+<area shape="rect" id="Node000010" href="$classApp_1_1Http_1_1Controllers_1_1MediaController.html" title=" " alt="" coords="1804,171,2001,489"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1695,72,1746,97,1794,131,1827,168,1823,172,1790,135,1744,102,1693,77"/>
+<area shape="rect" id="Node000011" href="$classApp_1_1Http_1_1Controllers_1_1ProfileController.html" title=" " alt="" coords="2026,263,2246,397"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1696,44,1769,49,1852,64,1937,90,1977,108,2015,131,2047,159,2074,192,2096,227,2113,261,2108,264,2091,230,2069,195,2043,163,2012,135,1975,113,1935,95,1851,69,1768,55,1695,49"/>
+<area shape="rect" id="Node000012" href="$classApp_1_1Http_1_1Controllers_1_1SearchController.html" title=" " alt="" coords="2270,255,2466,405"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1695,46,1836,53,2002,67,2082,78,2155,92,2216,110,2260,131,2290,157,2314,187,2333,221,2348,254,2343,256,2328,223,2309,190,2286,160,2257,136,2214,115,2154,98,2081,84,2001,73,1836,58,1695,51"/>
+<area shape="rect" id="Node000013" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html" title=" " alt="" coords="2491,157,2712,503"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1695,43,1881,45,2111,57,2225,68,2329,83,2417,104,2452,117,2480,131,2510,154,2506,158,2477,136,2450,122,2415,109,2328,88,2225,73,2111,62,1881,51,1695,48"/>
+<area shape="rect" id="Node000014" href="$classApp_1_1Http_1_1Controllers_1_1ThumbnailController.html" title=" " alt="" coords="2736,290,2891,370"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1695,46,1949,53,2271,68,2427,80,2563,94,2666,111,2702,120,2725,131,2744,147,2760,165,2784,207,2800,250,2810,289,2805,290,2795,252,2779,209,2756,168,2740,150,2723,136,2700,125,2665,116,2562,99,2427,85,2271,74,1948,58,1695,51"/>
+<area shape="rect" id="Node000015" href="$classApp_1_1Http_1_1Controllers_1_1TransfertController.html" title=" " alt="" coords="2915,218,3133,442"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1695,45,1985,52,2363,66,2548,78,2709,92,2833,109,2876,120,2904,131,2928,148,2948,169,2981,216,2977,219,2944,172,2924,152,2901,136,2874,125,2832,115,2709,97,2547,83,2363,72,1985,57,1695,51"/>
+</map>

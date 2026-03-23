@@ -1,0 +1,5 @@
+<map id="App\Http\Controllers\AdminController\updateRole" name="App\Http\Controllers\AdminController\updateRole">
+<area shape="rect" id="Node000001" title="Mettre à jour le rôle d&#39;un utilisateur." alt="" coords="5,13,216,53"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1AdminController.html#ad730b5c6ea161056a400d2da532bc5c7" title="Vérifie que l&#39;utilisateur a accès à l&#39;admin." alt="" coords="264,5,480,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,30,250,30,250,35,216,35"/>
+</map>

@@ -1,0 +1,25 @@
+var classApp_1_1Http_1_1Controllers_1_1AdminController =
+[
+    [ "Ajouterelevedepuiscsv", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ae9f4bbca527127c44c972c1158156afe", null ],
+    [ "checkAdminAccess", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ad730b5c6ea161056a400d2da532bc5c7", null ],
+    [ "createEleve", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a6b607c31c2c90208d7b05c091c05ec93", null ],
+    [ "createProfesseur", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a59b0fd82ed26515371ae873da7b78865", null ],
+    [ "createProjet", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ac145d64294b267b0628144514fef4a0d", null ],
+    [ "databaseView", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ab5be771566760ce250d3bacf00747a7f", null ],
+    [ "deleteEleve", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#adaa33021a8e95e89290bec694489680a", null ],
+    [ "deleteProfesseur", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a19ceb0b83a30b0ac427ed92c5cb27732", null ],
+    [ "deleteProjet", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a53a4f26c463340938bb86ee5d908d822", null ],
+    [ "downloadLogs", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ad985e4d699e7070910c61afa14033786", null ],
+    [ "logs", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#aac16e56b2b2e2d2ef8722e4ca1f47616", null ],
+    [ "projets", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#acc6c1e0842abf33dc84f80e918ed3f26", null ],
+    [ "reconciliation", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ac04f159f5297a0484abc22dd98101cff", null ],
+    [ "runBackup", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a04025e541dfdd35e10173eda5b52bfbd", null ],
+    [ "runReconciliation", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ab2ff5cb7874dc07b27db64f63f68cd68", null ],
+    [ "saveBackupSettings", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#ab6297a2cede2f08d8c873f43540a26e4", null ],
+    [ "settings", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#aacc2b11a802e1b91daba8cc983e23ff5", null ],
+    [ "updateEnvFile", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a7952b5ffe43638e3515737d54d7deeef", null ],
+    [ "updatePermission", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a24f46bcb4ceee895dd7c29a73aa6ef95", null ],
+    [ "updateRole", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a5977b084c3a2bb70d4df445dd3d01cb5", null ],
+    [ "updateSettings", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#a6f38af8b92f1669acb33e2314f7af015", null ],
+    [ "users", "classApp_1_1Http_1_1Controllers_1_1AdminController.html#af58acc179cf353eae60e5586f57fc9e8", null ]
+];

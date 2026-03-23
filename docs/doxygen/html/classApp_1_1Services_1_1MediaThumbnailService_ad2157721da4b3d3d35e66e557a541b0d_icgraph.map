@@ -1,0 +1,9 @@
+<map id="App\Services\MediaThumbnailService\getVideoDuration" name="App\Services\MediaThumbnailService\getVideoDuration">
+<area shape="rect" id="Node000001" title=" " alt="" coords="591,37,809,77"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Services_1_1MediaThumbnailService.html#ae38ef6cc053f00e0cf9a79ca3e9f14ee" title=" " alt="" coords="324,37,543,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="577,60,543,60,543,55,577,55"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Jobs_1_1GenerateMediaThumbnail.html#a685c63b748e4756f14496adc8bacb145" title=" " alt="" coords="15,5,266,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,47,266,42,267,36,310,41"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Services_1_1MediaThumbnailService.html#a22e8451e54959ce3ae9ebac15ac90162" title=" " alt="" coords="5,69,276,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="310,73,277,77,276,72,310,68"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="App\Http\Controllers\StreamController\streamLocalVideoByMapping" name="App\Http\Controllers\StreamController\streamLocalVideoByMapping">
+<area shape="rect" id="Node000001" title="Stream une vidéo locale de test en fonction d’un mapping d’ID (dev uniquement)." alt="" coords="5,5,227,60"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a7fceacb90a5dd2da455db750ca96f893" title="Stream un fichier vidéo local avec support des requêtes HTTP Range." alt="" coords="275,5,496,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
+</map>
