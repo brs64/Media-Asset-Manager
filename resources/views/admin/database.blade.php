@@ -4,6 +4,16 @@
 <div class="space-y-6">
     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-6">Sauvegarde de la base de données</h2>
 
+    @if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <div class="flex flex-col lg:flex-row gap-8">
         
         <div class="lg:w-1/3 space-y-6">

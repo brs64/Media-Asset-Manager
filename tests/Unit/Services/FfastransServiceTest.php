@@ -412,17 +412,16 @@ class FfastransServiceTest extends TestCase
      * @test
      * GIVEN : une erreur réseau lors de l'appel à l'API
      * WHEN : on appelle cancelJob
-     * THEN : false est retourné sans lever d'exception
+     * THEN : une exception est levée
      */
-    public function cancelJob_handles_exceptions()
+    public function cancelJob_throws_on_network_error()
     {
         Http::fake(function () {
             throw new \Exception('Network error');
         });
 
-        $result = $this->service->cancelJob('job-123');
-
-        $this->assertFalse($result);
+        $this->expectException(\Exception::class);
+        $this->service->cancelJob('job-123');
     }
 
     /**
@@ -435,6 +434,7 @@ class FfastransServiceTest extends TestCase
     {
         Http::fake([
             'ffastrans.local/api/json/v2/jobs' => Http::response(['jobs' => []], 200),
+            'ffastrans.local/api/json/v2/history*' => Http::response(['history' => []], 200),
         ]);
 
         $this->service->getFullStatusList();
@@ -458,6 +458,7 @@ class FfastransServiceTest extends TestCase
 
         Http::fake([
             'ffastrans.local/api/json/v2/jobs' => Http::response(['jobs' => []], 200),
+            'ffastrans.local/api/json/v2/history*' => Http::response(['history' => []], 200),
         ]);
 
         $this->service->getFullStatusList();
