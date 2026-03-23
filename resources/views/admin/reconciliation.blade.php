@@ -7,6 +7,16 @@
         <h2 class="text-3xl font-bold text-gray-800">Fonction de réconciliation</h2>
     </div>
 
+    @if ($errors->any())
+        <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-left shadow-sm">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if(session('reconciliation_result'))
         <div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700 text-left shadow-sm">
             <p class="font-bold">Résultat :</p>

@@ -29,6 +29,7 @@
         <div class="text-gray-500 font-medium">Chargement de la liste...</div>
     </div>
     <div x-show="!loading && error" x-cloak class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg text-center"><span class="font-medium">Erreur :</span> Impossible de récupérer la liste des transferts.</div>
+    <div x-show="!loading && !error && ffastransError" x-cloak class="p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg text-center"><span class="font-medium">Attention :</span> Connexion à FFAStrans impossible. Les statuts de transcodage ne sont pas disponibles.</div>
     <div x-show="!loading && !error && files.length === 0" x-cloak class="flex flex-col items-center justify-center py-10 text-gray-400"><svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg><p class="text-sm italic">Aucune vidéo en attente de traitement.</p></div>
 
     <div x-show="!loading && files.length > 0" x-cloak class="space-y-8">
@@ -138,12 +139,15 @@
 <script>
     function transferList() {
         return {
-            loading: true, error: false, files: [], modalOpen: false, limitModalOpen: false, cancelId: null,
+            loading: true, error: false, ffastransError: false, files: [], modalOpen: false, limitModalOpen: false, cancelId: null,
             fetchData() {
-                this.loading = true; this.error = false;
-                fetch('{{ route("admin.transferts.list") }}').then(res => res.ok ? res.json() : Promise.reject(res))
-                .then(data => { this.files = data.results ?? []; this.loading = false; })
-                .catch(() => { this.error = true; this.loading = false; });
+                this.loading = true; this.error = false; this.ffastransError = false;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
+                fetch('{{ route("admin.transferts.list") }}', { signal: controller.signal })
+                .then(res => { clearTimeout(timeoutId); return res.ok ? res.json() : Promise.reject(res); })
+                .then(data => { this.files = data.results ?? []; this.ffastransError = data.ffastrans_error ?? false; this.loading = false; })
+                .catch(() => { clearTimeout(timeoutId); this.error = true; this.loading = false; });
             },
             openModal(id) { this.cancelId = id; this.modalOpen = true; },
             confirmCancel() { this.modalOpen = false; window.dispatchEvent(new CustomEvent('confirm-cancel-event', { detail: { id: this.cancelId } })); }

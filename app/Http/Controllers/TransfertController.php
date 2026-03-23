@@ -25,13 +25,14 @@ class TransfertController extends Controller
     public function list(FfastransService $ffastrans)
     {
         $activeMap = [];
+        $ffastransError = false;
         try {
             $allJobs = $ffastrans->getFullStatusList();
-            
+
             foreach ($allJobs as $job) {
                 if (isset($job['filename'])) {
                     $key = pathinfo($job['filename'], PATHINFO_FILENAME);
-                   
+
                     if ($job['is_finished'] === false) {
                         $activeMap[$key] = $job;
                     }
@@ -40,6 +41,7 @@ class TransfertController extends Controller
         } catch (\Exception $e) {
             Log::error("FFAStrans Status Check Failed: " . $e->getMessage());
             $activeMap = [];
+            $ffastransError = true;
         }
 
         $padRoot = rtrim(config('btsplay.uris.nas_pad'), '/');
@@ -118,7 +120,8 @@ class TransfertController extends Controller
         return response()->json([
             'status' => 'done',
             'count' => count($results),
-            'results' => $results
+            'results' => $results,
+            'ffastrans_error' => $ffastransError,
         ]);
     }
 

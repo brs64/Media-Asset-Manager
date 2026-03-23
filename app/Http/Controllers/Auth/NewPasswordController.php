@@ -34,6 +34,12 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'email.required' => "L'adresse email est obligatoire.",
+            'email.email' => "L'adresse email est invalide.",
+            'password.required' => 'Le mot de passe est obligatoire.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+            'password.min' => 'Le mot de passe doit contenir au moins :min caractères.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

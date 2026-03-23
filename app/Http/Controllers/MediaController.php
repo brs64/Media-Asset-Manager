@@ -60,20 +60,21 @@ class MediaController extends Controller
             'chemin_local' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
-
             'properties' => 'nullable|array',
             'properties.*.key' => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
-
-            // On valide le tableau de participations
             'participations' => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
             'participations.*.role_id' => 'required|exists:roles,id',
-
-            /*'eleves' => 'nullable|array',
-            'eleves.*' => 'exists:eleves,id',
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',*/
+        ], [
+            'mtd_tech_titre.required' => 'Le titre est obligatoire.',
+            'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
+            'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
+            'projet_id.exists' => 'Le projet sélectionné est invalide.',
+            'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
+            'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
+            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
+            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
         ]);
 
         $properties = collect($request->input('properties', []))
@@ -174,27 +175,29 @@ class MediaController extends Controller
         $media = \App\Models\Media::findOrFail($id);
 
         $validated = $request->validate([
-            // Basic media fields (URIs are managed elsewhere, not in this form)
             'mtd_tech_titre' => 'required|string|max:255',
             'promotion' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',
             'theme' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:5000',
-
-            // Foreign keys
             'professeur_id' => 'nullable|exists:professeurs,id',
             'projet_ids' => 'nullable|array',
             'projet_ids.*' => 'exists:projets,id',
-
-            // Participations (array of student-role pairs)
             'participations' => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
             'participations.*.role_id' => 'required|exists:roles,id',
-
-            // propriétés personalisées
             'properties' => 'nullable|array',
             'properties.*.key' => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
+        ], [
+            'mtd_tech_titre.required' => 'Le titre est obligatoire.',
+            'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
+            'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
+            'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
+            'projet_ids.*.exists' => 'Un des projets sélectionnés est invalide.',
+            'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
+            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
+            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
         ]);
 
         // Sanitize single-line fields: remove newlines
@@ -306,6 +309,8 @@ class MediaController extends Controller
     {
         $request->validate([
             'path' => ['required', 'string'],
+        ], [
+            'path.required' => 'Le chemin est obligatoire.',
         ]);
 
         $success = $mediaService->syncLocalPath($request->path);

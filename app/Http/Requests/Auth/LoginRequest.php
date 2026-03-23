@@ -32,6 +32,14 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'name.required' => "L'identifiant est obligatoire.",
+            'password.required' => 'Le mot de passe est obligatoire.',
+        ];
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *
