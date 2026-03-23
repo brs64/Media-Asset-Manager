@@ -26,21 +26,21 @@ class SecurityRoleSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            SecurityPermission::create(['name' => $permission]);
+            SecurityPermission::firstOrCreate(['name' => $permission]);
         }
 
         // Créer les rôles et assigner les permissions
 
         // Rôle Admin : toutes les permissions
-        $adminRole = SecurityRole::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(SecurityPermission::all());
+        $adminRole = SecurityRole::firstOrCreate(['name' => 'admin']);
+        $adminRole->syncPermissions(SecurityPermission::all());
 
         // Rôle Professeur : toutes les permissions sauf supprimer
-        $professeurRole = SecurityRole::create(['name' => 'professeur']);
-        $professeurRole->givePermissionTo(['modifier video', 'diffuser video', 'administrer site']);
+        $professeurRole = SecurityRole::firstOrCreate(['name' => 'professeur']);
+        $professeurRole->syncPermissions(['modifier video', 'diffuser video', 'administrer site']);
 
         // Rôle Élève : diffuser vidéo uniquement
-        $eleveRole = SecurityRole::create(['name' => 'eleve']);
-        $eleveRole->givePermissionTo(['diffuser video']);
+        $eleveRole = SecurityRole::firstOrCreate(['name' => 'eleve']);
+        $eleveRole->syncPermissions(['diffuser video']);
     }
 }

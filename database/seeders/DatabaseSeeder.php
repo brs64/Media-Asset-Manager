@@ -15,13 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            SecurityRoleSeeder::class, // D'abord les rôles et permissions Spatie
-            ProjetSeeder::class,
-            ProfesseurSeeder::class,
-            EleveSeeder::class,
-            RoleSeeder::class,
-            MediaSeeder::class,
-        ]);
+        // Toujours exécuté : admin par défaut + rôles Spatie
+        $this->call(ProductionSeeder::class);
+
+        // Données de test uniquement en local/testing
+        if (app()->environment('local', 'testing')) {
+            $this->call([
+                ProjetSeeder::class,
+                ProfesseurSeeder::class,
+                EleveSeeder::class,
+                RoleSeeder::class,
+                MediaSeeder::class,
+            ]);
+        }
     }
 }
