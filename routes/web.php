@@ -127,6 +127,7 @@ Route::get('/explorer/scan', [FileExplorerController::class, 'scan'])
     ->name('explorer.scan');
 Route::get('/explorer', [FileExplorerController::class, 'index'])
     ->name('explorer.index');
+Route::post('/explorer/transcode-folder', [FileExplorerController::class, 'transcodeFolder']);
 
 
 
