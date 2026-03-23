@@ -21,7 +21,7 @@ class FfastransService
 
     protected function client()
     {
-        $client = Http::timeout(10)->acceptJson();
+        $client = Http::connectTimeout(3)->timeout(10)->acceptJson();
         if ($this->username && $this->password) {
             $client->withBasicAuth($this->username, $this->password);
         }
@@ -96,20 +96,12 @@ class FfastransService
     public function getFullStatusList()
     {
         // Get Active Jobs
-        try {
-            $activeResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/jobs");
-            $activeJobs = $activeResponse->successful() ? ($activeResponse->json()['jobs'] ?? []) : [];
-        } catch (Exception $e) {
-            $activeJobs = [];
-        }
+        $activeResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/jobs");
+        $activeJobs = $activeResponse->successful() ? ($activeResponse->json()['jobs'] ?? []) : [];
 
         // Get History (Last 50)
-        try {
-            $historyResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/history?start=0&count=50");
-            $historyJobs = $historyResponse->successful() ? ($historyResponse->json()['history'] ?? []) : [];
-        } catch (Exception $e) {
-            $historyJobs = [];
-        }
+        $historyResponse = $this->client()->get("{$this->baseUrl}/api/json/v2/history?start=0&count=50");
+        $historyJobs = $historyResponse->successful() ? ($historyResponse->json()['history'] ?? []) : [];
 
         $allJobs = [];
 
@@ -187,12 +179,7 @@ class FfastransService
     public function cancelJob(string $jobId)
     {
         $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
-        try {
-            $response = $this->client()->delete($endpoint);
-            return $response->successful();
-        } catch (Exception $e) {
-            Log::error("Failed to cancel: " . $e->getMessage());
-            return false;
-        }
+        $response = $this->client()->delete($endpoint);
+        return $response->successful();
     }
 }
