@@ -96,6 +96,9 @@ class MediaThumbnailService
 
         // Build FTP URL
         $config = config("filesystems.disks.{$ftpDisk}");
+        if (!$config) {
+            return null;
+        }
         return sprintf(
             'ftp://%s:%s@%s/%s',
             $config['username'],

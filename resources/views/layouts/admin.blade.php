@@ -12,11 +12,13 @@
             
             {{-- Helper function to determine active class --}}
             @php
-                function getTabClass($routeName) {
-                    $isActive = request()->routeIs($routeName);
-                    return $isActive 
-                        ? 'bg-[#b91c1c] ring-2 ring-offset-2 ring-red-700 scale-105 text-white font-bold py-2 px-4 rounded shadow transition-all capitalize duration-200' 
-                        : 'bg-[#E6A23C] hover:bg-[#d49230] text-white font-bold py-2 px-4 rounded shadow transition-all capitalize duration-200';
+                if (!function_exists('getTabClass')) {
+                    function getTabClass($routeName) {
+                        $isActive = request()->routeIs($routeName);
+                        return $isActive
+                            ? 'bg-[#b91c1c] ring-2 ring-offset-2 ring-red-700 scale-105 text-white font-bold py-2 px-4 rounded shadow transition-all capitalize duration-200'
+                            : 'bg-[#E6A23C] hover:bg-[#d49230] text-white font-bold py-2 px-4 rounded shadow transition-all capitalize duration-200';
+                    }
                 }
             @endphp
             <a href="{{ route('admin.database') }}" class="{{ getTabClass('admin.database') }}">

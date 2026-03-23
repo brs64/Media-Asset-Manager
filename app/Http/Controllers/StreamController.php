@@ -181,6 +181,8 @@ class StreamController extends Controller
                 $headers
             );
 
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error streaming video: ' . $e->getMessage());
             abort(500, 'Erreur lors du streaming de la vidéo');
@@ -216,6 +218,8 @@ class StreamController extends Controller
                 'Cache-Control' => 'no-cache, no-store, must-revalidate',
             ]);
 
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error streaming HLS: ' . $e->getMessage());
             abort(500, 'Erreur lors du streaming HLS');
@@ -480,6 +484,8 @@ class StreamController extends Controller
                 'Cache-Control' => 'max-age=3600',
             ]);
 
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error streaming segment: ' . $e->getMessage());
             abort(500, 'Erreur lors du streaming du segment');

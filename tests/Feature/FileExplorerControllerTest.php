@@ -18,8 +18,6 @@ class FileExplorerControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,7 +25,12 @@ class FileExplorerControllerTest extends TestCase
         $this->actingAs(User::factory()->create());
 
     }
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié
+     * WHEN : on lance un scan avec un nom de disque invalide
+     * THEN : la réponse retourne un statut 403
+     */
     public function scan_aborts_for_invalid_disk()
     {
         $response = $this->get('/explorer/scan?disk=invalid_disk');
@@ -35,7 +38,12 @@ class FileExplorerControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié avec les queues simulées
+     * WHEN : on démarre un scan sur le disque ftp_pad
+     * THEN : un job ScanDiskJob est dispatché et un scan_id est retourné
+     */
     public function start_scan_dispatches_job_and_returns_scan_id()
     {
         Queue::fake();
@@ -54,7 +62,12 @@ class FileExplorerControllerTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un scan en cours avec un statut et un compteur stockés en cache
+     * WHEN : on consulte le statut de ce scan
+     * THEN : la réponse retourne le statut 'running' et le compteur 5
+     */
     public function scan_status_returns_correct_values()
     {
         $scanId = (string) Str::uuid();
@@ -70,7 +83,12 @@ class FileExplorerControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un scan toujours en cours sans résultats finaux
+     * WHEN : on demande les résultats de ce scan
+     * THEN : la réponse retourne un statut 'running' avec des résultats vides
+     */
     public function scan_results_returns_empty_if_not_done()
     {
         $scanId = (string) Str::uuid();
@@ -88,7 +106,12 @@ class FileExplorerControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un scan terminé avec deux vidéos, dont une déjà importée et une en cours de transfert
+     * WHEN : on demande les résultats de ce scan
+     * THEN : seule la vidéo non importée est retournée avec ses informations de job
+     */
     public function scan_results_returns_processed_data()
     {
         $scanId = (string) Str::uuid();

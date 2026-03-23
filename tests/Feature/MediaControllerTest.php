@@ -17,7 +17,12 @@ class MediaControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : trois médias existent en base
+     * WHEN : on accède à la liste des médias
+     * THEN : la page s'affiche avec la liste des médias
+     */
     public function index_displays_media_list()
     {
         Media::factory()->count(3)->create();
@@ -29,7 +34,12 @@ class MediaControllerTest extends TestCase
         $response->assertViewHas('medias');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des rôles existent et des données valides avec participations
+     * WHEN : on soumet le formulaire de création d'un média
+     * THEN : le média, l'élève et la participation sont créés en base
+     */
     public function store_creates_media_and_participations()
     {
         $this->seed(RoleSeeder::class);
@@ -62,7 +72,12 @@ class MediaControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucune donnée fournie
+     * WHEN : on soumet le formulaire de création d'un média
+     * THEN : une erreur de validation est retournée pour le titre
+     */
     public function store_requires_title()
     {
         $response = $this->post(route('medias.store'), []);
@@ -70,7 +85,12 @@ class MediaControllerTest extends TestCase
         $response->assertSessionHasErrors('mtd_tech_titre');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média existant en base
+     * WHEN : on accède à la page de détail de ce média
+     * THEN : la page vidéo s'affiche correctement
+     */
     public function show_displays_media()
     {
         $media = Media::factory()->create();
@@ -81,7 +101,12 @@ class MediaControllerTest extends TestCase
         $response->assertViewIs('video');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : aucun média avec l'identifiant 999999 n'existe
+     * WHEN : on tente d'accéder à ce média
+     * THEN : une erreur 404 est retournée
+     */
     public function show_returns_404_when_media_not_found()
     {
         $response = $this->get(route('medias.show', 999999));
@@ -89,7 +114,12 @@ class MediaControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média existant et des rôles disponibles
+     * WHEN : on met à jour le titre et les participations du média
+     * THEN : le média est modifié et les nouvelles participations sont enregistrées
+     */
     public function update_updates_media_and_participations()
     {
         $this->seed(RoleSeeder::class);
@@ -120,7 +150,12 @@ class MediaControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un média existant et le service de suppression mocké
+     * WHEN : on supprime le média
+     * THEN : l'utilisateur est redirigé vers la liste avec un message de succès
+     */
     public function destroy_redirects_on_success()
     {
         $media = Media::factory()->create();
@@ -136,7 +171,12 @@ class MediaControllerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié et la file de jobs simulée
+     * WHEN : il lance la synchronisation des médias
+     * THEN : trois jobs de synchronisation sont dispatched
+     */
     public function sync_dispatches_jobs()
     {
         $user = \App\Models\User::factory()->create();
@@ -151,7 +191,12 @@ class MediaControllerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié et le service de synchronisation mocké avec succès
+     * WHEN : il envoie un chemin local à synchroniser
+     * THEN : la synchronisation réussit et un message de confirmation est retourné
+     */
     public function sync_local_path_success()
     {
         $user = \App\Models\User::factory()->create();
@@ -172,10 +217,14 @@ class MediaControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un utilisateur authentifié et le service de synchronisation retournant false
+     * WHEN : il envoie un chemin local inexistant à synchroniser
+     * THEN : une erreur 404 est retournée avec le message 'Media non trouvé'
+     */
     public function sync_local_path_returns_404_when_not_found()
     {
-
         $user = \App\Models\User::factory()->create();
         $this->actingAs($user);
 
