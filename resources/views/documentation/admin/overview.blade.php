@@ -231,9 +231,9 @@
 </div>
 
 <div class="docs-navigation-buttons">
-    <a href="{{ route('docs.interface.search') }}" class="docs-nav-button">
+    <a href="{{ route('docs.interface.video-player') }}" class="docs-nav-button">
         <i class="fa-solid fa-arrow-left"></i>
-        Interface - Recherche
+        Interface - Lecteur vidéo
     </a>
     <a href="{{ route('docs.admin.database') }}" class="docs-nav-button">
         Base de données

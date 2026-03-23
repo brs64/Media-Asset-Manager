@@ -90,12 +90,12 @@
 
     <h3>Chargement des vidéos</h3>
     <p>
-        Les vidéos sont chargées progressivement pour optimiser les performances :
+        Les vidéos sont chargées progressivement pour un affichage rapide :
     </p>
     <ul>
-        <li><strong>Miniatures lazy-loading</strong> : Les images se chargent au besoin</li>
-        <li><strong>Pagination côté serveur</strong> : Seules les 16 vidéos de la page sont transmises</li>
-        <li><strong>Cache navigateur</strong> : Les pages visitées sont mises en cache</li>
+        <li><strong>Images à la demande</strong> : Les miniatures se chargent au besoin</li>
+        <li><strong>Chargement par page</strong> : Seules les 16 vidéos de la page actuelle sont chargées</li>
+        <li><strong>Navigation rapide</strong> : Les pages visitées sont mémorisées</li>
     </ul>
 </div>
 
@@ -119,18 +119,7 @@
         <li>Consulter toutes les métadonnées</li>
         <li>Voir la liste complète des participants</li>
         <li>Accéder aux projets associés</li>
-        <li>Modifier les informations (professeurs uniquement)</li>
     </ul>
-</div>
-
-<div class="docs-section">
-    <h2>Filtres et tri (à venir)</h2>
-    <div class="docs-warning">
-        <p>
-            <strong>Fonctionnalité en développement :</strong> Dans les versions futures,
-            vous pourrez filtrer les vidéos par promotion, type de projet, thématique et participants.
-        </p>
-    </div>
 </div>
 
 <div class="docs-section">
@@ -150,9 +139,8 @@
 
     <h3>Recherche ciblée</h3>
     <p>
-        Si vous cherchez une vidéo spécifique, utilisez la barre de recherche plutôt que de parcourir
-        toutes les pages. Consultez la section <a href="{{ route('docs.interface.search') }}">Recherche</a>
-        pour plus d'informations.
+        Si vous cherchez une vidéo spécifique, utilisez la barre de recherche en haut de page
+        plutôt que de parcourir toutes les pages.
     </p>
 </div>
 

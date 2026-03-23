@@ -15,9 +15,8 @@
 
 <div class="docs-section">
     <p>
-        BTSPlay utilise un lecteur vidéo moderne basé sur <strong>Plyr</strong> et <strong>HLS.js</strong>
-        pour offrir une expérience de visionnage optimale. Le lecteur prend en charge le streaming adaptatif
-        et propose de nombreux contrôles de lecture.
+        BTSPlay propose un lecteur vidéo moderne avec une qualité qui s'adapte automatiquement
+        à votre connexion internet. Le lecteur propose de nombreux contrôles de lecture.
     </p>
 </div>
 
@@ -28,8 +27,7 @@
     </p>
     <ul>
         <li><strong>Depuis l'accueil</strong> : Cliquez sur une vignette de la grille</li>
-        <li><strong>Depuis la recherche</strong> : Cliquez sur un résultat de recherche</li>
-        <li><strong>Via URL directe</strong> : Accédez directement à /medias/{id}</li>
+        <li><strong>Depuis la recherche</strong> : Cliquez sur un résultat de recherche</li> 
     </ul>
 
     <p>
@@ -42,10 +40,10 @@
 
     <h3>Zone de lecture</h3>
     <ul>
-        <li><strong>Lecteur Plyr</strong> : Interface moderne et épurée</li>
-        <li><strong>Ratio 16:9</strong> : Format standard pour les vidéos audiovisuelles</li>
-        <li><strong>Responsive</strong> : S'adapte à la taille de l'écran</li>
-        <li><strong>Poster</strong> : Miniature affichée avant le début de la lecture</li>
+        <li><strong>Interface moderne</strong> : Lecteur épuré et facile à utiliser</li>
+        <li><strong>Format 16:9</strong> : Format standard pour les vidéos audiovisuelles</li>
+        <li><strong>Adaptation automatique</strong> : S'adapte à la taille de votre écran</li>
+        <li><strong>Miniature</strong> : Image affichée avant le début de la lecture</li>
     </ul>
 
     <h3>Barre de contrôle</h3>
@@ -93,12 +91,12 @@
 
     <h3>Qualité vidéo</h3>
     <p>
-        BTSPlay utilise le streaming adaptatif HLS pour ajuster automatiquement la qualité :
+        BTSPlay ajuste automatiquement la qualité selon votre connexion internet :
     </p>
     <ul>
         <li><strong>Auto (recommandé)</strong> : La qualité s'adapte à votre connexion internet</li>
         <li><strong>Sélection manuelle</strong> : Choisissez une qualité fixe (720p, 1080p, etc.)</li>
-        <li><strong>Basculement fluide</strong> : Changement de qualité sans interruption</li>
+        <li><strong>Changement fluide</strong> : Changement de qualité sans interruption</li>
     </ul>
 
     <div class="docs-note">
@@ -121,10 +119,9 @@
         <li><strong>2x</strong> : Lecture très rapide (200%)</li>
     </ul>
 
-    <div class="docs-warning">
+    <div class="docs-note">
         <p>
-            <strong>Note technique :</strong> La modification de la vitesse ne change pas la hauteur (pitch)
-            de l'audio. Les voix restent naturelles même en lecture accélérée.
+            <strong>Note :</strong> Les voix restent naturelles même en lecture accélérée.
         </p>
     </div>
 </div>
@@ -146,11 +143,11 @@
         <li><strong>Double-clic</strong> : Sur la vidéo en mode plein écran</li>
     </ul>
 
-    <h3>Comportement en plein écran</h3>
+    <h3>En mode plein écran</h3>
     <ul>
-        <li><strong>Contrôles masqués</strong> : Disparaissent après 3 secondes d'inactivité</li>
-        <li><strong>Mouvement de souris</strong> : Fait réapparaître les contrôles</li>
-        <li><strong>Tous les raccourcis actifs</strong> : Fonctionnent normalement</li>
+        <li><strong>Contrôles masqués</strong> : Disparaissent après 3 secondes sans bouger la souris</li>
+        <li><strong>Bouger la souris</strong> : Fait réapparaître les contrôles</li>
+        <li><strong>Raccourcis clavier</strong> : Fonctionnent normalement</li>
     </ul>
 </div>
 
@@ -167,37 +164,22 @@
         <li><strong>Flèche bas</strong> : Diminuer le volume</li>
         <li><strong>M</strong> : Activer/désactiver le son</li>
         <li><strong>F</strong> : Basculer en plein écran</li>
-        <li><strong>0-9</strong> : Sauter à 0%-90% de la vidéo</li>
     </ul>
 </div>
 
 <div class="docs-section">
-    <h2>Streaming et performance</h2>
+    <h2>Lecture et performance</h2>
 
-    <h3>Technologie HLS</h3>
+    <h3>Comment ça marche</h3>
     <p>
-        BTSPlay utilise HLS (HTTP Live Streaming) pour diffuser les vidéos :
+        BTSPlay diffuse les vidéos de manière optimisée :
     </p>
     <ul>
-        <li><strong>Streaming adaptatif</strong> : Qualité ajustée selon la bande passante</li>
-        <li><strong>Chargement progressif</strong> : La vidéo se charge par segments</li>
-        <li><strong>Reprise automatique</strong> : En cas de perte de connexion temporaire</li>
-        <li><strong>Buffering intelligent</strong> : Précharge les segments suivants</li>
+        <li><strong>Qualité adaptative</strong> : La qualité s'ajuste selon votre connexion</li>
+        <li><strong>Chargement progressif</strong> : La vidéo se charge petit à petit</li>
+        <li><strong>Reprise automatique</strong> : Continue après une perte de connexion temporaire</li>
+        <li><strong>Chargement anticipé</strong> : Prépare la suite de la vidéo à l'avance</li>
     </ul>
-
-    <h3>Formats supportés</h3>
-    <ul>
-        <li><strong>MP4</strong> : Format principal pour le streaming</li>
-        <li><strong>H.264</strong> : Codec vidéo standard</li>
-        <li><strong>AAC</strong> : Codec audio</li>
-    </ul>
-
-    <div class="docs-note">
-        <p>
-            <strong>Note :</strong> Les vidéos au format MXF (archive) doivent être transcodées en MP4
-            avant d'être visionnables. Cette opération est gérée automatiquement par les administrateurs.
-        </p>
-    </div>
 </div>
 
 <div class="docs-section">
@@ -211,16 +193,7 @@
         <li><strong>Titre et métadonnées</strong> : Description complète du projet</li>
         <li><strong>Participants</strong> : Liste des étudiants avec leurs rôles (réalisateur, cadreur, etc.)</li>
         <li><strong>Projets associés</strong> : Liens vers d'autres vidéos du même projet</li>
-        <li><strong>Propriétés personnalisées</strong> : Champs spécifiques ajoutés par les professeurs</li>
-    </ul>
-
-    <h3>Actions disponibles</h3>
-    <p>
-        Pour les professeurs, des boutons d'action apparaissent :
-    </p>
-    <ul>
-        <li><strong>Modifier</strong> : Éditer les métadonnées de la vidéo</li>
-        <li><strong>Supprimer</strong> : Retirer la vidéo de la base (avec confirmation)</li>
+        <li><strong>Propriétés personnalisées</strong> : Champs spécifiques supplémentaires</li>
     </ul>
 </div>
 
@@ -255,9 +228,14 @@
         <i class="fa-solid fa-arrow-left"></i>
         Barre de navigation
     </a>
-    <a href="{{ route('docs.interface.search') }}" class="docs-nav-button">
-        Recherche
-        <i class="fa-solid fa-arrow-right"></i>
-    </a>
+
+    @auth
+        @if(Auth::user()->hasRole('professeur') || Auth::user()->hasRole('admin'))
+            <a href="{{ route('docs.admin.overview') }}" class="docs-nav-button">
+                Admin - Vue d'ensemble
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        @endif
+    @endauth
 </div>
 @endsection

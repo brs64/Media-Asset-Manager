@@ -328,10 +328,6 @@
                         <i class="fa-solid fa-play-circle mr-2 text-xs"></i>
                         Lecteur vidéo
                     </a>
-                    <a href="{{ route('docs.interface.search') }}" class="docs-nav-link {{ request()->routeIs('docs.interface.search') ? 'active' : '' }}">
-                        <i class="fa-solid fa-magnifying-glass mr-2 text-xs"></i>
-                        Recherche
-                    </a>
                 </div>
 
                 @auth

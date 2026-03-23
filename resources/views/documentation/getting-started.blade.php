@@ -43,8 +43,7 @@
 
     <div class="docs-note">
         <p>
-            <strong>Première connexion ?</strong> Les comptes étudiants sont créés par les professeurs.
-            Si vous n'avez pas encore de compte, contactez votre enseignant.
+            <strong>Première connexion ?</strong> Si vous n'avez pas encore de compte, contactez votre enseignant.
         </p>
     </div>
 </div>
@@ -72,7 +71,6 @@
         <li><strong>Revenir à l'accueil</strong> : Cliquez sur le logo BTSPlay</li>
         <li><strong>Rechercher</strong> : Utilisez la barre de recherche centrale</li>
         <li><strong>Accéder à votre profil</strong> : Menu utilisateur à droite</li>
-        <li><strong>Administration</strong> : Panneau admin (professeurs uniquement)</li>
     </ul>
 </div>
 
@@ -137,7 +135,6 @@
     </p>
     <ul>
         <li><strong>Profil</strong> : Modifier vos informations personnelles et mot de passe</li>
-        <li><strong>Administration</strong> : Accéder au panneau admin (professeurs)</li>
         <li><strong>Se déconnecter</strong> : Terminer votre session</li>
     </ul>
 </div>
@@ -152,12 +149,9 @@
 <div class="docs-section">
     <h2>Prochaines étapes</h2>
     <p>
-        Maintenant que vous maîtrisez les bases, explorez la documentation détaillée :
+        Maintenant que vous maîtrisez les bases, explorez la documentation détaillée de l'interface utilisateur
+        pour découvrir toutes les fonctionnalités en détail.
     </p>
-    <ul>
-        <li><strong>Interface utilisateur</strong> : Découvrez toutes les fonctionnalités en détail</li>
-        <li><strong>Administration</strong> : Guide complet pour les professeurs</li>
-    </ul>
 </div>
 
 <div class="docs-navigation-buttons">

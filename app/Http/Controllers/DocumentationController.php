@@ -62,14 +62,6 @@ class DocumentationController extends Controller
     }
 
     /**
-     * Interface - Recherche
-     */
-    public function interfaceSearch()
-    {
-        return view('documentation.interface.search');
-    }
-
-    /**
      * Admin - Vue d'ensemble
      */
     public function adminOverview()

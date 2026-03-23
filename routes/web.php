@@ -40,7 +40,6 @@ Route::prefix('documentation')->name('docs.')->group(function () {
         Route::get('/page-accueil', [DocumentationController::class, 'interfaceHomePage'])->name('home');
         Route::get('/barre-navigation', [DocumentationController::class, 'interfaceNavbar'])->name('navbar');
         Route::get('/lecteur-video', [DocumentationController::class, 'interfaceVideoPlayer'])->name('video-player');
-        Route::get('/recherche', [DocumentationController::class, 'interfaceSearch'])->name('search');
     });
 
     // Administration (protégé pour les professeurs et admins uniquement)
