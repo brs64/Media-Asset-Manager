@@ -52,9 +52,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "0001__01__01__000000__create__users__table_8php.html",
-"classApp_1_1Http_1_1Controllers_1_1FileExplorerController.html#a85a78c5788fa7bca411a8768b57e324b",
-"classTests_1_1Feature_1_1Auth_1_1AuthenticationTest.html#ab5e04c0e67f219477fca7ee213478019",
-"functions_func_t.html"
+"classApp_1_1Http_1_1Controllers_1_1MediaController.html",
+"classTests_1_1Feature_1_1AdminControllerTest.html#a38de8754fa434cd00cb4e1dadf8bf49f",
+"classTests_1_1Feature_1_1TransfertControllerTest.html#a3c5acb170d8327e271b518ca5e35087c"
 ];
 
 var SYNCONMSG = 'cliquez pour désactiver la synchronisation du panel';

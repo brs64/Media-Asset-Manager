@@ -106,25 +106,27 @@ $(document).ready(function(){initNavTree('classTests_1_1Feature_1_1ProfileTest.h
 <div class="dynheader">
 Graphe d'héritage de Tests\Feature\ProfileTest:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classTests_1_1Feature_1_1ProfileTest__inherit__graph.svg" width="276" height="486"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classTests_1_1Feature_1_1ProfileTest__inherit__graph.svg" width="235" height="436"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Graphe de collaboration de Tests\Feature\ProfileTest:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classTests_1_1Feature_1_1ProfileTest__coll__graph.svg" width="276" height="486"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classTests_1_1Feature_1_1ProfileTest__coll__graph.svg" width="235" height="436"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Fonctions membres publiques</h2></td></tr>
 <tr class="memitem:a26473aa4f9e7ba56c6d563ad905e402e" id="r_a26473aa4f9e7ba56c6d563ad905e402e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTests_1_1Feature_1_1ProfileTest.html#a26473aa4f9e7ba56c6d563ad905e402e">test_profile_page_is_displayed</a> ()</td></tr>
+<tr class="memdesc:a26473aa4f9e7ba56c6d563ad905e402e"><td class="mdescLeft">&#160;</td><td class="mdescRight">GIVEN : un utilisateur authentifié WHEN : il accède à la page de profil THEN : la page s'affiche correctement avec un statut 200.  <br /></td></tr>
 <tr class="separator:a26473aa4f9e7ba56c6d563ad905e402e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab029267d43bc2abae6afbaf10bb264aa" id="r_ab029267d43bc2abae6afbaf10bb264aa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTests_1_1Feature_1_1ProfileTest.html#ab029267d43bc2abae6afbaf10bb264aa">test_profile_information_can_be_updated</a> ()</td></tr>
+<tr class="memdesc:ab029267d43bc2abae6afbaf10bb264aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">GIVEN : un utilisateur authentifié WHEN : il met à jour son nom via le formulaire de profil THEN : le nom est modifié en base et il est redirigé vers le profil.  <br /></td></tr>
 <tr class="separator:ab029267d43bc2abae6afbaf10bb264aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5783533354cb978ccf470ece17ad9ed7" id="r_a5783533354cb978ccf470ece17ad9ed7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTests_1_1Feature_1_1ProfileTest.html#a5783533354cb978ccf470ece17ad9ed7">test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged</a> ()</td></tr>
-<tr class="separator:a5783533354cb978ccf470ece17ad9ed7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a102ef07358dcfc4370690e0c2816ad04" id="r_a102ef07358dcfc4370690e0c2816ad04"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTests_1_1Feature_1_1ProfileTest.html#a102ef07358dcfc4370690e0c2816ad04">test_user_can_delete_their_account</a> ()</td></tr>
+<tr class="memdesc:a102ef07358dcfc4370690e0c2816ad04"><td class="mdescLeft">&#160;</td><td class="mdescRight">GIVEN : un utilisateur authentifié WHEN : il supprime son compte en fournissant le bon mot de passe THEN : le compte est supprimé, il est déconnecté et redirigé vers l'accueil.  <br /></td></tr>
 <tr class="separator:a102ef07358dcfc4370690e0c2816ad04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0443df9048f7f3ab68d4070fe52cbe9" id="r_ae0443df9048f7f3ab68d4070fe52cbe9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTests_1_1Feature_1_1ProfileTest.html#ae0443df9048f7f3ab68d4070fe52cbe9">test_correct_password_must_be_provided_to_delete_account</a> ()</td></tr>
+<tr class="memdesc:ae0443df9048f7f3ab68d4070fe52cbe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">GIVEN : un utilisateur authentifié WHEN : il tente de supprimer son compte avec un mot de passe incorrect THEN : une erreur est retournée et le compte n'est pas supprimé  <br /></td></tr>
 <tr class="separator:ae0443df9048f7f3ab68d4070fe52cbe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Description détaillée</h2>
@@ -146,26 +148,9 @@ Fonctions membres publiques</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00082">82</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
+<p>GIVEN : un utilisateur authentifié WHEN : il tente de supprimer son compte avec un mot de passe incorrect THEN : une erreur est retournée et le compte n'est pas supprimé </p>
 
-</div>
-</div>
-<a id="a5783533354cb978ccf470ece17ad9ed7" name="a5783533354cb978ccf470ece17ad9ed7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5783533354cb978ccf470ece17ad9ed7">&#9670;&#160;</a></span>test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Tests\Feature\ProfileTest::test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00046">46</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
+<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00081">81</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
 
 </div>
 </div>
@@ -184,7 +169,9 @@ Fonctions membres publiques</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00024">24</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
+<p>GIVEN : un utilisateur authentifié WHEN : il met à jour son nom via le formulaire de profil THEN : le nom est modifié en base et il est redirigé vers le profil. </p>
+
+<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00034">34</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
 
 </div>
 </div>
@@ -203,7 +190,9 @@ Fonctions membres publiques</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00013">13</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
+<p>GIVEN : un utilisateur authentifié WHEN : il accède à la page de profil THEN : la page s'affiche correctement avec un statut 200. </p>
+
+<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00018">18</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
 
 </div>
 </div>
@@ -222,7 +211,9 @@ Fonctions membres publiques</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00064">64</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
+<p>GIVEN : un utilisateur authentifié WHEN : il supprime son compte en fournissant le bon mot de passe THEN : le compte est supprimé, il est déconnecté et redirigé vers l'accueil. </p>
+
+<p class="definition">Définition à la ligne <a class="el" href="ProfileTest_8php_source.html#l00058">58</a> du fichier <a class="el" href="ProfileTest_8php_source.html">ProfileTest.php</a>.</p>
 
 </div>
 </div>

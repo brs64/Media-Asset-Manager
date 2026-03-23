@@ -1,7 +1,11 @@
 <map id="Tests\Feature\AdminControllerTest" name="Tests\Feature\AdminControllerTest">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,232,247,573"/>
-<area shape="rect" id="Node000002" href="$classTests_1_1TestCase.html" title=" " alt="" coords="71,119,181,184"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,198,129,232,123,232,123,198"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="74,5,178,71"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="129,84,129,119,123,119,123,84"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,428,258,860"/>
+<area shape="rect" id="Node000002" href="$classTests_1_1TestCase.html" title=" " alt="" coords="5,210,115,275"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,289,100,427,94,428,66,290"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="8,5,112,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="63,85,63,210,57,210,57,85"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Models_1_1User.html" title=" " alt="" coords="139,120,304,365"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="199,366,190,413,184,411,194,365"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="163,5,280,71"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="224,84,224,120,219,120,219,84"/>
 </map>

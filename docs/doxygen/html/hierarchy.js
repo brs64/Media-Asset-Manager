@@ -7,20 +7,19 @@ var hierarchy =
       [ "Tests\\TestCase", "classTests_1_1TestCase.html", [
         [ "Tests\\Feature\\AdminControllerTest", "classTests_1_1Feature_1_1AdminControllerTest.html", null ],
         [ "Tests\\Feature\\Auth\\AuthenticationTest", "classTests_1_1Feature_1_1Auth_1_1AuthenticationTest.html", null ],
-        [ "Tests\\Feature\\Auth\\EmailVerificationTest", "classTests_1_1Feature_1_1Auth_1_1EmailVerificationTest.html", null ],
-        [ "Tests\\Feature\\Auth\\PasswordConfirmationTest", "classTests_1_1Feature_1_1Auth_1_1PasswordConfirmationTest.html", null ],
-        [ "Tests\\Feature\\Auth\\PasswordResetTest", "classTests_1_1Feature_1_1Auth_1_1PasswordResetTest.html", null ],
         [ "Tests\\Feature\\Auth\\PasswordUpdateTest", "classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest.html", null ],
-        [ "Tests\\Feature\\Auth\\RegistrationTest", "classTests_1_1Feature_1_1Auth_1_1RegistrationTest.html", null ],
         [ "Tests\\Feature\\FileExplorerControllerTest", "classTests_1_1Feature_1_1FileExplorerControllerTest.html", null ],
         [ "Tests\\Feature\\FileExplorerServiceTest", "classTests_1_1Feature_1_1FileExplorerServiceTest.html", null ],
         [ "Tests\\Feature\\MediaControllerTest", "classTests_1_1Feature_1_1MediaControllerTest.html", null ],
-        [ "Tests\\Feature\\MediaManagerTest", "classTests_1_1Feature_1_1MediaManagerTest.html", null ],
         [ "Tests\\Feature\\MediaThumbnailServiceTest", "classTests_1_1Feature_1_1MediaThumbnailServiceTest.html", null ],
         [ "Tests\\Feature\\PermissionsTest", "classTests_1_1Feature_1_1PermissionsTest.html", null ],
         [ "Tests\\Feature\\ProfileTest", "classTests_1_1Feature_1_1ProfileTest.html", null ],
+        [ "Tests\\Feature\\SearchControllerTest", "classTests_1_1Feature_1_1SearchControllerTest.html", null ],
         [ "Tests\\Feature\\SearchMediaTest", "classTests_1_1Feature_1_1SearchMediaTest.html", null ],
-        [ "Tests\\Feature\\StreamControllerTest", "classTests_1_1Feature_1_1StreamControllerTest.html", null ]
+        [ "Tests\\Feature\\StreamControllerTest", "classTests_1_1Feature_1_1StreamControllerTest.html", null ],
+        [ "Tests\\Feature\\TransfertControllerTest", "classTests_1_1Feature_1_1TransfertControllerTest.html", null ],
+        [ "Tests\\Unit\\Services\\FfastransServiceTest", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html", null ],
+        [ "Tests\\Unit\\Services\\MediaServiceTest", "classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html", null ]
       ] ]
     ] ],
     [ "App\\Http\\Controllers\\Controller", "classApp_1_1Http_1_1Controllers_1_1Controller.html", [
@@ -28,7 +27,6 @@ var hierarchy =
       [ "App\\Http\\Controllers\\Auth\\AuthenticatedSessionController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1AuthenticatedSessionController.html", null ],
       [ "App\\Http\\Controllers\\Auth\\NewPasswordController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1NewPasswordController.html", null ],
       [ "App\\Http\\Controllers\\Auth\\PasswordController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController.html", null ],
-      [ "App\\Http\\Controllers\\Auth\\RegisteredUserController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1RegisteredUserController.html", null ],
       [ "App\\Http\\Controllers\\DocumentationController", "classApp_1_1Http_1_1Controllers_1_1DocumentationController.html", null ],
       [ "App\\Http\\Controllers\\FileExplorerController", "classApp_1_1Http_1_1Controllers_1_1FileExplorerController.html", null ],
       [ "App\\Http\\Controllers\\HomeController", "classApp_1_1Http_1_1Controllers_1_1HomeController.html", null ],
@@ -66,6 +64,8 @@ var hierarchy =
       [ "Database\\Factories\\MediaFactory", "classDatabase_1_1Factories_1_1MediaFactory.html", null ],
       [ "Database\\Factories\\ParticipationFactory", "classDatabase_1_1Factories_1_1ParticipationFactory.html", null ],
       [ "Database\\Factories\\ProfesseurFactory", "classDatabase_1_1Factories_1_1ProfesseurFactory.html", null ],
+      [ "Database\\Factories\\ProjetFactory", "classDatabase_1_1Factories_1_1ProjetFactory.html", null ],
+      [ "Database\\Factories\\RoleFactory", "classDatabase_1_1Factories_1_1RoleFactory.html", null ],
       [ "Database\\Factories\\UserFactory", "classDatabase_1_1Factories_1_1UserFactory.html", null ]
     ] ],
     [ "FormRequest", null, [
@@ -96,8 +96,5 @@ var hierarchy =
       [ "App\\Jobs\\GenerateMediaThumbnail", "classApp_1_1Jobs_1_1GenerateMediaThumbnail.html", null ],
       [ "App\\Jobs\\ScanDiskJob", "classApp_1_1Jobs_1_1ScanDiskJob.html", null ],
       [ "App\\Jobs\\SyncMediaFromDiskJob", "classApp_1_1Jobs_1_1SyncMediaFromDiskJob.html", null ]
-    ] ],
-    [ "TestCase", null, [
-      [ "Tests\\Unit\\ExampleTest", "classTests_1_1Unit_1_1ExampleTest.html", null ]
     ] ]
 ];

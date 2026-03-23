@@ -118,12 +118,13 @@ Graphe de collaboration de App\Http\Controllers\SearchController:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Fonctions membres publiques</h2></td></tr>
 <tr class="memitem:a3792c72af63f696013ec1201d65b4d70" id="r_a3792c72af63f696013ec1201d65b4d70"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classApp_1_1Http_1_1Controllers_1_1SearchController.html#a3792c72af63f696013ec1201d65b4d70">__construct</a> (<a class="el" href="classApp_1_1Services_1_1MediaService.html">MediaService</a> $mediaService)</td></tr>
+<tr class="memdesc:a3792c72af63f696013ec1201d65b4d70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise le contrôleur avec le service de gestion des médias.  <br /></td></tr>
 <tr class="separator:a3792c72af63f696013ec1201d65b4d70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab41f7b702903e0a23bf8d8a35ba89df3" id="r_ab41f7b702903e0a23bf8d8a35ba89df3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classApp_1_1Http_1_1Controllers_1_1SearchController.html#ab41f7b702903e0a23bf8d8a35ba89df3">index</a> (Request $request)</td></tr>
-<tr class="memdesc:ab41f7b702903e0a23bf8d8a35ba89df3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gère l'affichage ET le traitement de la recherche.  <br /></td></tr>
+<tr class="memdesc:ab41f7b702903e0a23bf8d8a35ba89df3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gère l'affichage et le traitement de la recherche de médias.  <br /></td></tr>
 <tr class="separator:ab41f7b702903e0a23bf8d8a35ba89df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab79c2e3615f906bf4d91c83a9581f6b9" id="r_ab79c2e3615f906bf4d91c83a9581f6b9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classApp_1_1Http_1_1Controllers_1_1SearchController.html#ab79c2e3615f906bf4d91c83a9581f6b9">autocomplete</a> (Request $request)</td></tr>
-<tr class="memdesc:ab79c2e3615f906bf4d91c83a9581f6b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">API for autocomplete.  <br /></td></tr>
+<tr class="memdesc:ab79c2e3615f906bf4d91c83a9581f6b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fournit une API d’autocomplétion pour les titres de médias.  <br /></td></tr>
 <tr class="separator:ab79c2e3615f906bf4d91c83a9581f6b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
@@ -151,7 +152,16 @@ Attributs protégés</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00016">16</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
+<p>Initialise le contrôleur avec le service de gestion des médias. </p>
+<p>Utilise l'injection de dépendance pour déléguer la logique métier de recherche au service MediaService.</p>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">MediaService</td><td class="paramname">$mediaService</td><td>Service de gestion et recherche des médias </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00023">23</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
 
 <p class="reference">Références <a class="el" href="SearchController_8php_source.html#l00013">App\Http\Controllers\SearchController\$mediaService</a>.</p>
 
@@ -174,9 +184,17 @@ Attributs protégés</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>API for autocomplete. </p>
+<p>Fournit une API d’autocomplétion pour les titres de médias. </p>
+<p>Recherche les titres correspondant au terme saisi et retourne une liste limitée de suggestions pour alimenter un champ de recherche dynamique.</p>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">Request</td><td class="paramname">$request</td><td>Requête HTTP contenant le terme de recherche ("term") </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Renvoie</dt><dd>\Illuminate\Http\JsonResponse Liste des titres correspondants au format JSON </dd></dl>
 
-<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00053">53</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
+<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00079">79</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
 
 </div>
 </div>
@@ -196,9 +214,23 @@ Attributs protégés</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Gère l'affichage ET le traitement de la recherche. </p>
+<p>Gère l'affichage et le traitement de la recherche de médias. </p>
+<p>Cette méthode centralise la récupération des filtres envoyés par la requête (formulaire ou query params), puis délègue la logique de recherche au MediaService.</p>
+<p>Fonctionnalités :</p><ul>
+<li>Support d’un mot-clé global (description ou motCle)</li>
+<li>Transmission de filtres multiples au service</li>
+<li>Pagination avec conservation des paramètres</li>
+<li>Chargement des données nécessaires à l’affichage (projets, professeurs)</li>
+</ul>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">Request</td><td class="paramname">$request</td><td>Requête HTTP contenant les filtres de recherche </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Renvoie</dt><dd>\Illuminate\View\View Vue "recherche" avec les résultats et filtres associés </dd></dl>
 
-<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00024">24</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
+<p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00044">44</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
 
 </div>
 </div>
@@ -225,7 +257,7 @@ Attributs protégés</h2></td></tr>
 
 <p class="definition">Définition à la ligne <a class="el" href="SearchController_8php_source.html#l00013">13</a> du fichier <a class="el" href="SearchController_8php_source.html">SearchController.php</a>.</p>
 
-<p class="reference">Référencé par <a class="el" href="SearchController_8php_source.html#l00016">App\Http\Controllers\SearchController\__construct()</a>.</p>
+<p class="reference">Référencé par <a class="el" href="SearchController_8php_source.html#l00023">App\Http\Controllers\SearchController\__construct()</a>.</p>
 
 </div>
 </div>

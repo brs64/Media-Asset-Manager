@@ -1,0 +1,25 @@
+var classTests_1_1Unit_1_1Services_1_1FfastransServiceTest =
+[
+    [ "cancelJob_deletes_job_successfully", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a99aeb19969fee8bd8442425221253150", null ],
+    [ "cancelJob_handles_exceptions", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac70599f7e5072986bdd1fa679332a6b5", null ],
+    [ "cancelJob_returns_false_on_failure", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aa39ec2df76344d8d98031c043fbdfce9", null ],
+    [ "client_uses_basic_auth_when_configured", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a1165d7aab33e68c3aa1c9cde3a4de4b5", null ],
+    [ "client_works_without_auth_when_not_configured", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aeb56ec5217406a34936fb9e2d16b9010", null ],
+    [ "getFullStatusList_combines_active_and_history_jobs", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a2926d25b5125268133c01f30be63befd", null ],
+    [ "getFullStatusList_handles_api_errors_gracefully", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac21fa2a458bb5d55592d2c27ccbcdedf", null ],
+    [ "getFullStatusList_sorts_by_date_descending", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a138db6459cb8d949bd7cb75b52e9efb4", null ],
+    [ "getFullStatusList_translates_statuses_to_french", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a14a0145e5299dc7fbb689455372b0b3d", null ],
+    [ "getJobStatus_falls_back_to_history_if_not_active", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ab73523ca4cc5ab3badabb4dba02f6671", null ],
+    [ "getJobStatus_returns_active_job_status", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a88646998571af5b2218d6f93b6cf4908", null ],
+    [ "getJobStatus_returns_error_when_job_not_found", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a6bdf1dcbdcee9f2245d716f6e72891c3", null ],
+    [ "setUp", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ab6b97d4c35266ec5369c6459946a2a04", null ],
+    [ "submitJob_preserves_unc_paths", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aa34aa04001ae4488355e8bdd446dd120", null ],
+    [ "submitJob_sends_correct_payload_to_api", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a73e4397fcb66f3b923526cecf42740eb", null ],
+    [ "submitJob_throws_exception_on_failed_response", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a2139c691db9de517e5dc0e2910049316", null ],
+    [ "translatePath_converts_linux_to_windows_path", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a17104da7a88b8d67c40ebda650a9a8c1", null ],
+    [ "translatePath_handles_relative_paths", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ae3f8b84df04fa0c3b0139c1ab4200b5f", null ],
+    [ "translatePath_preserves_windows_paths", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac8f7b17debfd5421b7407d50d2aa4fc8", null ],
+    [ "translatePath_replaces_forward_slashes_with_backslashes", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a761c34f76d768f6dce6697f23484f6cd", null ],
+    [ "translatePath_returns_original_if_no_remote_root", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a32b1a10b68765661145b5c26d326b17c", null ],
+    [ "$service", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a549e611f6c592f6a216757bd5269091c", null ]
+];

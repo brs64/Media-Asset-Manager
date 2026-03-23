@@ -14,8 +14,7 @@ var annotated_dup =
           [ "Auth", "namespaceApp_1_1Http_1_1Controllers_1_1Auth.html", [
             [ "AuthenticatedSessionController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1AuthenticatedSessionController.html", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1AuthenticatedSessionController" ],
             [ "NewPasswordController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1NewPasswordController.html", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1NewPasswordController" ],
-            [ "PasswordController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController.html", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController" ],
-            [ "RegisteredUserController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1RegisteredUserController.html", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1RegisteredUserController" ]
+            [ "PasswordController", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController.html", "classApp_1_1Http_1_1Controllers_1_1Auth_1_1PasswordController" ]
           ] ],
           [ "AdminController", "classApp_1_1Http_1_1Controllers_1_1AdminController.html", "classApp_1_1Http_1_1Controllers_1_1AdminController" ],
           [ "Controller", "classApp_1_1Http_1_1Controllers_1_1Controller.html", null ],
@@ -74,6 +73,8 @@ var annotated_dup =
         [ "MediaFactory", "classDatabase_1_1Factories_1_1MediaFactory.html", "classDatabase_1_1Factories_1_1MediaFactory" ],
         [ "ParticipationFactory", "classDatabase_1_1Factories_1_1ParticipationFactory.html", "classDatabase_1_1Factories_1_1ParticipationFactory" ],
         [ "ProfesseurFactory", "classDatabase_1_1Factories_1_1ProfesseurFactory.html", "classDatabase_1_1Factories_1_1ProfesseurFactory" ],
+        [ "ProjetFactory", "classDatabase_1_1Factories_1_1ProjetFactory.html", "classDatabase_1_1Factories_1_1ProjetFactory" ],
+        [ "RoleFactory", "classDatabase_1_1Factories_1_1RoleFactory.html", "classDatabase_1_1Factories_1_1RoleFactory" ],
         [ "UserFactory", "classDatabase_1_1Factories_1_1UserFactory.html", "classDatabase_1_1Factories_1_1UserFactory" ]
       ] ],
       [ "Seeders", "namespaceDatabase_1_1Seeders.html", [
@@ -90,25 +91,25 @@ var annotated_dup =
       [ "Feature", "namespaceTests_1_1Feature.html", [
         [ "Auth", "namespaceTests_1_1Feature_1_1Auth.html", [
           [ "AuthenticationTest", "classTests_1_1Feature_1_1Auth_1_1AuthenticationTest.html", "classTests_1_1Feature_1_1Auth_1_1AuthenticationTest" ],
-          [ "EmailVerificationTest", "classTests_1_1Feature_1_1Auth_1_1EmailVerificationTest.html", "classTests_1_1Feature_1_1Auth_1_1EmailVerificationTest" ],
-          [ "PasswordConfirmationTest", "classTests_1_1Feature_1_1Auth_1_1PasswordConfirmationTest.html", "classTests_1_1Feature_1_1Auth_1_1PasswordConfirmationTest" ],
-          [ "PasswordResetTest", "classTests_1_1Feature_1_1Auth_1_1PasswordResetTest.html", "classTests_1_1Feature_1_1Auth_1_1PasswordResetTest" ],
-          [ "PasswordUpdateTest", "classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest.html", "classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest" ],
-          [ "RegistrationTest", "classTests_1_1Feature_1_1Auth_1_1RegistrationTest.html", "classTests_1_1Feature_1_1Auth_1_1RegistrationTest" ]
+          [ "PasswordUpdateTest", "classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest.html", "classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest" ]
         ] ],
         [ "AdminControllerTest", "classTests_1_1Feature_1_1AdminControllerTest.html", "classTests_1_1Feature_1_1AdminControllerTest" ],
         [ "FileExplorerControllerTest", "classTests_1_1Feature_1_1FileExplorerControllerTest.html", "classTests_1_1Feature_1_1FileExplorerControllerTest" ],
         [ "FileExplorerServiceTest", "classTests_1_1Feature_1_1FileExplorerServiceTest.html", "classTests_1_1Feature_1_1FileExplorerServiceTest" ],
         [ "MediaControllerTest", "classTests_1_1Feature_1_1MediaControllerTest.html", "classTests_1_1Feature_1_1MediaControllerTest" ],
-        [ "MediaManagerTest", "classTests_1_1Feature_1_1MediaManagerTest.html", "classTests_1_1Feature_1_1MediaManagerTest" ],
         [ "MediaThumbnailServiceTest", "classTests_1_1Feature_1_1MediaThumbnailServiceTest.html", "classTests_1_1Feature_1_1MediaThumbnailServiceTest" ],
         [ "PermissionsTest", "classTests_1_1Feature_1_1PermissionsTest.html", "classTests_1_1Feature_1_1PermissionsTest" ],
         [ "ProfileTest", "classTests_1_1Feature_1_1ProfileTest.html", "classTests_1_1Feature_1_1ProfileTest" ],
+        [ "SearchControllerTest", "classTests_1_1Feature_1_1SearchControllerTest.html", "classTests_1_1Feature_1_1SearchControllerTest" ],
         [ "SearchMediaTest", "classTests_1_1Feature_1_1SearchMediaTest.html", "classTests_1_1Feature_1_1SearchMediaTest" ],
-        [ "StreamControllerTest", "classTests_1_1Feature_1_1StreamControllerTest.html", "classTests_1_1Feature_1_1StreamControllerTest" ]
+        [ "StreamControllerTest", "classTests_1_1Feature_1_1StreamControllerTest.html", "classTests_1_1Feature_1_1StreamControllerTest" ],
+        [ "TransfertControllerTest", "classTests_1_1Feature_1_1TransfertControllerTest.html", "classTests_1_1Feature_1_1TransfertControllerTest" ]
       ] ],
-      [ "Unit", "namespaceTests_1_1Unit.html", [
-        [ "ExampleTest", "classTests_1_1Unit_1_1ExampleTest.html", "classTests_1_1Unit_1_1ExampleTest" ]
+      [ "Unit", null, [
+        [ "Services", "namespaceTests_1_1Unit_1_1Services.html", [
+          [ "FfastransServiceTest", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html", "classTests_1_1Unit_1_1Services_1_1FfastransServiceTest" ],
+          [ "MediaServiceTest", "classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html", "classTests_1_1Unit_1_1Services_1_1MediaServiceTest" ]
+        ] ]
       ] ],
       [ "TestCase", "classTests_1_1TestCase.html", null ]
     ] ],

@@ -114,40 +114,60 @@ $(document).ready(function(){initNavTree('PermissionsTest_8php_source.html','');
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>{</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    use RefreshDatabase;</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="foldopen" id="foldopen00015" data-start="{" data-end="}">
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#a7b8fa71886a8eec89ca7248950bb680e">   15</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#a7b8fa71886a8eec89ca7248950bb680e">un_professeur_ne_peut_pas_acceder_aux_reglages_admin</a>()</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="comment">// 1. Création d&#39;un User classique (le compte)</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        $user = User::factory()-&gt;create([<span class="stringliteral">&#39;is_admin&#39;</span> =&gt; <span class="keyword">false</span>]);</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="comment">// 2. Création du Professeur lié à ce compte</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        $prof = Professeur::factory()-&gt;create([<span class="stringliteral">&#39;user_id&#39;</span> =&gt; $user-&gt;id]);</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="comment">// 3. Test de l&#39;accès</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        $response = $this-&gt;actingAs($user)-&gt;get(<span class="stringliteral">&#39;/admin/settings&#39;</span>);</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        $response-&gt;assertStatus(403); <span class="comment">// Doit être bloqué</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    }</div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="}">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#a07594f2c97d0fd779fe9e28de8101dd5">   14</a></span>    <span class="keyword">protected</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#a07594f2c97d0fd779fe9e28de8101dd5">setUp</a>(): void</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        parent::setUp();</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        \Spatie\Permission\Models\Role::create([<span class="stringliteral">&#39;name&#39;</span> =&gt; <span class="stringliteral">&#39;admin&#39;</span>]);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        \Spatie\Permission\Models\Role::create([<span class="stringliteral">&#39;name&#39;</span> =&gt; <span class="stringliteral">&#39;professeur&#39;</span>]);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    }</div>
 </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="foldopen" id="foldopen00030" data-start="{" data-end="}">
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#a6940bfa328bc2c5c0f88ed87e0ed1ca3">   30</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#a6940bfa328bc2c5c0f88ed87e0ed1ca3">l_admin_unique_peut_acceder_aux_reglages</a>()</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    {</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="comment">// On simule l&#39;admin &quot;en dur&quot; via le compte User</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        $adminUser = User::factory()-&gt;create([<span class="stringliteral">&#39;is_admin&#39;</span> =&gt; <span class="keyword">true</span>]);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        $response = $this-&gt;actingAs($adminUser)-&gt;get(<span class="stringliteral">&#39;/admin/settings&#39;</span>);</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        $response-&gt;assertStatus(200); <span class="comment">// Doit passer</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    }</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#aaf34c1d74bd237626943614c0b48a375">   27</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#aaf34c1d74bd237626943614c0b48a375">un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages</a>()</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        $user-&gt;assignRole(<span class="stringliteral">&#39;professeur&#39;</span>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        Professeur::factory()-&gt;create([<span class="stringliteral">&#39;user_id&#39;</span> =&gt; $user-&gt;id]);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <span class="comment">// Professeurs can access admin (checkAdminAccess allows them)</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        $response = $this-&gt;actingAs($user)-&gt;get(<span class="stringliteral">&#39;/admin/settings&#39;</span>);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    }</div>
 </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>}</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="}">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#ad1d15ac85e39a46a3392987a7bbb40c9">   45</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#ad1d15ac85e39a46a3392987a7bbb40c9">un_utilisateur_sans_role_ne_peut_pas_acceder_a_ladmin</a>()</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    {</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        $response = $this-&gt;actingAs($user)-&gt;get(<span class="stringliteral">&#39;/admin/settings&#39;</span>);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        $response-&gt;assertStatus(403);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    }</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1PermissionsTest.html#a1b9e377556e7e2dc882d1010d2c92fdb">   60</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1PermissionsTest.html#a1b9e377556e7e2dc882d1010d2c92fdb">l_admin_peut_acceder_aux_reglages</a>()</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        $adminUser = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        $adminUser-&gt;assignRole(<span class="stringliteral">&#39;admin&#39;</span>);</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        $response = $this-&gt;actingAs($adminUser)-&gt;get(<span class="stringliteral">&#39;/admin/settings&#39;</span>);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    }</div>
+</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>}</div>
 </div>
 <div class="ttc" id="aclassApp_1_1Models_1_1Professeur_html"><div class="ttname"><a href="classApp_1_1Models_1_1Professeur.html">App\Models\Professeur</a></div><div class="ttdef"><b>Definition</b> <a href="Professeur_8php_source.html#l00009">Professeur.php:10</a></div></div>
 <div class="ttc" id="aclassApp_1_1Models_1_1User_html"><div class="ttname"><a href="classApp_1_1Models_1_1User.html">App\Models\User</a></div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00013">User.php:14</a></div></div>
 <div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html">Tests\Feature\PermissionsTest</a></div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00010">PermissionsTest.php:11</a></div></div>
-<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_a6940bfa328bc2c5c0f88ed87e0ed1ca3"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#a6940bfa328bc2c5c0f88ed87e0ed1ca3">Tests\Feature\PermissionsTest\l_admin_unique_peut_acceder_aux_reglages</a></div><div class="ttdeci">l_admin_unique_peut_acceder_aux_reglages()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00030">PermissionsTest.php:30</a></div></div>
-<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_a7b8fa71886a8eec89ca7248950bb680e"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#a7b8fa71886a8eec89ca7248950bb680e">Tests\Feature\PermissionsTest\un_professeur_ne_peut_pas_acceder_aux_reglages_admin</a></div><div class="ttdeci">un_professeur_ne_peut_pas_acceder_aux_reglages_admin()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00015">PermissionsTest.php:15</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_a07594f2c97d0fd779fe9e28de8101dd5"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#a07594f2c97d0fd779fe9e28de8101dd5">Tests\Feature\PermissionsTest\setUp</a></div><div class="ttdeci">setUp()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00014">PermissionsTest.php:14</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_a1b9e377556e7e2dc882d1010d2c92fdb"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#a1b9e377556e7e2dc882d1010d2c92fdb">Tests\Feature\PermissionsTest\l_admin_peut_acceder_aux_reglages</a></div><div class="ttdeci">l_admin_peut_acceder_aux_reglages()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00060">PermissionsTest.php:60</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_aaf34c1d74bd237626943614c0b48a375"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#aaf34c1d74bd237626943614c0b48a375">Tests\Feature\PermissionsTest\un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages</a></div><div class="ttdeci">un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00027">PermissionsTest.php:27</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1PermissionsTest_html_ad1d15ac85e39a46a3392987a7bbb40c9"><div class="ttname"><a href="classTests_1_1Feature_1_1PermissionsTest.html#ad1d15ac85e39a46a3392987a7bbb40c9">Tests\Feature\PermissionsTest\un_utilisateur_sans_role_ne_peut_pas_acceder_a_ladmin</a></div><div class="ttdeci">un_utilisateur_sans_role_ne_peut_pas_acceder_a_ladmin()</div><div class="ttdef"><b>Definition</b> <a href="PermissionsTest_8php_source.html#l00045">PermissionsTest.php:45</a></div></div>
 <div class="ttc" id="aclassTests_1_1TestCase_html"><div class="ttname"><a href="classTests_1_1TestCase.html">Tests\TestCase</a></div><div class="ttdef"><b>Definition</b> <a href="TestCase_8php_source.html#l00007">TestCase.php:8</a></div></div>
 <div class="ttc" id="anamespaceTests_1_1Feature_html"><div class="ttname"><a href="namespaceTests_1_1Feature.html">Tests\Feature</a></div><div class="ttdef"><b>Definition</b> <a href="AdminControllerTest_8php_source.html#l00003">AdminControllerTest.php:3</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

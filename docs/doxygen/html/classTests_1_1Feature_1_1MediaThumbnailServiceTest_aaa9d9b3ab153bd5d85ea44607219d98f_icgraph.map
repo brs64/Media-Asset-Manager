@@ -1,17 +1,33 @@
 <map id="Tests\Feature\MediaThumbnailServiceTest\initializeService" name="Tests\Feature\MediaThumbnailServiceTest\initializeService">
-<area shape="rect" id="Node000001" title="Helper pour initialiser les propriétés protégées du service." alt="" coords="304,287,525,327"/>
-<area shape="rect" id="Node000002" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a282d3875de9b294e907167983f6cd431" title=" " alt="" coords="20,5,241,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="396,276,373,234,341,184,301,133,254,89,236,77,239,72,258,85,305,129,346,181,378,231,400,273"/>
-<area shape="rect" id="Node000003" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a43ad963f470f95c37b2fb3ce823f5923" title=" " alt="" coords="19,99,242,154"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="385,279,328,223,293,194,255,169,229,157,232,152,257,164,296,190,332,219,389,275"/>
-<area shape="rect" id="Node000004" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aff51e145c96ee5fd40e06b592ef99616" title=" " alt="" coords="20,179,241,248"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="339,285,236,251,237,245,341,280"/>
-<area shape="rect" id="Node000005" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a9d4bc50559be10557da600e53f4bddcb" title=" " alt="" coords="15,272,247,341"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="290,309,247,309,247,304,290,304"/>
-<area shape="rect" id="Node000006" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a64c9d33832f54b88684145fc2c4af012" title=" " alt="" coords="10,365,251,435"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="341,333,237,368,236,363,339,328"/>
-<area shape="rect" id="Node000007" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a2a304cacdc02375138fabc543ebe7cec" title=" " alt="" coords="5,459,256,514"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="389,339,332,394,296,424,257,449,232,462,229,457,255,444,293,419,328,390,385,335"/>
-<area shape="rect" id="Node000008" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aad0803e7c150380319e60ef2163a76dd" title=" " alt="" coords="15,539,246,608"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="400,341,377,382,345,432,305,483,258,527,237,541,235,536,254,523,301,479,341,429,372,380,395,338"/>
+<area shape="rect" id="Node000001" title="Helper pour initialiser les propriétés protégées du service." alt="" coords="351,626,572,666"/>
+<area shape="rect" id="Node000002" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#ae97a82808b4f3b35301d056594e9cfe6" title=" " alt="" coords="33,5,275,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="453,613,433,493,400,331,379,249,355,175,329,115,301,75,273,55,276,51,305,71,333,113,360,174,384,248,405,330,438,492,458,612"/>
+<area shape="rect" id="Node000003" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a282d3875de9b294e907167983f6cd431" title=" " alt="" coords="43,85,265,154"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="456,613,448,524,439,467,425,405,405,341,378,278,344,220,301,168,283,154,263,143,266,138,286,150,305,164,348,217,383,276,410,339,430,403,444,466,453,523,462,612"/>
+<area shape="rect" id="Node000004" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a43ad963f470f95c37b2fb3ce823f5923" title=" " alt="" coords="43,179,265,233"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="454,613,442,537,416,439,396,387,370,336,339,289,301,248,264,226,267,221,304,244,343,286,375,333,401,385,421,437,447,536,459,612"/>
+<area shape="rect" id="Node000005" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aff51e145c96ee5fd40e06b592ef99616" title=" " alt="" coords="43,258,265,327"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="449,613,431,555,402,481,359,406,332,372,301,341,263,319,266,314,304,337,336,368,363,403,406,479,436,553,455,612"/>
+<area shape="rect" id="Node000006" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a1bc2b9290d59d373f6024c98663a3e57" title=" " alt="" coords="22,352,286,407"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="444,614,422,570,391,518,350,466,301,421,280,409,282,404,304,417,354,462,395,515,427,568,449,612"/>
+<area shape="rect" id="Node000007" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a9d4bc50559be10557da600e53f4bddcb" title=" " alt="" coords="38,431,270,501"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="430,618,373,566,338,539,301,515,269,500,271,495,304,510,342,534,377,562,434,614"/>
+<area shape="rect" id="Node000008" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a64c9d33832f54b88684145fc2c4af012" title=" " alt="" coords="33,525,275,594"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="376,625,274,596,276,591,377,620"/>
+<area shape="rect" id="Node000009" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a3b00ac52c532d90342d5890e04da3592" title=" " alt="" coords="43,619,265,673"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="337,649,265,649,265,643,337,643"/>
+<area shape="rect" id="Node000010" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#af44218428ce6db7604c6ec446724fe92" title=" " alt="" coords="43,697,265,752"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="370,672,262,700,261,695,368,667"/>
+<area shape="rect" id="Node000011" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a2a304cacdc02375138fabc543ebe7cec" title=" " alt="" coords="29,776,279,831"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="430,678,373,723,304,766,274,778,272,773,301,761,370,719,426,674"/>
+<area shape="rect" id="Node000012" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aad0803e7c150380319e60ef2163a76dd" title=" " alt="" coords="39,855,269,925"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="445,680,421,717,389,762,350,806,304,844,271,863,268,858,301,840,346,802,385,758,416,714,440,677"/>
+<area shape="rect" id="Node000013" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#acb4d68a90e1ce5157e57e113b1f2ce00" title=" " alt="" coords="30,949,278,1004"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="454,680,435,737,405,806,362,878,335,910,304,939,280,954,277,950,301,935,331,907,358,875,400,804,430,735,449,679"/>
+<area shape="rect" id="Node000014" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a72fe0aa90b16e60fa54fc264f0f533da" title=" " alt="" coords="32,1029,276,1098"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="458,680,443,750,415,840,395,888,370,935,340,979,304,1017,278,1036,275,1032,301,1013,336,975,366,932,390,886,410,839,438,749,453,679"/>
+<area shape="rect" id="Node000015" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a79cc79f75b7189adb40557540b94d25d" title=" " alt="" coords="29,1123,279,1177"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="462,680,453,767,443,823,429,883,409,945,382,1006,348,1062,304,1112,281,1129,278,1124,301,1108,343,1059,378,1003,404,943,424,882,438,822,448,766,456,680"/>
+<area shape="rect" id="Node000016" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a37830e5107eaba66d0578cc20a309c0a" title=" " alt="" coords="5,1201,303,1256"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="463,680,459,779,452,845,439,917,420,990,391,1063,354,1131,331,1162,304,1191,289,1203,285,1199,301,1187,326,1159,349,1128,387,1061,414,989,434,915,447,844,454,779,458,680"/>
 </map>

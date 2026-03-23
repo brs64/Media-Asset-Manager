@@ -101,86 +101,320 @@ $(document).ready(function(){initNavTree('test.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ad6fa39d734908ec2139d06e5ceb1ef28">Tests\Feature\AdminControllerTest::Ajouterelevedepuiscsv_handles_empty_lines</a>  ()</dt>
+<dd><a class="anchor" id="_test000021"></a> GIVEN : un fichier CSV contenant des lignes vides intercalées WHEN : l'administrateur importe le fichier THEN : les lignes vides sont ignorées et les élèves sont créés correctement  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a69e1d0e04b1222b10866e14aaba8f6c5">Tests\Feature\AdminControllerTest::Ajouterelevedepuiscsv_handles_space_separated_format</a>  ()</dt>
+<dd><a class="anchor" id="_test000018"></a> GIVEN : un fichier texte avec des noms séparés par des espaces WHEN : l'administrateur importe le fichier THEN : les élèves sont créés correctement malgré le format différent  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ac987e04a6b24a9d5a3efe07455f9a7eb">Tests\Feature\AdminControllerTest::Ajouterelevedepuiscsv_ignores_duplicates</a>  ()</dt>
+<dd><a class="anchor" id="_test000019"></a> GIVEN : un élève 'DUPONT Jean' existe déjà en base WHEN : on importe un CSV contenant ce même élève et un nouveau THEN : seul le nouvel élève est ajouté, le doublon est ignoré  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#abfcc904f129345480f13c02fdd84e53a">Tests\Feature\AdminControllerTest::Ajouterelevedepuiscsv_imports_students_from_csv</a>  ()</dt>
+<dd><a class="anchor" id="_test000017"></a> GIVEN : un fichier CSV contenant trois élèves WHEN : l'administrateur importe le fichier CSV THEN : les trois élèves sont créés en base avec les noms en majuscules  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a295117c37dca652f37afc6c599ab0568">Tests\Feature\AdminControllerTest::Ajouterelevedepuiscsv_validates_file_type</a>  ()</dt>
+<dd><a class="anchor" id="_test000020"></a> GIVEN : un fichier PDF (type non autorisé) WHEN : l'administrateur tente de l'importer comme fichier d'élèves THEN : une erreur de validation est retournée pour le type de fichier  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ad7c259a293c6a693f8ddfed08319c918">Tests\Feature\AdminControllerTest::createEleve_creates_new_student</a>  ()</dt>
+<dd><a class="anchor" id="_test000010"></a> GIVEN : un administrateur authentifié avec des données valides WHEN : il soumet le formulaire de création d'un élève THEN : l'élève est créé en base avec les bonnes informations  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a38de8754fa434cd00cb4e1dadf8bf49f">Tests\Feature\AdminControllerTest::createEleve_validates_required_fields</a>  ()</dt>
+<dd><a class="anchor" id="_test000011"></a> GIVEN : un administrateur authentifié WHEN : il soumet le formulaire de création d'un élève sans données THEN : des erreurs de validation sont retournées pour nom et prénom  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a190cf6341984227cf8bb12e4b75d1433">Tests\Feature\AdminControllerTest::createProfesseur_creates_new_professor</a>  ()</dt>
+<dd><a class="anchor" id="_test000005"></a> GIVEN : un administrateur authentifié avec des données valides WHEN : il soumet le formulaire de création d'un professeur THEN : le professeur et son utilisateur sont créés en base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ada27e1a0f5c61b0a1149224322b01cd0">Tests\Feature\AdminControllerTest::createProfesseur_validates_required_fields</a>  ()</dt>
+<dd><a class="anchor" id="_test000006"></a> GIVEN : un administrateur authentifié WHEN : il soumet le formulaire de création sans données THEN : des erreurs de validation sont retournées pour les champs obligatoires  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a5f8afd8a55a040f2b2ef9c5d66c3bcc2">Tests\Feature\AdminControllerTest::createProfesseur_validates_unique_identifiant</a>  ()</dt>
+<dd><a class="anchor" id="_test000007"></a> GIVEN : un utilisateur avec l'identifiant 'jdupont' existe déjà WHEN : on tente de créer un professeur avec le même identifiant THEN : une erreur de validation est retournée pour l'identifiant  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ad2df6cfb63fb77243eb23241e1e14325">Tests\Feature\AdminControllerTest::databaseView_displays_backup_logs</a>  ()</dt>
+<dd><a class="anchor" id="_test000013"></a> GIVEN : un fichier de log de sauvegarde existant WHEN : l'administrateur accède à la page de base de données THEN : la page affiche les logs de sauvegarde  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ade43b2d542b3f8bd47aee96e8cf73420">Tests\Feature\AdminControllerTest::deleteEleve_deletes_student</a>  ()</dt>
+<dd><a class="anchor" id="_test000012"></a> GIVEN : un élève existant en base WHEN : l'administrateur supprime cet élève THEN : l'élève est supprimé de la base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a0c5363c1ba7e2ec353bc6a5513f802a7">Tests\Feature\AdminControllerTest::deleteProfesseur_deletes_professor_without_media</a>  ()</dt>
+<dd><a class="anchor" id="_test000008"></a> GIVEN : un professeur sans médias associés WHEN : l'administrateur supprime ce professeur THEN : le professeur est supprimé de la base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a01117fdd147dd6204aded3727bc2b49c">Tests\Feature\AdminControllerTest::deleteProfesseur_prevents_deletion_if_has_media</a>  ()</dt>
+<dd><a class="anchor" id="_test000009"></a> GIVEN : un professeur ayant des médias associés WHEN : l'administrateur tente de le supprimer THEN : la suppression est refusée et le professeur reste en base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a48c15c340fe6e8f9cae1f72a66c6a59c">Tests\Feature\AdminControllerTest::downloadLogs_downloads_log_file</a>  ()</dt>
+<dd><a class="anchor" id="_test000015"></a> GIVEN : un fichier de log existant avec du contenu WHEN : l'administrateur demande le téléchargement des logs THEN : le fichier est téléchargé avec succès  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a2584383b8e0816fda6d36000ea02d7e1">Tests\Feature\AdminControllerTest::downloadLogs_returns_error_when_file_missing</a>  ()</dt>
+<dd><a class="anchor" id="_test000016"></a> GIVEN : aucun fichier de log n'existe WHEN : l'administrateur demande le téléchargement des logs THEN : une erreur est retournée avec redirection  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#afd380483260a43f4743d41a2e6bca08d">Tests\Feature\AdminControllerTest::logs_page_displays_recent_logs</a>  ()</dt>
+<dd><a class="anchor" id="_test000002"></a> GIVEN : un fichier de log existant avec des entrées WHEN : l'administrateur accède à la page des logs THEN : la page s'affiche avec les logs récents  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#afe1b93e9b5b6cdebf9e06e109b14e6fa">Tests\Feature\AdminControllerTest::logs_page_handles_missing_log_file</a>  ()</dt>
+<dd><a class="anchor" id="_test000003"></a> GIVEN : aucun fichier de log n'existe WHEN : l'administrateur accède à la page des logs THEN : la page s'affiche avec une liste de logs vide  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#afa32f847b4c955773af35b170eff50b4">Tests\Feature\AdminControllerTest::reconciliation_page_displays</a>  ()</dt>
+<dd><a class="anchor" id="_test000022"></a> GIVEN : un administrateur authentifié WHEN : il accède à la page de réconciliation THEN : la page s'affiche correctement  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#acee2a973f50060e3910e8774a67b370f">Tests\Feature\AdminControllerTest::runBackup_executes_backup_command_successfully</a>  ()</dt>
+<dd><a class="anchor" id="_test000014"></a> GIVEN : un administrateur authentifié et la commande de sauvegarde disponible WHEN : il lance une sauvegarde manuelle THEN : la commande s'exécute avec succès et un message de confirmation s'affiche  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a9b1934ad658287da05bc86e5f76dd493">Tests\Feature\AdminControllerTest::runReconciliation_executes_sync</a>  ()</dt>
+<dd><a class="anchor" id="_test000023"></a> GIVEN : un administrateur authentifié WHEN : il lance la réconciliation THEN : la synchronisation s'exécute et le résultat est stocké en session  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a59cf6cea0791484a116018395340abc8">Tests\Feature\AdminControllerTest::saveBackupSettings_updates_backup_configuration</a>  ()</dt>
+<dd><a class="anchor" id="_test000024"></a> GIVEN : un administrateur avec des paramètres de sauvegarde valides WHEN : il enregistre la configuration de sauvegarde THEN : les paramètres sont mis à jour avec succès  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#ad2bbc1e9bc76027264e377db31abd301">Tests\Feature\AdminControllerTest::saveBackupSettings_validates_required_fields</a>  ()</dt>
+<dd><a class="anchor" id="_test000025"></a> GIVEN : un administrateur authentifié WHEN : il soumet le formulaire de sauvegarde sans données THEN : des erreurs de validation sont retournées pour les champs obligatoires  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#a184b0994febd4df8b55229d92ca7e8a2">Tests\Feature\AdminControllerTest::settings_page_displays_configuration</a>  ()</dt>
+<dd><a class="anchor" id="_test000001"></a> GIVEN : un administrateur authentifié WHEN : il accède à la page des réglages THEN : la page s'affiche avec les paramètres de configuration  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1AdminControllerTest.html#af3ae14ef5d47f2695cca36c7074a2f80">Tests\Feature\AdminControllerTest::users_page_displays_professeurs_and_eleves</a>  ()</dt>
+<dd><a class="anchor" id="_test000004"></a> GIVEN : des professeurs et des élèves existent en base WHEN : l'administrateur accède à la page des utilisateurs THEN : la page affiche les listes de professeurs et d'élèves  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerControllerTest.html#aa5554a79788474f08a36342e1319332f">Tests\Feature\FileExplorerControllerTest::scan_aborts_for_invalid_disk</a>  ()</dt>
-<dd><a class="anchor" id="_test000001"></a>  </dd>
+<dd><a class="anchor" id="_test000026"></a> GIVEN : un utilisateur authentifié WHEN : on lance un scan avec un nom de disque invalide THEN : la réponse retourne un statut 403  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerControllerTest.html#a58fcf91a70f231b80dea442807f2fee3">Tests\Feature\FileExplorerControllerTest::scan_results_returns_empty_if_not_done</a>  ()</dt>
-<dd><a class="anchor" id="_test000004"></a>  </dd>
+<dd><a class="anchor" id="_test000029"></a> GIVEN : un scan toujours en cours sans résultats finaux WHEN : on demande les résultats de ce scan THEN : la réponse retourne un statut 'running' avec des résultats vides  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerControllerTest.html#a025c971d04d56401e8dcb7bfc3c5911b">Tests\Feature\FileExplorerControllerTest::scan_results_returns_processed_data</a>  ()</dt>
-<dd><a class="anchor" id="_test000005"></a>  </dd>
+<dd><a class="anchor" id="_test000030"></a> GIVEN : un scan terminé avec deux vidéos, dont une déjà importée et une en cours de transfert WHEN : on demande les résultats de ce scan THEN : seule la vidéo non importée est retournée avec ses informations de job  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerControllerTest.html#a88115d9c9862ece0769848fa49061a47">Tests\Feature\FileExplorerControllerTest::scan_status_returns_correct_values</a>  ()</dt>
-<dd><a class="anchor" id="_test000003"></a>  </dd>
+<dd><a class="anchor" id="_test000028"></a> GIVEN : un scan en cours avec un statut et un compteur stockés en cache WHEN : on consulte le statut de ce scan THEN : la réponse retourne le statut 'running' et le compteur 5  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerControllerTest.html#afef518db407f051b9bf0ef717f4ac023">Tests\Feature\FileExplorerControllerTest::start_scan_dispatches_job_and_returns_scan_id</a>  ()</dt>
-<dd><a class="anchor" id="_test000002"></a>  </dd>
+<dd><a class="anchor" id="_test000027"></a> GIVEN : un utilisateur authentifié avec les queues simulées WHEN : on démarre un scan sur le disque ftp_pad THEN : un job ScanDiskJob est dispatché et un scan_id est retourné  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerServiceTest.html#a5631e9a35cfb9aea89c69427d5da13d1">Tests\Feature\FileExplorerServiceTest::isVideo_returns_true_for_video_extensions</a>  ()</dt>
-<dd><a class="anchor" id="_test000010"></a>  </dd>
+<dd><a class="anchor" id="_test000035"></a> GIVEN : des listes de noms de fichiers vidéo et non-vidéo WHEN : on vérifie chaque fichier avec la méthode isVideo THEN : les fichiers vidéo retournent true, les autres retournent false  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerServiceTest.html#a05b77dae4c35e7e06303fb0a3f2257b2">Tests\Feature\FileExplorerServiceTest::scanDisk_handles_laravel_disks</a>  ()</dt>
-<dd><a class="anchor" id="_test000008"></a>  </dd>
+<dd><a class="anchor" id="_test000033"></a> GIVEN : un disque Laravel simulé contenant un sous-dossier, une vidéo .mkv et un fichier .txt WHEN : on scanne ce disque THEN : seuls le dossier et la vidéo sont retournés, le fichier texte est ignoré  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerServiceTest.html#ae962b5f7b2e3ff2770068e26fa022fa0">Tests\Feature\FileExplorerServiceTest::scanDisk_returns_empty_for_empty_directory</a>  ()</dt>
-<dd><a class="anchor" id="_test000006"></a>  </dd>
+<dd><a class="anchor" id="_test000031"></a> GIVEN : un répertoire temporaire vide WHEN : on scanne ce répertoire THEN : le résultat est un tableau vide  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerServiceTest.html#a8d2a451e7cf3bac9aebcbf35b32408c8">Tests\Feature\FileExplorerServiceTest::scanDisk_returns_folders_and_videos_only</a>  ()</dt>
-<dd><a class="anchor" id="_test000007"></a>  </dd>
+<dd><a class="anchor" id="_test000032"></a> GIVEN : un répertoire contenant un dossier, une vidéo .mp4 et un fichier .txt WHEN : on scanne ce répertoire THEN : seuls le dossier et la vidéo sont retournés, le fichier texte est ignoré  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1FileExplorerServiceTest.html#a51ae2214662e2bc5ff76142bf0ccc8f1">Tests\Feature\FileExplorerServiceTest::scanDiskRecursive_calls_callback_for_all_items</a>  ()</dt>
-<dd><a class="anchor" id="_test000009"></a>  </dd>
+<dd><a class="anchor" id="_test000034"></a> GIVEN : un répertoire contenant un dossier et deux fichiers vidéo WHEN : on scanne récursivement ce répertoire avec un callback THEN : le callback est appelé pour chaque élément trouvé (dossier et vidéos)  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a8c26c28c2677c48106dad3e268ca27ad">Tests\Feature\MediaControllerTest::destroy_redirects_on_success</a>  ()</dt>
-<dd><a class="anchor" id="_test000017"></a>  </dd>
+<dd><a class="anchor" id="_test000042"></a> GIVEN : un média existant et le service de suppression mocké WHEN : on supprime le média THEN : l'utilisateur est redirigé vers la liste avec un message de succès  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#aa978643e5053e9444b664445cd21c85c">Tests\Feature\MediaControllerTest::index_displays_media_list</a>  ()</dt>
-<dd><a class="anchor" id="_test000011"></a>  </dd>
+<dd><a class="anchor" id="_test000036"></a> GIVEN : trois médias existent en base WHEN : on accède à la liste des médias THEN : la page s'affiche avec la liste des médias  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a2b2b9b40f7bd0e33334931a9ecc434e0">Tests\Feature\MediaControllerTest::show_displays_media</a>  ()</dt>
-<dd><a class="anchor" id="_test000014"></a>  </dd>
+<dd><a class="anchor" id="_test000039"></a> GIVEN : un média existant en base WHEN : on accède à la page de détail de ce média THEN : la page vidéo s'affiche correctement  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#ad35367c1223c014d28076312646e6135">Tests\Feature\MediaControllerTest::show_returns_404_when_media_not_found</a>  ()</dt>
-<dd><a class="anchor" id="_test000015"></a>  </dd>
+<dd><a class="anchor" id="_test000040"></a> GIVEN : aucun média avec l'identifiant 999999 n'existe WHEN : on tente d'accéder à ce média THEN : une erreur 404 est retournée  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a292fb2b3e18f7ab601fdccaf75d9e51e">Tests\Feature\MediaControllerTest::store_creates_media_and_participations</a>  ()</dt>
-<dd><a class="anchor" id="_test000012"></a>  </dd>
+<dd><a class="anchor" id="_test000037"></a> GIVEN : des rôles existent et des données valides avec participations WHEN : on soumet le formulaire de création d'un média THEN : le média, l'élève et la participation sont créés en base  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#ace91935b9d24903af554f511b7ea7d50">Tests\Feature\MediaControllerTest::store_requires_title</a>  ()</dt>
-<dd><a class="anchor" id="_test000013"></a>  </dd>
+<dd><a class="anchor" id="_test000038"></a> GIVEN : aucune donnée fournie WHEN : on soumet le formulaire de création d'un média THEN : une erreur de validation est retournée pour le titre  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a81300d9df1fd3106be740087354aa52a">Tests\Feature\MediaControllerTest::sync_dispatches_jobs</a>  ()</dt>
-<dd><a class="anchor" id="_test000018"></a>  </dd>
+<dd><a class="anchor" id="_test000043"></a> GIVEN : un utilisateur authentifié et la file de jobs simulée WHEN : il lance la synchronisation des médias THEN : trois jobs de synchronisation sont dispatched  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a63ee09025175f2499d133ee9febc0745">Tests\Feature\MediaControllerTest::sync_local_path_returns_404_when_not_found</a>  ()</dt>
-<dd><a class="anchor" id="_test000020"></a>  </dd>
+<dd><a class="anchor" id="_test000045"></a> GIVEN : un utilisateur authentifié et le service de synchronisation retournant false WHEN : il envoie un chemin local inexistant à synchroniser THEN : une erreur 404 est retournée avec le message 'Media non trouvé'  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a01db2e1b052d36d12b3f7b71a2b24406">Tests\Feature\MediaControllerTest::sync_local_path_success</a>  ()</dt>
-<dd><a class="anchor" id="_test000019"></a>  </dd>
+<dd><a class="anchor" id="_test000044"></a> GIVEN : un utilisateur authentifié et le service de synchronisation mocké avec succès WHEN : il envoie un chemin local à synchroniser THEN : la synchronisation réussit et un message de confirmation est retourné  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaControllerTest.html#a874e0f0248ed80bf45fc34a0c756a0fb">Tests\Feature\MediaControllerTest::update_updates_media_and_participations</a>  ()</dt>
-<dd><a class="anchor" id="_test000016"></a>  </dd>
+<dd><a class="anchor" id="_test000041"></a> GIVEN : un média existant et des rôles disponibles WHEN : on met à jour le titre et les participations du média THEN : le média est modifié et les nouvelles participations sont enregistrées  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#ae97a82808b4f3b35301d056594e9cfe6">Tests\Feature\MediaThumbnailServiceTest::it_calculates_correct_timecode_from_duration</a>  ()</dt>
+<dd><a class="anchor" id="_test000055"></a> GIVEN : des durées vidéo au format HH:MM:SS.ss WHEN : on calcule le timecode (50% de la durée) THEN : le timecode retourné correspond à la moitié de la durée en secondes  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a282d3875de9b294e907167983f6cd431">Tests\Feature\MediaThumbnailServiceTest::it_correctly_builds_ftp_url_from_arch_and_pad_disks</a>  ()</dt>
-<dd><a class="anchor" id="_test000024"></a>  </dd>
+<dd><a class="anchor" id="_test000049"></a> GIVEN : un média avec des chemins archive et PAD, et une configuration FTP archive WHEN : on construit l'URL FTP pour le chemin archive THEN : l'URL contient les identifiants et le chemin correct  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a43ad963f470f95c37b2fb3ce823f5923">Tests\Feature\MediaThumbnailServiceTest::it_deletes_existing_thumbnail_file_successfully</a>  ()</dt>
-<dd><a class="anchor" id="_test000025"></a>  </dd>
+<dd><a class="anchor" id="_test000050"></a> GIVEN : un média avec une miniature existante sur le disque WHEN : on supprime la miniature THEN : la suppression retourne true et le fichier n'existe plus  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aff51e145c96ee5fd40e06b592ef99616">Tests\Feature\MediaThumbnailServiceTest::it_generates_thumbnail_from_local_video_file_when_forced</a>  ()</dt>
-<dd><a class="anchor" id="_test000022"></a>  </dd>
+<dd><a class="anchor" id="_test000047"></a> GIVEN : un média avec un fichier vidéo local existant et ffmpeg mocké WHEN : on force la génération de la miniature THEN : une miniature est générée et son chemin contient l'identifiant du média  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a1bc2b9290d59d373f6024c98663a3e57">Tests\Feature\MediaThumbnailServiceTest::it_generates_thumbnail_with_custom_video_path</a>  ()</dt>
+<dd><a class="anchor" id="_test000058"></a> GIVEN : un média avec un chemin vidéo personnalisé passé en paramètre WHEN : on force la génération de la miniature avec ce chemin personnalisé THEN : la miniature est générée avec succès  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a9d4bc50559be10557da600e53f4bddcb">Tests\Feature\MediaThumbnailServiceTest::it_regenerates_missing_thumbnails_and_skips_existing_ones</a>  ()</dt>
-<dd><a class="anchor" id="_test000027"></a>  </dd>
+<dd><a class="anchor" id="_test000052"></a> GIVEN : deux médias dont un avec miniature existante et un sans WHEN : on régénère les miniatures manquantes THEN : une miniature est générée et l'autre est ignorée (skipped)  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a64c9d33832f54b88684145fc2c4af012">Tests\Feature\MediaThumbnailServiceTest::it_returns_existing_thumbnail_without_regenerating_when_force_is_false</a>  ()</dt>
-<dd><a class="anchor" id="_test000021"></a>  </dd>
+<dd><a class="anchor" id="_test000046"></a> GIVEN : un média avec une miniature déjà existante sur le disque WHEN : on génère la miniature sans forcer la régénération THEN : le chemin de la miniature existante est retourné sans régénération  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a3b00ac52c532d90342d5890e04da3592">Tests\Feature\MediaThumbnailServiceTest::it_returns_null_when_ffmpeg_execution_fails</a>  ()</dt>
+<dd><a class="anchor" id="_test000056"></a> GIVEN : un média avec un chemin archive et ffmpeg configuré pour échouer WHEN : on force la génération de la miniature THEN : le résultat est null car ffmpeg a échoué  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#af44218428ce6db7604c6ec446724fe92">Tests\Feature\MediaThumbnailServiceTest::it_returns_null_when_ftp_config_is_missing</a>  ()</dt>
+<dd><a class="anchor" id="_test000059"></a> GIVEN : un média avec un chemin archive mais sans configuration FTP WHEN : on force la génération de la miniature THEN : le résultat est null car la configuration FTP est absente  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a2a304cacdc02375138fabc543ebe7cec">Tests\Feature\MediaThumbnailServiceTest::it_returns_null_when_no_video_path_is_available</a>  ()</dt>
-<dd><a class="anchor" id="_test000023"></a>  </dd>
+<dd><a class="anchor" id="_test000048"></a> GIVEN : un média sans aucun chemin vidéo (local, archive, PAD) WHEN : on tente de générer une miniature THEN : le résultat est null  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#aad0803e7c150380319e60ef2163a76dd">Tests\Feature\MediaThumbnailServiceTest::it_returns_true_when_deleting_thumbnail_that_does_not_exist</a>  ()</dt>
-<dd><a class="anchor" id="_test000026"></a>  </dd>
-<dt>Membre <a class="el" href="classTests_1_1Feature_1_1PermissionsTest.html#a6940bfa328bc2c5c0f88ed87e0ed1ca3">Tests\Feature\PermissionsTest::l_admin_unique_peut_acceder_aux_reglages</a>  ()</dt>
-<dd><a class="anchor" id="_test000029"></a>  </dd>
-<dt>Membre <a class="el" href="classTests_1_1Feature_1_1PermissionsTest.html#a7b8fa71886a8eec89ca7248950bb680e">Tests\Feature\PermissionsTest::un_professeur_ne_peut_pas_acceder_aux_reglages_admin</a>  ()</dt>
-<dd><a class="anchor" id="_test000028"></a>  </dd>
+<dd><a class="anchor" id="_test000051"></a> GIVEN : un média sans miniature existante sur le disque WHEN : on tente de supprimer la miniature THEN : la suppression retourne true (pas d'erreur)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#acb4d68a90e1ce5157e57e113b1f2ce00">Tests\Feature\MediaThumbnailServiceTest::it_uses_archive_path_when_local_path_not_exists</a>  ()</dt>
+<dd><a class="anchor" id="_test000053"></a> GIVEN : un média avec un chemin local inexistant mais un chemin FTP archive disponible WHEN : on force la génération de la miniature THEN : la miniature est générée via le chemin archive  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a72fe0aa90b16e60fa54fc264f0f533da">Tests\Feature\MediaThumbnailServiceTest::it_uses_default_timecode_when_duration_cannot_be_determined</a>  ()</dt>
+<dd><a class="anchor" id="_test000057"></a> GIVEN : un média avec un chemin archive et une durée indéterminable (null) WHEN : on force la génération de la miniature THEN : ffmpeg est appelé avec le timecode par défaut (5 secondes)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a79cc79f75b7189adb40557540b94d25d">Tests\Feature\MediaThumbnailServiceTest::it_uses_pad_path_when_archive_not_available</a>  ()</dt>
+<dd><a class="anchor" id="_test000054"></a> GIVEN : un média avec uniquement un chemin FTP PAD disponible WHEN : on force la génération de la miniature THEN : la miniature est générée via le chemin PAD  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1MediaThumbnailServiceTest.html#a37830e5107eaba66d0578cc20a309c0a">Tests\Feature\MediaThumbnailServiceTest::regenerateMissingThumbnails_tracks_failed_generations</a>  ()</dt>
+<dd><a class="anchor" id="_test000060"></a> GIVEN : deux médias sans miniature, dont un sans chemin vidéo et un avec un fichier local WHEN : on régénère les miniatures manquantes THEN : les statistiques contiennent les compteurs de succès et d'échecs  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1PermissionsTest.html#a1b9e377556e7e2dc882d1010d2c92fdb">Tests\Feature\PermissionsTest::l_admin_peut_acceder_aux_reglages</a>  ()</dt>
+<dd><a class="anchor" id="_test000063"></a> GIVEN : un utilisateur avec le rôle admin WHEN : il accède à la page des réglages admin THEN : l'accès est autorisé (statut 200)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1PermissionsTest.html#aaf34c1d74bd237626943614c0b48a375">Tests\Feature\PermissionsTest::un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages</a>  ()</dt>
+<dd><a class="anchor" id="_test000061"></a> GIVEN : un utilisateur avec le rôle professeur WHEN : il accède à la page des réglages admin THEN : l'accès est autorisé (statut 200)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1PermissionsTest.html#ad1d15ac85e39a46a3392987a7bbb40c9">Tests\Feature\PermissionsTest::un_utilisateur_sans_role_ne_peut_pas_acceder_a_ladmin</a>  ()</dt>
+<dd><a class="anchor" id="_test000062"></a> GIVEN : un utilisateur sans aucun rôle assigné WHEN : il tente d'accéder à la page des réglages admin THEN : l'accès est refusé (statut 403)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#add652ce4e89ca82b52f906939653d400">Tests\Feature\SearchControllerTest::autocomplete_handles_empty_term</a>  ()</dt>
+<dd><a class="anchor" id="_test000074"></a> GIVEN : 15 médias en base de données WHEN : on lance l'autocomplétion avec un terme vide THEN : jusqu'à 10 résultats sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#aa37c5b792eceef3d30372dd9927c5236">Tests\Feature\SearchControllerTest::autocomplete_is_case_insensitive</a>  ()</dt>
+<dd><a class="anchor" id="_test000075"></a> GIVEN : un média avec un titre en casse mixte WHEN : on recherche le même titre en minuscules THEN : le média est trouvé malgré la différence de casse  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a0cb674f42f0380b5f19f272a47400915">Tests\Feature\SearchControllerTest::autocomplete_limits_results_to_10</a>  ()</dt>
+<dd><a class="anchor" id="_test000072"></a> GIVEN : 15 médias avec le même titre WHEN : on lance l'autocomplétion avec un terme correspondant THEN : le résultat est limité à 10 éléments maximum  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#aec9f978cf59f3206945315bf498f5ed4">Tests\Feature\SearchControllerTest::autocomplete_returns_empty_array_when_no_matches</a>  ()</dt>
+<dd><a class="anchor" id="_test000073"></a> GIVEN : 5 médias sans titre correspondant au terme recherché WHEN : on lance l'autocomplétion avec un terme inexistant THEN : un tableau vide est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a4924b1c36fe4280cd9e2395d3cb052f0">Tests\Feature\SearchControllerTest::autocomplete_returns_matching_titles</a>  ()</dt>
+<dd><a class="anchor" id="_test000071"></a> GIVEN : trois médias dont deux avec un titre commençant par 'Documentaire' WHEN : on lance l'autocomplétion avec le terme 'Documentaire' THEN : seuls les deux médias correspondants sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a27863b57d6682c4221b41bd13b3ebc12">Tests\Feature\SearchControllerTest::autocomplete_searches_partial_matches</a>  ()</dt>
+<dd><a class="anchor" id="_test000076"></a> GIVEN : un média avec un titre long WHEN : on recherche une sous-chaîne du titre THEN : le média est trouvé par correspondance partielle  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a8698c877e91fb87336cc4a52650c9cf8">Tests\Feature\SearchControllerTest::index_appends_query_parameters_to_pagination</a>  ()</dt>
+<dd><a class="anchor" id="_test000070"></a> GIVEN : 25 médias avec la même description WHEN : on recherche cette description et on consulte la pagination THEN : les paramètres de recherche sont conservés dans les liens de pagination  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a89ae87ff208bd3a9b3d9b36f79936ec6">Tests\Feature\SearchControllerTest::index_displays_search_page_without_results_when_no_query</a>  ()</dt>
+<dd><a class="anchor" id="_test000064"></a> GIVEN : aucun paramètre de recherche fourni WHEN : on accède à la page de recherche THEN : la page s'affiche avec les variables de vue nécessaires  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a3893f537c9d1c6835b23926e9b43207b">Tests\Feature\SearchControllerTest::index_loads_projets_and_professeurs_for_filters</a>  ()</dt>
+<dd><a class="anchor" id="_test000068"></a> GIVEN : 3 projets et 5 professeurs en base de données WHEN : on accède à la page de recherche THEN : les listes de projets et professeurs sont disponibles dans la vue  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#accdc44ede148d35f1474fea1e4d3530f">Tests\Feature\SearchControllerTest::index_paginates_results</a>  ()</dt>
+<dd><a class="anchor" id="_test000069"></a> GIVEN : 25 médias avec la même description WHEN : on recherche cette description THEN : les résultats sont paginés via LengthAwarePaginator  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#ae123d8fe3268d9efd20fbef0ac5e279c">Tests\Feature\SearchControllerTest::index_prioritizes_description_over_motCle</a>  ()</dt>
+<dd><a class="anchor" id="_test000067"></a> GIVEN : un média avec une description correspondant au terme de recherche WHEN : on fournit à la fois description et motCle comme paramètres THEN : la description est prioritaire sur le mot-clé  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a85e86f2225548f28b44a70289838461d">Tests\Feature\SearchControllerTest::index_returns_all_medias_when_no_search_term</a>  ()</dt>
+<dd><a class="anchor" id="_test000078"></a> GIVEN : 10 médias en base de données WHEN : on accède à la recherche sans terme de recherche THEN : tous les médias sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#acfb9dc36d8ed6fdf8c606f1f527fe5cd">Tests\Feature\SearchControllerTest::index_searches_with_description_parameter</a>  ()</dt>
+<dd><a class="anchor" id="_test000065"></a> GIVEN : un média avec une description unique et trois autres médias WHEN : on recherche par le mot 'unique' dans la description THEN : seul le média correspondant est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#a10be79e77fe3c5e5b455cc39b49a4e36">Tests\Feature\SearchControllerTest::index_searches_with_motCle_parameter</a>  ()</dt>
+<dd><a class="anchor" id="_test000066"></a> GIVEN : un média avec un titre spécifique et trois autres médias WHEN : on recherche par mot-clé correspondant au titre THEN : seul le média correspondant est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1SearchControllerTest.html#af303663cd5ebd17d89c38c807d6b31cf">Tests\Feature\SearchControllerTest::index_uses_media_service_for_search</a>  ()</dt>
+<dd><a class="anchor" id="_test000077"></a> GIVEN : un MediaService mocké configuré pour répondre à une recherche WHEN : on effectue une recherche par description THEN : le service est appelé et la page s'affiche correctement  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#ae75f0e18e304b9963291990fef361c27">Tests\Feature\StreamControllerTest::it_returns_404_if_local_video_does_not_exist</a>  ()</dt>
-<dd><a class="anchor" id="_test000033"></a>  </dd>
+<dd><a class="anchor" id="_test000082"></a> GIVEN : un média avec un chemin local pointant vers un fichier inexistant WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 404  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a1b40f823bc0f6bf31698055e068a5248">Tests\Feature\StreamControllerTest::it_returns_404_when_ftp_file_is_missing</a>  ()</dt>
-<dd><a class="anchor" id="_test000036"></a>  </dd>
+<dd><a class="anchor" id="_test000085"></a> GIVEN : un média avec un chemin FTP archive mais le fichier n'existe pas sur le disque WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 404  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a44055f43662161e9200d2fe3981d3884">Tests\Feature\StreamControllerTest::it_returns_404_when_hls_segment_is_missing</a>  ()</dt>
-<dd><a class="anchor" id="_test000040"></a>  </dd>
+<dd><a class="anchor" id="_test000089"></a> GIVEN : un média HLS sans le segment .ts demandé sur le disque WHEN : on demande le streaming d'un segment inexistant THEN : la réponse retourne un statut 404  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a80a35583b0eb3d914990563e16ff15ea">Tests\Feature\StreamControllerTest::it_returns_404_when_media_does_not_exist</a>  ()</dt>
-<dd><a class="anchor" id="_test000030"></a>  </dd>
+<dd><a class="anchor" id="_test000079"></a> GIVEN : aucun média n'existe avec l'identifiant 999 WHEN : on tente de streamer ce média inexistant THEN : la réponse retourne un statut 404  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a3efeaa6d3aed14371d320892332e1c44">Tests\Feature\StreamControllerTest::it_returns_404_when_media_has_no_video_paths</a>  ()</dt>
-<dd><a class="anchor" id="_test000031"></a>  </dd>
+<dd><a class="anchor" id="_test000080"></a> GIVEN : un média existe sans aucun chemin vidéo configuré WHEN : on tente de streamer ce média THEN : la réponse retourne un statut 404  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a9b5ea8b035b07aa4a5a6ec552d3724bc">Tests\Feature\StreamControllerTest::it_streams_hls_playlist_when_extension_is_m3u8</a>  ()</dt>
-<dd><a class="anchor" id="_test000038"></a>  </dd>
+<dd><a class="anchor" id="_test000087"></a> GIVEN : un média pointant vers un fichier playlist HLS (.m3u8) sur le disque FTP archive WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 200 avec le Content-Type HLS approprié  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a129c902acbd93d93e97866b2b0eea871">Tests\Feature\StreamControllerTest::it_streams_hls_segment</a>  ()</dt>
-<dd><a class="anchor" id="_test000039"></a>  </dd>
+<dd><a class="anchor" id="_test000088"></a> GIVEN : un média HLS avec un segment .ts présent sur le disque FTP archive WHEN : on demande le streaming du segment spécifique THEN : la réponse retourne un statut 200 avec le Content-Type video/mp2t  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a7caf87973f451cc2ea3be27e0b1fbc13">Tests\Feature\StreamControllerTest::it_streams_video_from_ftp_arch_disk</a>  ()</dt>
-<dd><a class="anchor" id="_test000034"></a>  </dd>
+<dd><a class="anchor" id="_test000083"></a> GIVEN : un média sans chemin local mais avec un chemin FTP archive et un fichier présent WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 200 avec le header Accept-Ranges  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a9596eee3f179ffdd05007de42db17e93">Tests\Feature\StreamControllerTest::it_streams_video_from_ftp_pad_disk_when_arch_not_available</a>  ()</dt>
-<dd><a class="anchor" id="_test000035"></a>  </dd>
+<dd><a class="anchor" id="_test000084"></a> GIVEN : un média avec uniquement un chemin FTP PAD et un fichier présent sur ce disque WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 200  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a08f6d26b241c5208c3556533cd079bf9">Tests\Feature\StreamControllerTest::it_streams_video_from_local_storage_when_chemin_local_exists</a>  ()</dt>
-<dd><a class="anchor" id="_test000032"></a>  </dd>
+<dd><a class="anchor" id="_test000081"></a> GIVEN : un média avec un chemin local et un fichier vidéo présent sur le disque local WHEN : on demande le streaming de ce média THEN : la réponse retourne un statut 200 avec le header Accept-Ranges  </dd>
 <dt>Membre <a class="el" href="classTests_1_1Feature_1_1StreamControllerTest.html#a20fbca67c8e0fe7052f7e052be5759c9">Tests\Feature\StreamControllerTest::it_supports_http_range_requests</a>  ()</dt>
-<dd><a class="anchor" id="_test000037"></a> </dd>
+<dd><a class="anchor" id="_test000086"></a> GIVEN : un média avec un fichier vidéo de 5000 octets sur le disque FTP archive WHEN : on envoie une requête avec un header Range demandant les octets 0 à 100 THEN : la réponse retourne un statut 206 (Partial Content) avec le header Accept-Ranges  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a99d14f5f7407ca08733aca2980120ee3">Tests\Feature\TransfertControllerTest::cancel_cancels_job_successfully</a>  ()</dt>
+<dd><a class="anchor" id="_test000104"></a> GIVEN : un service FFAStrans prêt à annuler un job WHEN : on annule le job THEN : une redirection avec un message de succès est retournée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#ac8b227aca2cc258073f381f5cd372c4c">Tests\Feature\TransfertControllerTest::cancel_handles_failure</a>  ()</dt>
+<dd><a class="anchor" id="_test000105"></a> GIVEN : un service FFAStrans qui échoue à annuler un job WHEN : on tente d'annuler le job THEN : une redirection avec un message d'erreur est retournée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a3c5acb170d8327e271b518ca5e35087c">Tests\Feature\TransfertControllerTest::checkStatus_detects_cancelled_state</a>  ()</dt>
+<dd><a class="anchor" id="_test000101"></a> GIVEN : un job FFAStrans annulé WHEN : on vérifie le statut du job THEN : le statut 'Annulé' est retourné avec finished à true  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a27997b809acaf75b14827d07bd775994">Tests\Feature\TransfertControllerTest::checkStatus_detects_error_state</a>  ()</dt>
+<dd><a class="anchor" id="_test000100"></a> GIVEN : un job FFAStrans en état d'erreur WHEN : on vérifie le statut du job THEN : le statut 'Echoué' est retourné avec finished à true  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#aea30a9dceef778e745729cbee03c9420">Tests\Feature\TransfertControllerTest::checkStatus_detects_success_state</a>  ()</dt>
+<dd><a class="anchor" id="_test000099"></a> GIVEN : un job FFAStrans terminé avec succès WHEN : on vérifie le statut du job THEN : le statut 'Terminé' est retourné avec finished à true  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a8508581ea283600df8cb3f4b223ac188">Tests\Feature\TransfertControllerTest::checkStatus_extracts_progress_from_variables</a>  ()</dt>
+<dd><a class="anchor" id="_test000102"></a> GIVEN : un job FFAStrans avec la progression dans les variables WHEN : on vérifie le statut du job THEN : la progression est extraite des variables du job  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a1f3da39a60843b245a11850f2e4b0da0">Tests\Feature\TransfertControllerTest::checkStatus_handles_connection_error</a>  ()</dt>
+<dd><a class="anchor" id="_test000103"></a> GIVEN : un service FFAStrans qui lève une exception de connexion WHEN : on vérifie le statut d'un job THEN : une erreur 500 avec le message 'Erreur de connexion' est retournée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a6ec83afcdf2ce7f1733b54f1896e35f8">Tests\Feature\TransfertControllerTest::checkStatus_returns_job_progress</a>  ()</dt>
+<dd><a class="anchor" id="_test000098"></a> GIVEN : un job FFAStrans en cours de traitement à 75% WHEN : on vérifie le statut du job THEN : la progression et le statut 'En cours' sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a853ad3686f2388ad704284d8cae72bee">Tests\Feature\TransfertControllerTest::index_displays_transfert_page</a>  ()</dt>
+<dd><a class="anchor" id="_test000090"></a> GIVEN : un utilisateur authentifié WHEN : on accède à la page des transferts THEN : la page s'affiche avec la variable maxConcurrent  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#aa3ed48b0945dabec5f2f8e9a13a936ed">Tests\Feature\TransfertControllerTest::list_handles_ffastrans_error_gracefully</a>  ()</dt>
+<dd><a class="anchor" id="_test000093"></a> GIVEN : un média sans chemin local et une erreur de connexion FFAStrans WHEN : on récupère la liste des transferts THEN : les résultats sont retournés avec le statut 'En attente'  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a234b472159eab8b9e3c8b1431ddd8914">Tests\Feature\TransfertControllerTest::list_matches_active_jobs_with_media</a>  ()</dt>
+<dd><a class="anchor" id="_test000092"></a> GIVEN : un média sans chemin local et un job FFAStrans actif correspondant WHEN : on récupère la liste des transferts THEN : le média est associé aux informations du job en cours  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a416c517c66d44dd63050e42b7fd95ff3">Tests\Feature\TransfertControllerTest::list_prioritizes_arch_over_pad</a>  ()</dt>
+<dd><a class="anchor" id="_test000094"></a> GIVEN : un média avec à la fois un chemin NAS_ARCH et NAS_PAD WHEN : on récupère la liste des transferts THEN : le disque NAS_ARCH est utilisé en priorité  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#abdb705e98e86ed6373ceeb795e90b9f3">Tests\Feature\TransfertControllerTest::list_returns_media_without_local_paths</a>  ()</dt>
+<dd><a class="anchor" id="_test000091"></a> GIVEN : des médias sur NAS sans chemin local et un média avec chemin local WHEN : on récupère la liste des transferts THEN : seuls les médias sans chemin local sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#aaf599408b098071f7fbcb50d1a9bc2f0">Tests\Feature\TransfertControllerTest::list_uses_pad_when_arch_not_available</a>  ()</dt>
+<dd><a class="anchor" id="_test000095"></a> GIVEN : un média avec uniquement un chemin NAS_PAD WHEN : on récupère la liste des transferts THEN : le disque NAS_PAD est utilisé comme source  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#ac01fe67b2f80bab8eaba863db9958421">Tests\Feature\TransfertControllerTest::startJob_handles_ffastrans_error</a>  ()</dt>
+<dd><a class="anchor" id="_test000097"></a> GIVEN : un service FFAStrans mocké qui lève une exception WHEN : on tente de soumettre un job de transfert THEN : une erreur 500 est retournée avec le message d'erreur  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Feature_1_1TransfertControllerTest.html#a3b3f07a3bc45166727619bc8dcdc356e">Tests\Feature\TransfertControllerTest::startJob_submits_job_to_ffastrans</a>  ()</dt>
+<dd><a class="anchor" id="_test000096"></a> GIVEN : un service FFAStrans mocké prêt à accepter un job WHEN : on soumet un job de transfert avec un chemin et un disque THEN : le job est créé et l'identifiant est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a99aeb19969fee8bd8442425221253150">Tests\Unit\Services\FfastransServiceTest::cancelJob_deletes_job_successfully</a>  ()</dt>
+<dd><a class="anchor" id="_test000121"></a> GIVEN : un job actif et une API qui accepte la suppression WHEN : on appelle cancelJob avec son identifiant THEN : une requête DELETE est envoyée et true est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac70599f7e5072986bdd1fa679332a6b5">Tests\Unit\Services\FfastransServiceTest::cancelJob_handles_exceptions</a>  ()</dt>
+<dd><a class="anchor" id="_test000123"></a> GIVEN : une erreur réseau lors de l'appel à l'API WHEN : on appelle cancelJob THEN : false est retourné sans lever d'exception  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aa39ec2df76344d8d98031c043fbdfce9">Tests\Unit\Services\FfastransServiceTest::cancelJob_returns_false_on_failure</a>  ()</dt>
+<dd><a class="anchor" id="_test000122"></a> GIVEN : une API qui retourne une erreur 500 lors de l'annulation WHEN : on appelle cancelJob THEN : false est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a1165d7aab33e68c3aa1c9cde3a4de4b5">Tests\Unit\Services\FfastransServiceTest::client_uses_basic_auth_when_configured</a>  ()</dt>
+<dd><a class="anchor" id="_test000124"></a> GIVEN : un utilisateur et un mot de passe configurés pour FFAStrans WHEN : on effectue un appel à l'API THEN : le header Authorization est présent dans la requête  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aeb56ec5217406a34936fb9e2d16b9010">Tests\Unit\Services\FfastransServiceTest::client_works_without_auth_when_not_configured</a>  ()</dt>
+<dd><a class="anchor" id="_test000125"></a> GIVEN : aucun identifiant d'authentification configuré WHEN : on effectue un appel à l'API THEN : la requête est envoyée sans authentification et fonctionne  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a2926d25b5125268133c01f30be63befd">Tests\Unit\Services\FfastransServiceTest::getFullStatusList_combines_active_and_history_jobs</a>  ()</dt>
+<dd><a class="anchor" id="_test000114"></a> GIVEN : un job actif et un job dans l'historique sur l'API WHEN : on appelle getFullStatusList THEN : les deux jobs sont retournés avec les bons statuts et noms de fichiers  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac21fa2a458bb5d55592d2c27ccbcdedf">Tests\Unit\Services\FfastransServiceTest::getFullStatusList_handles_api_errors_gracefully</a>  ()</dt>
+<dd><a class="anchor" id="_test000117"></a> GIVEN : une API FFAStrans qui retourne des erreurs 500 WHEN : on appelle getFullStatusList THEN : un tableau vide est retourné sans lever d'exception  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a138db6459cb8d949bd7cb75b52e9efb4">Tests\Unit\Services\FfastransServiceTest::getFullStatusList_sorts_by_date_descending</a>  ()</dt>
+<dd><a class="anchor" id="_test000115"></a> GIVEN : deux jobs dans l'historique avec des dates différentes WHEN : on appelle getFullStatusList THEN : les jobs sont triés du plus récent au plus ancien  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a14a0145e5299dc7fbb689455372b0b3d">Tests\Unit\Services\FfastransServiceTest::getFullStatusList_translates_statuses_to_french</a>  ()</dt>
+<dd><a class="anchor" id="_test000116"></a> GIVEN : des jobs avec différents statuts anglais (Success, Error, Cancelled, Failed) WHEN : on appelle getFullStatusList THEN : les statuts sont traduits en français (Terminé, Echoué, Annulé, En cours)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ab73523ca4cc5ab3badabb4dba02f6671">Tests\Unit\Services\FfastransServiceTest::getJobStatus_falls_back_to_history_if_not_active</a>  ()</dt>
+<dd><a class="anchor" id="_test000119"></a> GIVEN : un job absent des actifs mais présent dans l'historique WHEN : on appelle getJobStatus avec son identifiant THEN : le statut est récupéré depuis l'historique avec une progression à 100%  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a88646998571af5b2218d6f93b6cf4908">Tests\Unit\Services\FfastransServiceTest::getJobStatus_returns_active_job_status</a>  ()</dt>
+<dd><a class="anchor" id="_test000118"></a> GIVEN : un job actif en cours de traitement à 75% WHEN : on appelle getJobStatus avec son identifiant THEN : le statut et la progression du job sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a6bdf1dcbdcee9f2245d716f6e72891c3">Tests\Unit\Services\FfastransServiceTest::getJobStatus_returns_error_when_job_not_found</a>  ()</dt>
+<dd><a class="anchor" id="_test000120"></a> GIVEN : un job qui n'existe ni dans les actifs ni dans l'historique WHEN : on appelle getJobStatus avec son identifiant THEN : un statut d'erreur 'Job not found' est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#aa34aa04001ae4488355e8bdd446dd120">Tests\Unit\Services\FfastransServiceTest::submitJob_preserves_unc_paths</a>  ()</dt>
+<dd><a class="anchor" id="_test000112"></a> GIVEN : un chemin UNC Windows et une API simulée WHEN : on soumet un job avec ce chemin UNC THEN : le chemin UNC est envoyé tel quel dans le champ inputfile  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a73e4397fcb66f3b923526cecf42740eb">Tests\Unit\Services\FfastransServiceTest::submitJob_sends_correct_payload_to_api</a>  ()</dt>
+<dd><a class="anchor" id="_test000111"></a> GIVEN : une API FFAStrans simulée qui retourne un job_id WHEN : on soumet un job avec un fichier, un workflow et des variables THEN : le payload envoyé contient les bons paramètres et le job_id est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a2139c691db9de517e5dc0e2910049316">Tests\Unit\Services\FfastransServiceTest::submitJob_throws_exception_on_failed_response</a>  ()</dt>
+<dd><a class="anchor" id="_test000113"></a> GIVEN : une API FFAStrans qui retourne une erreur 400 WHEN : on soumet un job THEN : une exception est levée avec le code d'erreur  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a17104da7a88b8d67c40ebda650a9a8c1">Tests\Unit\Services\FfastransServiceTest::translatePath_converts_linux_to_windows_path</a>  ()</dt>
+<dd><a class="anchor" id="_test000106"></a> GIVEN : un chemin Linux valide configuré avec un path_local WHEN : on appelle translatePath avec ce chemin THEN : le chemin est converti en format Windows UNC  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ae3f8b84df04fa0c3b0139c1ab4200b5f">Tests\Unit\Services\FfastransServiceTest::translatePath_handles_relative_paths</a>  ()</dt>
+<dd><a class="anchor" id="_test000107"></a> GIVEN : aucun path_local configuré et un chemin relatif WHEN : on appelle translatePath avec un chemin relatif THEN : le chemin est préfixé par le path_remote et converti en backslashes  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#ac8f7b17debfd5421b7407d50d2aa4fc8">Tests\Unit\Services\FfastransServiceTest::translatePath_preserves_windows_paths</a>  ()</dt>
+<dd><a class="anchor" id="_test000109"></a> GIVEN : un chemin déjà au format Windows WHEN : on appelle translatePath avec ce chemin THEN : la structure du chemin Windows est préservée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a761c34f76d768f6dce6697f23484f6cd">Tests\Unit\Services\FfastransServiceTest::translatePath_replaces_forward_slashes_with_backslashes</a>  ()</dt>
+<dd><a class="anchor" id="_test000110"></a> GIVEN : un chemin contenant des slashes Linux WHEN : on appelle translatePath avec ce chemin THEN : tous les slashes sont remplacés par des backslashes  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html#a32b1a10b68765661145b5c26d326b17c">Tests\Unit\Services\FfastransServiceTest::translatePath_returns_original_if_no_remote_root</a>  ()</dt>
+<dd><a class="anchor" id="_test000108"></a> GIVEN : aucun path_remote configuré WHEN : on appelle translatePath avec un chemin quelconque THEN : le chemin est retourné avec les slashes convertis en backslashes uniquement  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a36e589691ec0496df8e89a7d55c61c5a">Tests\Unit\Services\MediaServiceTest::assignRoles_creates_roles_and_participations</a>  ()</dt>
+<dd><a class="anchor" id="_test000133"></a> GIVEN : un média existant et une liste de deux élèves WHEN : on appelle assignRoles avec le rôle 'Réalisateur' THEN : le rôle, les élèves et les participations sont créés en base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a8e18eb70cf7bd98c7b39e4792eebdd8b">Tests\Unit\Services\MediaServiceTest::assignRoles_updates_existing_participation</a>  ()</dt>
+<dd><a class="anchor" id="_test000134"></a> GIVEN : un média avec une participation existante pour un élève et un rôle WHEN : on réassigne le même rôle au même élève THEN : aucune participation en double n'est créée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a89de13eb1ce1cf21107a1dda09cc0f9e">Tests\Unit\Services\MediaServiceTest::deleteMedia_deletes_media_and_participations</a>  ()</dt>
+<dd><a class="anchor" id="_test000131"></a> GIVEN : un média avec une participation associée en base WHEN : on appelle deleteMedia avec l'id du média THEN : le média et ses participations sont supprimés de la base  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#ae0ed6c64a9280aef21a4185749fcc350">Tests\Unit\Services\MediaServiceTest::deleteMedia_rolls_back_on_error</a>  ()</dt>
+<dd><a class="anchor" id="_test000132"></a> GIVEN : un identifiant de média inexistant WHEN : on appelle deleteMedia avec cet identifiant THEN : false est retourné et la transaction est annulée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a8032d89f1e1e9fa554385a378fadf749">Tests\Unit\Services\MediaServiceTest::extractFirstName_extracts_first_name_correctly</a>  ()</dt>
+<dd><a class="anchor" id="_test000128"></a> GIVEN : des noms complets au format 'Nom Prénom' simples et composés WHEN : on appelle extractFirstName avec ces noms THEN : le prénom (dernier mot) est correctement extrait  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a4a07737d5f9bc3ec1cad48cee2afa787">Tests\Unit\Services\MediaServiceTest::extractLastName_extracts_last_name_correctly</a>  ()</dt>
+<dd><a class="anchor" id="_test000129"></a> GIVEN : des noms complets simples et avec nom de famille composé WHEN : on appelle extractLastName avec ces noms THEN : le nom de famille (tout sauf le dernier mot) est correctement extrait  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#aa0455942f2f6bfb3cf0e404e9f5f198e">Tests\Unit\Services\MediaServiceTest::extractLastName_returns_full_name_when_single_word</a>  ()</dt>
+<dd><a class="anchor" id="_test000130"></a> GIVEN : un nom composé d'un seul mot WHEN : on appelle extractLastName avec ce nom THEN : le mot unique est retourné tel quel  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a5f86dc56e26869e30327210b0bc06546">Tests\Unit\Services\MediaServiceTest::extractVideoTitle_extracts_title_from_standard_format</a>  ()</dt>
+<dd><a class="anchor" id="_test000126"></a> GIVEN : un nom de fichier au format standard 'année_projet_titre.mp4' WHEN : on appelle extractVideoTitle avec ce nom THEN : seul le titre 'TitreVideo' est extrait  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#ae0f5ee097b6952ab666277497189c771">Tests\Unit\Services\MediaServiceTest::extractVideoTitle_returns_filename_when_no_pattern_match</a>  ()</dt>
+<dd><a class="anchor" id="_test000127"></a> GIVEN : un nom de fichier sans le format standard (pas de underscores) WHEN : on appelle extractVideoTitle avec ce nom THEN : le nom du fichier sans extension est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#aea13b80dddd10bb26e4206abe418c54a">Tests\Unit\Services\MediaServiceTest::formatFileSize_formats_bytes_correctly</a>  ()</dt>
+<dd><a class="anchor" id="_test000157"></a> GIVEN : des tailles de fichiers en octets (500, 1024, 1048576, 1536000) WHEN : on appelle formatFileSize avec chaque taille THEN : les tailles sont formatées en unités lisibles (B, KB, MB)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a4c0db422e89e3e801c9d9ab9936e48d3">Tests\Unit\Services\MediaServiceTest::getMediaInfo_returns_complete_information</a>  ()</dt>
+<dd><a class="anchor" id="_test000152"></a> GIVEN : un média complet avec professeur, projet, élève et participation WHEN : on appelle getMediaInfo avec l'id du média THEN : toutes les informations sont retournées dans le format attendu  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a69546442b827fb481654034dacec6e96">Tests\Unit\Services\MediaServiceTest::getMediaInfo_returns_null_for_nonexistent_media</a>  ()</dt>
+<dd><a class="anchor" id="_test000151"></a> GIVEN : un identifiant de média inexistant WHEN : on appelle getMediaInfo avec cet identifiant THEN : null est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a4bd21e4d16f805ecd6521be309d669fa">Tests\Unit\Services\MediaServiceTest::getRecentMedia_returns_limited_results</a>  ()</dt>
+<dd><a class="anchor" id="_test000153"></a> GIVEN : 30 médias en base WHEN : on appelle getRecentMedia avec une limite de 10 THEN : seuls 10 médias sont retournés  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a76a95e3da98af5816690f81a2d056362">Tests\Unit\Services\MediaServiceTest::getRecentMedia_returns_most_recent_first</a>  ()</dt>
+<dd><a class="anchor" id="_test000154"></a> GIVEN : un média ancien et un média récent en base WHEN : on appelle getRecentMedia THEN : le média le plus récent est en première position  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a453883a72ca191f9d982bdd6b6288a7c">Tests\Unit\Services\MediaServiceTest::sanitizeForDisplay_handles_null_values</a>  ()</dt>
+<dd><a class="anchor" id="_test000156"></a> GIVEN : une valeur null WHEN : on appelle sanitizeForDisplay avec null THEN : une chaîne vide est retournée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#aa904aea8ad3a88171b225970fe7b321e">Tests\Unit\Services\MediaServiceTest::sanitizeForDisplay_removes_newlines</a>  ()</dt>
+<dd><a class="anchor" id="_test000155"></a> GIVEN : un texte contenant des sauts de ligne et retours chariot WHEN : on appelle sanitizeForDisplay avec ce texte THEN : tous les sauts de ligne sont remplacés par des espaces  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#ae8a5ab42396d446a4dd7856fa92be89c">Tests\Unit\Services\MediaServiceTest::searchMedia_combines_multiple_filters</a>  ()</dt>
+<dd><a class="anchor" id="_test000142"></a> GIVEN : deux médias avec des professeurs, promotions et types différents WHEN : on combine plusieurs filtres sans mot-clé THEN : tous les médias sont retournés (bug connu : les filtres seuls ne fonctionnent pas) NOTE: Currently filters without keyword don't work due to early return at line 244  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#adef5a8710b142a4cdfc992dd288d9893">Tests\Unit\Services\MediaServiceTest::searchMedia_filters_by_professor_id</a>  ()</dt>
+<dd><a class="anchor" id="_test000140"></a> GIVEN : un média associé à un professeur et un autre sans professeur WHEN : on filtre par professeur_id sans mot-clé THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas) NOTE: Currently filters without keyword don't work due to early return at line 244  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#ae74cd98041d624b92b3ccaeca9acb96c">Tests\Unit\Services\MediaServiceTest::searchMedia_filters_by_project_id</a>  ()</dt>
+<dd><a class="anchor" id="_test000139"></a> GIVEN : un projet associé à un seul média parmi deux en base WHEN : on filtre par projet_id sans mot-clé THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas) NOTE: Currently filters without keyword don't work due to early return at line 244 This test validates current behavior (returns all media)  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a3ddc5f5c11d045476e4f70e98510e6f6">Tests\Unit\Services\MediaServiceTest::searchMedia_filters_by_promotion</a>  ()</dt>
+<dd><a class="anchor" id="_test000141"></a> GIVEN : deux médias avec des promotions différentes ('2024' et '2023') WHEN : on filtre par promotion '2024' sans mot-clé THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas) NOTE: Currently filters without keyword don't work due to early return at line 244  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#aec5b878638a92beba394fb2021ddebce">Tests\Unit\Services\MediaServiceTest::searchMedia_finds_by_description</a>  ()</dt>
+<dd><a class="anchor" id="_test000136"></a> GIVEN : deux médias en base dont un avec 'description test' dans sa description WHEN : on recherche avec le mot-clé 'description test' THEN : seul le média correspondant est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#af73ad16231892701b80d8148ff386650">Tests\Unit\Services\MediaServiceTest::searchMedia_finds_by_professor_name</a>  ()</dt>
+<dd><a class="anchor" id="_test000138"></a> GIVEN : un média associé au professeur 'Dupont' et un autre sans professeur WHEN : on recherche avec le mot-clé 'Dupont' THEN : seul le média du professeur Dupont est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a414bfbadd068514c0944d005b2ee1eef">Tests\Unit\Services\MediaServiceTest::searchMedia_finds_by_theme</a>  ()</dt>
+<dd><a class="anchor" id="_test000137"></a> GIVEN : deux médias avec des thèmes différents ('Documentaire' et 'Fiction') WHEN : on recherche avec le mot-clé 'Documentaire' THEN : seul le média avec le thème 'Documentaire' est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a21bcc2d685560ec840c9e02a6c5796a1">Tests\Unit\Services\MediaServiceTest::searchMedia_finds_by_title</a>  ()</dt>
+<dd><a class="anchor" id="_test000135"></a> GIVEN : deux médias en base dont un avec le titre 'Video Test 123' WHEN : on recherche avec le mot-clé 'Test' THEN : seul le média correspondant est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a4e3070e2f463682e74577a65f01ea822">Tests\Unit\Services\MediaServiceTest::syncLocalPath_is_case_insensitive</a>  ()</dt>
+<dd><a class="anchor" id="_test000149"></a> GIVEN : un média avec le titre 'TestVideo' en base WHEN : on appelle syncLocalPath avec 'testvideo.mp4' en minuscules THEN : le média est trouvé et son chemin local est mis à jour NOTE: syncLocalPath uses PATHINFO_FILENAME which removes extension  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#af32d1d64af0c033631ec82c8039046b0">Tests\Unit\Services\MediaServiceTest::syncLocalPath_returns_false_when_media_not_found</a>  ()</dt>
+<dd><a class="anchor" id="_test000150"></a> GIVEN : aucun média correspondant au fichier en base WHEN : on appelle syncLocalPath avec un chemin vers un fichier inconnu THEN : false est retourné  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a7f056270ea8d944a2429a9d43bd214bf">Tests\Unit\Services\MediaServiceTest::syncLocalPath_updates_existing_media</a>  ()</dt>
+<dd><a class="anchor" id="_test000148"></a> GIVEN : un média existant avec le titre 'TestVideo' WHEN : on appelle syncLocalPath avec un chemin contenant 'TestVideo.mp4' THEN : le chemin local du média est mis à jour en base NOTE: syncLocalPath uses PATHINFO_FILENAME which removes extension  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a7ec3525d9b3d09b1f001c2e1ef05d51f">Tests\Unit\Services\MediaServiceTest::updateMetadata_creates_new_professor_if_not_exists</a>  ()</dt>
+<dd><a class="anchor" id="_test000144"></a> GIVEN : un média existant et un nom de professeur inconnu en base WHEN : on appelle updateMetadata avec ce nom de professeur THEN : le professeur est créé et associé au média  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a6e950e398064622f59d6704dbe8f4891">Tests\Unit\Services\MediaServiceTest::updateMetadata_replaces_old_participations</a>  ()</dt>
+<dd><a class="anchor" id="_test000147"></a> GIVEN : un média avec une participation existante pour le rôle 'Réalisateur' WHEN : on met à jour les métadonnées avec un nouveau rôle 'Acteur' THEN : l'ancienne participation est supprimée et la nouvelle est créée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#ac957b1e185a29ca36403bdd34bcd0af9">Tests\Unit\Services\MediaServiceTest::updateMetadata_reuses_existing_professor</a>  ()</dt>
+<dd><a class="anchor" id="_test000145"></a> GIVEN : un professeur 'Dupont Jean' déjà existant en base WHEN : on appelle updateMetadata avec le même nom de professeur THEN : le professeur existant est réutilisé sans créer de doublon  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a8e7713572ff2f0867a062bc94a0810d2">Tests\Unit\Services\MediaServiceTest::updateMetadata_rolls_back_on_error</a>  ()</dt>
+<dd><a class="anchor" id="_test000146"></a> GIVEN : un identifiant de média inexistant WHEN : on appelle updateMetadata avec cet identifiant THEN : false est retourné et la transaction est annulée  </dd>
+<dt>Membre <a class="el" href="classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#a88b091375e5abbf4ba337ce217c7f3ff">Tests\Unit\Services\MediaServiceTest::updateMetadata_updates_media_successfully</a>  ()</dt>
+<dd><a class="anchor" id="_test000143"></a> GIVEN : un média existant en base WHEN : on met à jour ses métadonnées avec professeur, projet, description et rôles THEN : toutes les métadonnées sont enregistrées et les relations créées </dd>
 </dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

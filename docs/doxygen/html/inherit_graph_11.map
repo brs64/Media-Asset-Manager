@@ -1,15 +1,19 @@
 <map id="Graphe hiérarchique des classes" name="Graphe hiérarchique des classes">
 <area shape="rect" id="Node000000" title=" " alt="" coords="5,13,93,38"/>
 <area shape="rect" id="Node000001" href="$classDatabase_1_1Factories_1_1UserFactory.html" title="\Databaseloquent\Factories\Factory&lt;\App\Models\User&gt;" alt="" coords="145,5,292,45"/>
-<area shape="poly" id="edge38_Node000000_Node000001" title=" " alt="" coords="107,23,145,23,145,28,107,28"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="15,141,84,166"/>
-<area shape="poly" id="edge43_Node000002_Node000001" title=" " alt="" coords="66,128,98,91,140,55,161,43,163,48,143,60,102,95,70,132"/>
+<area shape="poly" id="edge36_Node000000_Node000001" title=" " alt="" coords="107,23,145,23,145,28,107,28"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="15,205,84,230"/>
+<area shape="poly" id="edge43_Node000002_Node000001" title=" " alt="" coords="57,190,87,124,110,88,140,55,157,43,160,48,143,59,115,91,92,127,62,193"/>
 <area shape="rect" id="Node000003" href="$classDatabase_1_1Factories_1_1EleveFactory.html" title=" " alt="" coords="145,69,292,109"/>
-<area shape="poly" id="edge39_Node000002_Node000003" title=" " alt="" coords="96,133,164,107,166,112,98,138"/>
+<area shape="poly" id="edge37_Node000002_Node000003" title=" " alt="" coords="66,192,98,155,140,119,161,107,163,112,143,124,102,159,70,196"/>
 <area shape="rect" id="Node000004" href="$classDatabase_1_1Factories_1_1MediaFactory.html" title=" " alt="" coords="145,133,292,173"/>
-<area shape="poly" id="edge40_Node000002_Node000004" title=" " alt="" coords="98,151,145,151,145,156,98,156"/>
+<area shape="poly" id="edge38_Node000002_Node000004" title=" " alt="" coords="96,197,164,171,166,176,98,202"/>
 <area shape="rect" id="Node000005" href="$classDatabase_1_1Factories_1_1ParticipationFactory.html" title=" " alt="" coords="141,197,296,237"/>
-<area shape="poly" id="edge41_Node000002_Node000005" title=" " alt="" coords="98,168,166,195,164,200,96,173"/>
+<area shape="poly" id="edge39_Node000002_Node000005" title=" " alt="" coords="98,215,141,215,141,220,98,220"/>
 <area shape="rect" id="Node000006" href="$classDatabase_1_1Factories_1_1ProfesseurFactory.html" title=" " alt="" coords="145,261,292,301"/>
-<area shape="poly" id="edge42_Node000002_Node000006" title=" " alt="" coords="70,175,102,212,143,247,163,259,161,264,140,252,98,215,66,179"/>
+<area shape="poly" id="edge40_Node000002_Node000006" title=" " alt="" coords="98,232,166,259,164,264,96,237"/>
+<area shape="rect" id="Node000007" href="$classDatabase_1_1Factories_1_1ProjetFactory.html" title=" " alt="" coords="145,325,292,365"/>
+<area shape="poly" id="edge41_Node000002_Node000007" title=" " alt="" coords="70,239,102,276,143,311,163,323,161,328,140,316,98,279,66,243"/>
+<area shape="rect" id="Node000008" href="$classDatabase_1_1Factories_1_1RoleFactory.html" title=" " alt="" coords="145,389,292,429"/>
+<area shape="poly" id="edge42_Node000002_Node000008" title=" " alt="" coords="62,242,92,308,115,344,143,375,160,387,157,392,140,379,110,347,87,310,57,244"/>
 </map>

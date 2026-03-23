@@ -5,6 +5,7 @@ var searchData=
   ['flushbuffertocache_2',['flushBufferToCache',['../classApp_1_1Jobs_1_1ScanDiskJob.html#ad4c5a6d48d5608d686b0d08df17601c3',1,'App::Jobs::ScanDiskJob']]],
   ['forceextensionmp4_3',['forceExtensionMp4',['../classApp_1_1Helpers_1_1VideoHelper.html#a1b15bc6ff810d6f83e7aa97b9c811d16',1,'App::Helpers::VideoHelper']]],
   ['forceextensionmxf_4',['forceExtensionMxf',['../classApp_1_1Helpers_1_1VideoHelper.html#abd111a16e0c3be928242f6baf767a718',1,'App::Helpers::VideoHelper']]],
-  ['formatfilesize_5',['formatfilesize',['../classApp_1_1Helpers_1_1VideoHelper.html#a5dd9975a322171625f4d841d4e90cedf',1,'App\Helpers\VideoHelper\formatFileSize()'],['../classApp_1_1Services_1_1MediaService.html#a29c64c7d1db016a301600f531a610c7f',1,'App\Services\MediaService\formatFileSize(int $bytes)']]],
-  ['formatparticipations_6',['formatParticipations',['../classApp_1_1Services_1_1MediaService.html#ad21fa960ad71133c6a04130b9d0dd78c',1,'App::Services::MediaService']]]
+  ['formatfilesize_5',['formatfilesize',['../classApp_1_1Helpers_1_1VideoHelper.html#a5dd9975a322171625f4d841d4e90cedf',1,'App\Helpers\VideoHelper\formatFileSize()'],['../classApp_1_1Services_1_1MediaService.html#a29c64c7d1db016a301600f531a610c7f',1,'App\Services\MediaService\formatFileSize()']]],
+  ['formatfilesize_5fformats_5fbytes_5fcorrectly_6',['formatFileSize_formats_bytes_correctly',['../classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html#aea13b80dddd10bb26e4206abe418c54a',1,'Tests::Unit::Services::MediaServiceTest']]],
+  ['formatparticipations_7',['formatParticipations',['../classApp_1_1Services_1_1MediaService.html#ad21fa960ad71133c6a04130b9d0dd78c',1,'App::Services::MediaService']]]
 ];

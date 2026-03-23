@@ -1,37 +1,35 @@
 <map id="Tests\TestCase" name="Tests\TestCase">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1866,119,1975,184"/>
-<area shape="rect" id="Node000003" href="$classTests_1_1Feature_1_1AdminControllerTest.html" title=" " alt="" coords="5,299,247,641"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1853,155,1498,154,996,162,745,171,524,186,354,207,296,220,259,234,223,264,194,301,190,298,220,260,257,230,294,215,353,201,523,181,745,166,996,157,1498,149,1853,149"/>
-<area shape="rect" id="Node000004" href="$classTests_1_1Feature_1_1Auth_1_1AuthenticationTest.html" title=" " alt="" coords="271,398,475,542"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1852,155,1541,157,1111,166,898,176,710,190,567,209,518,221,487,234,451,268,423,310,403,355,389,399,384,397,398,353,418,307,447,264,485,230,516,216,566,204,709,185,897,170,1111,161,1541,151,1852,150"/>
-<area shape="rect" id="Node000005" href="$classTests_1_1Feature_1_1Auth_1_1EmailVerificationTest.html" title=" " alt="" coords="499,381,705,559"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1852,156,1587,160,1230,172,1054,182,900,196,783,213,743,223,718,234,685,264,659,301,638,341,624,381,619,379,634,339,654,298,681,260,715,230,741,218,782,208,900,191,1054,177,1230,167,1587,155,1852,151"/>
-<area shape="rect" id="Node000006" href="$classTests_1_1Feature_1_1Auth_1_1PasswordConfirmationTest.html" title=" " alt="" coords="729,381,936,559"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1852,157,1633,164,1350,179,1212,189,1092,202,1001,217,970,225,950,234,917,264,890,301,870,341,855,381,850,379,865,339,886,298,913,260,947,230,968,220,1000,212,1091,197,1212,184,1350,174,1633,159,1852,152"/>
-<area shape="rect" id="Node000007" href="$classTests_1_1Feature_1_1Auth_1_1PasswordResetTest.html" title=" " alt="" coords="961,363,1198,577"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1852,155,1700,158,1511,169,1418,179,1333,193,1262,211,1211,234,1180,261,1154,293,1132,328,1115,364,1110,362,1127,326,1149,290,1176,257,1209,230,1260,206,1332,188,1417,174,1511,164,1700,153,1852,150"/>
-<area shape="rect" id="Node000008" href="$classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest.html" title=" " alt="" coords="1223,398,1451,542"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1853,160,1753,169,1639,184,1534,205,1493,219,1464,234,1427,269,1397,311,1375,356,1358,399,1353,397,1370,354,1393,308,1423,265,1460,230,1491,214,1532,200,1638,179,1752,164,1852,154"/>
-<area shape="rect" id="Node000009" href="$classTests_1_1Feature_1_1Auth_1_1RegistrationTest.html" title=" " alt="" coords="1475,405,1681,535"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1853,165,1814,175,1772,189,1732,208,1696,234,1661,273,1633,317,1612,363,1597,406,1592,404,1607,361,1629,315,1657,269,1692,230,1729,204,1770,184,1812,169,1852,160"/>
-<area shape="rect" id="Node000010" href="$classTests_1_1Feature_1_1FileExplorerControllerTest.html" title=" " alt="" coords="1706,343,1911,597"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1908,198,1856,344,1851,342,1903,196"/>
-<area shape="rect" id="Node000011" href="$classTests_1_1Feature_1_1FileExplorerServiceTest.html" title=" " alt="" coords="1935,326,2133,614"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1939,196,1985,325,1980,327,1934,198"/>
-<area shape="rect" id="Node000012" href="$classTests_1_1Feature_1_1MediaControllerTest.html" title=" " alt="" coords="2157,303,2391,637"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1989,161,2069,185,2110,205,2146,230,2179,263,2206,301,2202,305,2175,267,2143,234,2107,209,2067,190,1988,166"/>
-<area shape="rect" id="Node000013" href="$classTests_1_1Feature_1_1MediaManagerTest.html" title=" " alt="" coords="2415,437,2642,503"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1989,154,2094,162,2216,177,2328,199,2373,213,2405,230,2430,251,2452,277,2486,333,2510,389,2524,436,2519,438,2505,391,2481,335,2447,280,2426,255,2402,234,2371,218,2327,204,2215,182,2093,168,1988,159"/>
-<area shape="rect" id="Node000014" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html" title=" " alt="" coords="2666,247,2914,693"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1989,150,2145,152,2341,163,2438,173,2527,187,2602,206,2655,230,2676,245,2672,249,2653,234,2600,211,2526,192,2438,178,2341,168,2145,158,1989,155"/>
-<area shape="rect" id="Node000015" href="$classTests_1_1Feature_1_1PermissionsTest.html" title=" " alt="" coords="2938,405,3149,535"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1989,152,2215,159,2509,173,2652,183,2777,196,2873,211,2906,220,2927,230,2949,247,2967,266,2997,311,3018,359,3033,404,3028,406,3013,361,2992,314,2963,270,2945,251,2925,234,2904,225,2872,216,2777,201,2652,188,2509,178,2215,164,1989,157"/>
-<area shape="rect" id="Node000016" href="$classTests_1_1Feature_1_1ProfileTest.html" title=" " alt="" coords="3173,346,3439,594"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1989,151,2261,156,2629,168,2811,179,2970,192,3092,209,3134,219,3162,230,3193,253,3219,281,3242,312,3261,344,3257,347,3238,315,3215,284,3189,257,3159,234,3133,224,3091,214,2969,197,2810,184,2629,174,2261,161,1989,156"/>
-<area shape="rect" id="Node000017" href="$classTests_1_1Feature_1_1SearchMediaTest.html" title=" " alt="" coords="3463,329,3680,611"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1989,150,2319,150,2780,159,3009,168,3211,183,3365,203,3418,215,3453,230,3478,249,3499,273,3532,327,3527,330,3495,276,3474,253,3450,234,3417,220,3364,208,3210,188,3009,174,2779,164,2319,156,1989,155"/>
-<area shape="rect" id="Node000018" href="$classTests_1_1Feature_1_1StreamControllerTest.html" title=" " alt="" coords="3704,232,3945,708"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="1989,151,2378,159,2932,175,3440,199,3612,213,3665,221,3694,230,3705,237,3702,242,3692,234,3664,226,3611,218,3440,204,2932,181,2378,165,1989,157"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="1869,5,1973,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1923,84,1923,119,1918,119,1918,84"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1789,119,1898,184"/>
+<area shape="rect" id="Node000003" href="$classTests_1_1Feature_1_1AdminControllerTest.html" title=" " alt="" coords="5,392,241,824"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1775,157,1420,165,926,180,683,191,475,204,324,218,277,226,254,234,220,266,192,305,170,347,154,393,149,391,166,345,188,302,216,263,251,230,276,221,323,213,475,198,683,186,925,175,1420,159,1775,151"/>
+<area shape="rect" id="Node000004" href="$classTests_1_1Feature_1_1Auth_1_1AuthenticationTest.html" title=" " alt="" coords="265,509,480,707"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1775,155,1479,156,1074,165,874,174,698,189,566,208,521,221,493,234,465,261,441,292,422,326,407,363,387,438,377,509,372,508,382,437,402,361,417,324,437,289,461,257,490,230,519,216,564,203,698,183,873,169,1073,159,1479,150,1775,150"/>
+<area shape="rect" id="Node000005" href="$classTests_1_1Feature_1_1Auth_1_1PasswordUpdateTest.html" title=" " alt="" coords="504,536,732,680"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1775,156,1529,160,1205,173,1047,183,908,196,804,213,768,223,746,234,715,264,689,299,668,338,652,379,631,462,622,536,617,536,626,461,647,378,663,336,684,296,711,261,743,230,766,218,802,208,908,191,1046,177,1205,167,1529,155,1775,151"/>
+<area shape="rect" id="Node000006" href="$classTests_1_1Feature_1_1FileExplorerControllerTest.html" title=" " alt="" coords="757,481,962,735"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1775,157,1577,165,1325,179,1204,190,1098,202,1019,217,992,225,976,234,951,258,929,286,912,316,897,348,877,416,866,482,861,481,872,415,892,347,907,314,925,283,947,255,972,230,990,220,1018,212,1098,197,1203,184,1325,174,1577,159,1775,152"/>
+<area shape="rect" id="Node000007" href="$classTests_1_1Feature_1_1FileExplorerServiceTest.html" title=" " alt="" coords="986,464,1183,752"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1775,155,1634,157,1462,167,1378,177,1302,191,1240,210,1216,221,1197,234,1174,257,1154,282,1124,340,1104,402,1093,464,1087,463,1099,401,1119,338,1150,279,1170,253,1194,230,1213,217,1238,205,1301,186,1377,172,1461,162,1634,151,1775,149"/>
+<area shape="rect" id="Node000008" href="$classTests_1_1Feature_1_1MediaControllerTest.html" title=" " alt="" coords="1207,441,1442,775"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1775,161,1690,171,1596,186,1511,207,1478,220,1456,234,1416,278,1385,330,1363,386,1347,442,1342,441,1358,384,1381,327,1412,275,1452,230,1476,215,1509,202,1595,181,1690,166,1775,156"/>
+<area shape="rect" id="Node000009" href="$classTests_1_1Feature_1_1MediaThumbnailServiceTest.html" title=" " alt="" coords="1466,232,1714,984"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1779,189,1752,209,1728,234,1716,250,1712,246,1724,230,1748,205,1776,185"/>
+<area shape="rect" id="Node000010" href="$classTests_1_1Feature_1_1PermissionsTest.html" title=" " alt="" coords="1739,509,1948,707"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1846,198,1846,508,1841,508,1841,198"/>
+<area shape="rect" id="Node000011" href="$classTests_1_1Feature_1_1ProfileTest.html" title=" " alt="" coords="1973,509,2197,707"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1911,185,1939,205,1963,230,2004,297,2035,370,2058,442,2073,508,2068,509,2053,443,2030,372,1999,300,1959,234,1935,209,1908,189"/>
+<area shape="rect" id="Node000012" href="$classTests_1_1Feature_1_1SearchControllerTest.html" title=" " alt="" coords="2221,303,2460,913"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1912,157,1992,167,2079,183,2158,204,2189,216,2210,230,2242,264,2268,302,2264,305,2238,267,2207,234,2186,221,2156,209,2078,188,1991,173,1911,162"/>
+<area shape="rect" id="Node000013" href="$classTests_1_1Feature_1_1SearchMediaTest.html" title=" " alt="" coords="2484,467,2701,749"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1912,150,2049,153,2215,164,2297,174,2371,188,2431,206,2474,230,2499,253,2519,280,2552,339,2573,403,2587,466,2581,467,2568,404,2547,341,2515,283,2495,257,2471,234,2429,211,2369,193,2296,179,2215,169,2049,158,1912,155"/>
+<area shape="rect" id="Node000014" href="$classTests_1_1Feature_1_1StreamControllerTest.html" title=" " alt="" coords="2725,370,2967,846"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1912,152,2110,160,2362,175,2484,185,2590,198,2670,212,2698,221,2716,230,2747,259,2772,293,2793,330,2810,369,2805,371,2788,332,2768,296,2743,262,2712,234,2696,226,2669,217,2589,203,2483,190,2362,180,2110,165,1911,157"/>
+<area shape="rect" id="Node000015" href="$classTests_1_1Feature_1_1TransfertControllerTest.html" title=" " alt="" coords="2991,392,3242,824"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1912,151,2165,155,2501,167,2666,177,2810,190,2919,208,2957,218,2981,230,3017,263,3045,302,3068,346,3086,391,3081,393,3063,348,3041,305,3013,267,2978,234,2955,223,2918,213,2809,196,2665,182,2501,172,2165,160,1912,156"/>
+<area shape="rect" id="Node000016" href="$classTests_1_1Unit_1_1Services_1_1FfastransServiceTest.html" title=" " alt="" coords="3267,363,3484,853"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1912,149,2219,150,2643,158,2853,167,3037,182,3177,202,3225,215,3256,230,3285,257,3309,289,3329,324,3345,361,3340,363,3324,327,3305,292,3281,261,3252,234,3223,220,3176,207,3036,187,2853,173,2643,163,2219,155,1912,155"/>
+<area shape="rect" id="Node000017" href="$classTests_1_1Unit_1_1Services_1_1MediaServiceTest.html" title=" " alt="" coords="3509,370,3746,846"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1912,151,2278,159,2794,174,3047,185,3265,198,3423,212,3472,221,3498,230,3530,258,3556,292,3577,329,3593,369,3589,371,3572,332,3551,295,3526,262,3495,234,3471,226,3422,218,3264,203,3047,190,2794,180,2278,164,1912,156"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1791,5,1895,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1846,84,1846,119,1841,119,1841,84"/>
 </map>
