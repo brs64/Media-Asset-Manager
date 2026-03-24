@@ -210,8 +210,8 @@ class MediaService
 
             if ($media->chemin_local) {
                 // Construction des chemins à cibler
-                $fullVideoPath = "/mnt/archivage/H264/" . $media->chemin_local;
-                $fullThumbnailPath = rtrim("/mnt/archivage/Thumbnails/" . $media->chemin_local, ".mp4") . ".jpg";
+                $fullVideoPath = "/mnt/archivage/" . $media->chemin_local;
+                $fullThumbnailPath = rtrim("/mnt/miniatures/" . $media->chemin_local, ".mp4") . ".jpg";
 
                 // Suppression du fichier vidéo local
                 Storage::delete($fullVideoPath);
