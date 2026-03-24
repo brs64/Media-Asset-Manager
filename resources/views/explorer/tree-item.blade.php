@@ -3,12 +3,26 @@
 
         {{-- DOSSIER --}}
         @if ($item['type'] === 'folder')
-            <div class="dossier-label cursor-pointer text-gray-200 hover:text-white select-none flex items-center gap-2"
+            <div class="dossier-label cursor-pointer text-gray-200 hover:text-white select-none flex items-center gap-2 group relative"
                  data-disk="{{ $item['disk'] }}"
                  data-path="{{ $item['path'] }}"
                  onclick="loadFolder(this)">
                 <span class="icon text-yellow-500">📁</span>
                 <span class="font-medium">{{ $item['name'] }}</span>
+                {{-- The "+" menu: hidden by default, fixed 10px from the right edge of the panel --}}
+                <span class="hidden group-hover:block absolute right-[10px] top-0 text-lg hover:text-blue-400" 
+                      onclick="event.stopPropagation(); toggleActionMenu(event, this)">
+                    +
+                </span>
+
+                {{-- The hidden dropdown menu --}}
+                <div class="action-dropdown hidden fixed w-40 bg-gray-800 border border-gray-600 rounded shadow-2xl z-[1000] overflow-hidden hover:bg-blue-600"> {{-- added overflow-hidden --}}
+                    <div onclick="event.stopPropagation(); window.openTranscodeModal('{{ $item['disk'] }}', '{{ $item['path'] }}')" 
+                        role="button"
+                        class="cursor-pointer w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white transition-colors select-none">
+                        Transcoder Dossier
+                    </div>
+                </div>
             </div>
 
             {{-- Container vide pour lazy-loading --}}

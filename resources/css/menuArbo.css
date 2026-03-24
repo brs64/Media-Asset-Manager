@@ -125,3 +125,15 @@
     pointer-events: auto;
     transition: opacity 0.3s ease, z-index 0s;
 }
+
+/* Ensure the dropdown div doesn't inherit the 20px recursive padding */
+.action-dropdown div {
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
+
+/* Optional: make the dropdown look "detached" and floating */
+.action-dropdown {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

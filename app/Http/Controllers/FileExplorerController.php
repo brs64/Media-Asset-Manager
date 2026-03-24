@@ -203,4 +203,48 @@ class FileExplorerController extends Controller
             'results'=> $unifiedList,
         ]);
     }
+
+    // Envoyer des videos en transcodage par dossier entier
+    public function transcodeFolder(Request $request)
+    {
+        $disk = $request->input('disk');
+        $path = $request->input('path');
+
+        $column = match ($disk) {
+            'ftp_pad'  => 'URI_NAS_PAD',
+            'ftp_arch' => 'URI_NAS_ARCH',
+            default    => null,
+        };
+
+        if (!$column) return response()->json(['success' => false, 'message' => 'Disque non supporté'], 400);
+
+        $count = 0;
+        \App\Services\FileExplorerService::scanDiskRecursive($disk, $path, function($item) use ($column, &$count) {
+            if ($item['type'] === 'video') {
+                $media = Media::where($column, $item['path'])
+                            ->whereNull('chemin_local')
+                            ->where('transcode_status', 'disponible')
+                            ->first();
+
+                if ($media) {
+                    $media->update(['transcode_status' => 'en_attente']);
+                    $count++;
+                }
+            }
+        });
+
+        if ($count > 0) {
+            \App\Jobs\ProcessTranscodingQueueJob::dispatch()
+                    ->onQueue('transcoding')
+                    ->delay(now()->subSeconds(3605)); // Dispatch with a past delay to trigger immediately
+            
+            $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
+            exec($command);
+        }
+
+        return response()->json([
+            'success' => true, 
+            'message' => "$count vidéos ajoutées à la file d'attente."
+        ]);
+    }
 }
