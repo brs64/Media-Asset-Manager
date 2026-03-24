@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BTSPlay - Media Asset Manager:  Fichier source de app/Models/User.php</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<script type="text/javascript" src="darkmode_toggle.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">BTSPlay - Media Asset Manager
+   </div>
+   <div id="projectbrief">Système de gestion de médias audiovisuels - BTS Audiovisuel Biarritz</div>
+  </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Recherche" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Généré par Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('User_8php_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Chargement...</div>
+<div class="SRStatus" id="Searching">Recherche...</div>
+<div class="SRStatus" id="NoMatches">Aucune correspondance</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">User.php</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="User_8php.html">Aller à la documentation de ce fichier.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>&lt;?php</div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceApp_1_1Models.html">App\Models</a>;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>use Illuminate\Database\Eloquent\Factories\HasFactory;</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>use Illuminate\Foundation\Auth\User as Authenticatable;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>use Illuminate\Notifications\Notifiable;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// Spatie</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>use Spatie\Permission\Traits\HasRoles;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>use Illuminate\Database\Eloquent\Relations\HasMany;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="foldopen" id="foldopen00013" data-start="{" data-end="};">
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html">   13</a></span><span class="keyword">class </span><a class="code hl_class" href="classApp_1_1Models_1_1User.html">User</a> <span class="keyword">extends</span> Authenticatable</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>{</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    use HasFactory, Notifiable, HasRoles;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#ab4030437e467a0cc396b0c3ea53199f7">   20</a></span>    <span class="keyword">protected</span> <a class="code hl_variable" href="classApp_1_1Models_1_1User.html#ab4030437e467a0cc396b0c3ea53199f7">$fillable</a> = [</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="stringliteral">&#39;name&#39;</span>,       <span class="comment">// login ou identifiant</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="stringliteral">&#39;password&#39;</span>,</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="stringliteral">&#39;nom&#39;</span>,        <span class="comment">// pour professeur ou élève</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <span class="stringliteral">&#39;prenom&#39;</span>,     <span class="comment">// idem</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    ];</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a1f25bef37dae884e548034f839fa1f63">   30</a></span>    <span class="keyword">protected</span> <a class="code hl_variable" href="classApp_1_1Models_1_1User.html#a1f25bef37dae884e548034f839fa1f63">$hidden</a> = [</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="stringliteral">&#39;password&#39;</span>,</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="stringliteral">&#39;remember_token&#39;</span>,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    ];</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#afc845f919d34d162c4500b1942d322d7">   38</a></span>    <span class="keyword">protected</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#afc845f919d34d162c4500b1942d322d7">casts</a>(): array</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="keywordflow">return</span> [</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            <span class="stringliteral">&#39;password&#39;</span> =&gt; <span class="stringliteral">&#39;hashed&#39;</span>,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        ];</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">// Relation média (pour professeur)</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#ae46317bccad3028a444e7e9efb9f6fa0">   48</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#ae46317bccad3028a444e7e9efb9f6fa0">media</a>(): HasMany</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordflow">return</span> $this-&gt;hasMany(Media::class, <span class="stringliteral">&#39;professeur_id&#39;</span>);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    }</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="comment">// Helpers pour type utilisateur</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a701215ac31290fa24a4f2a056d3839ae">   60</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a701215ac31290fa24a4f2a056d3839ae">isProfesseur</a>(): bool</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordflow">return</span> $this-&gt;hasRole(<span class="stringliteral">&#39;professeur&#39;</span>);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
+</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="foldopen" id="foldopen00068" data-start="{" data-end="}">
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a93d16b474da518916256ba054844ccb9">   68</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a93d16b474da518916256ba054844ccb9">isEleve</a>(): bool</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="keywordflow">return</span> $this-&gt;hasRole(<span class="stringliteral">&#39;eleve&#39;</span>);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    }</div>
+</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="foldopen" id="foldopen00076" data-start="{" data-end="}">
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#aa74c4b1b6e0aa694334bc01de749171e">   76</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#aa74c4b1b6e0aa694334bc01de749171e">getProfile</a>(): array</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keywordflow">return</span> [</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>            <span class="stringliteral">&#39;nom&#39;</span> =&gt; $this-&gt;nom,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>            <span class="stringliteral">&#39;prenom&#39;</span> =&gt; $this-&gt;prenom,</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        ];</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="comment">// Gestion des droits sur le front</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="comment">// ---------------------------------------------------</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="foldopen" id="foldopen00091" data-start="{" data-end="}">
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a2debf606b795dd03a6d23c7828097e28">   91</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a2debf606b795dd03a6d23c7828097e28">canModifierVideo</a>(): bool</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <span class="keywordflow">return</span> $this-&gt;can(<span class="stringliteral">&#39;modifier video&#39;</span>);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    }</div>
+</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a4de2d0dbedd55aa056698d20bea9fddf">   96</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a4de2d0dbedd55aa056698d20bea9fddf">canDiffuserVideo</a>(): bool</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">return</span> $this-&gt;can(<span class="stringliteral">&#39;diffuser video&#39;</span>);</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    }</div>
+</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="}">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a58094948b99f9fe18734dc180766c1d1">  101</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a58094948b99f9fe18734dc180766c1d1">canSupprimerVideo</a>(): bool</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    {</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keywordflow">return</span> $this-&gt;can(<span class="stringliteral">&#39;supprimer video&#39;</span>);</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    }</div>
+</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="foldopen" id="foldopen00106" data-start="{" data-end="}">
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="classApp_1_1Models_1_1User.html#a64e2f889303342a38e36c7c367ec94c9">  106</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classApp_1_1Models_1_1User.html#a64e2f889303342a38e36c7c367ec94c9">canAdministrerSite</a>(): bool</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    {</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <span class="keywordflow">return</span> $this-&gt;can(<span class="stringliteral">&#39;administrer site&#39;</span>);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    }</div>
+</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>}</div>
+</div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html"><div class="ttname"><a href="classApp_1_1Models_1_1User.html">App\Models\User</a></div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00013">User.php:14</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a1f25bef37dae884e548034f839fa1f63"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a1f25bef37dae884e548034f839fa1f63">App\Models\User\$hidden</a></div><div class="ttdeci">$hidden</div><div class="ttdoc">Champs cachés pour la sérialisation.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00030">User.php:30</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a2debf606b795dd03a6d23c7828097e28"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a2debf606b795dd03a6d23c7828097e28">App\Models\User\canModifierVideo</a></div><div class="ttdeci">canModifierVideo()</div><div class="ttdoc">Vérifie si l'utilisateur peut modifier une vidéo.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00091">User.php:91</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a4de2d0dbedd55aa056698d20bea9fddf"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a4de2d0dbedd55aa056698d20bea9fddf">App\Models\User\canDiffuserVideo</a></div><div class="ttdeci">canDiffuserVideo()</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00096">User.php:96</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a58094948b99f9fe18734dc180766c1d1"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a58094948b99f9fe18734dc180766c1d1">App\Models\User\canSupprimerVideo</a></div><div class="ttdeci">canSupprimerVideo()</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00101">User.php:101</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a64e2f889303342a38e36c7c367ec94c9"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a64e2f889303342a38e36c7c367ec94c9">App\Models\User\canAdministrerSite</a></div><div class="ttdeci">canAdministrerSite()</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00106">User.php:106</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a701215ac31290fa24a4f2a056d3839ae"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a701215ac31290fa24a4f2a056d3839ae">App\Models\User\isProfesseur</a></div><div class="ttdeci">isProfesseur()</div><div class="ttdoc">Vérifie si l'utilisateur est un professeur.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00060">User.php:60</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_a93d16b474da518916256ba054844ccb9"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#a93d16b474da518916256ba054844ccb9">App\Models\User\isEleve</a></div><div class="ttdeci">isEleve()</div><div class="ttdoc">Vérifie si l'utilisateur est un élève.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00068">User.php:68</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_aa74c4b1b6e0aa694334bc01de749171e"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#aa74c4b1b6e0aa694334bc01de749171e">App\Models\User\getProfile</a></div><div class="ttdeci">getProfile()</div><div class="ttdoc">Obtient le profil (ici c'est juste nom/prenom stocké sur User)</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00076">User.php:76</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_ab4030437e467a0cc396b0c3ea53199f7"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#ab4030437e467a0cc396b0c3ea53199f7">App\Models\User\$fillable</a></div><div class="ttdeci">$fillable</div><div class="ttdoc">Champs assignables en masse.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00020">User.php:20</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_ae46317bccad3028a444e7e9efb9f6fa0"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#ae46317bccad3028a444e7e9efb9f6fa0">App\Models\User\media</a></div><div class="ttdeci">media()</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00048">User.php:48</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html_afc845f919d34d162c4500b1942d322d7"><div class="ttname"><a href="classApp_1_1Models_1_1User.html#afc845f919d34d162c4500b1942d322d7">App\Models\User\casts</a></div><div class="ttdeci">casts()</div><div class="ttdoc">Casts.</div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00038">User.php:38</a></div></div>
+<div class="ttc" id="anamespaceApp_1_1Models_html"><div class="ttname"><a href="namespaceApp_1_1Models.html">App\Models</a></div><div class="ttdef"><b>Definition</b> <a href="Eleve_8php_source.html#l00003">Eleve.php:3</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a class="el" href="dir_fc6199fba97859a095e1d9a5aa5fae23.html">Models</a></li><li class="navelem"><a class="el" href="User_8php.html">User.php</a></li>
+    <li class="footer">Généré par <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -15,13 +15,26 @@ class MediaController extends Controller
 {
     protected $mediaService;
 
+    /**
+     * @brief Initialise le contrôleur avec le service de gestion des médias.
+     *
+     * Utilise l'injection de dépendance pour déléguer la logique métier
+     * (recherche, suppression, synchronisation) au MediaService.
+     *
+     * @param MediaService $mediaService Service de gestion des médias
+     */
     public function __construct(MediaService $mediaService)
     {
         $this->mediaService = $mediaService;
     }
 
     /**
-     * Display a listing of the resource.
+     * @brief Affiche la liste des médias avec filtres et pagination.
+     *
+     * Récupère les paramètres de recherche depuis la requête HTTP et délègue
+     * la récupération des résultats au MediaService.
+     *
+     * @return \Illuminate\View\View Vue "home" contenant la liste paginée des médias
      */
     public function index()
     {
@@ -32,7 +45,12 @@ class MediaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @brief Affiche le formulaire de création d’un nouveau média.
+     *
+     * Charge les données nécessaires à la construction du formulaire :
+     * projets, professeurs, élèves et rôles.
+     *
+     * @return \Illuminate\View\View Vue du formulaire de création de métadonnées
      */
     public function create()
     {
@@ -45,7 +63,21 @@ class MediaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @brief Enregistre un nouveau média avec ses métadonnées et participations.
+     *
+     * Cette méthode :
+     * - Valide les données du formulaire
+     * - Nettoie certains champs texte
+     * - Crée le média en base
+     * - Gère les propriétés personnalisées
+     * - Crée automatiquement les élèves si nécessaire
+     * - Associe les participations (élève + rôle)
+     *
+     * @param Request $request Requête HTTP contenant les données du formulaire
+     * @return \Illuminate\Http\RedirectResponse Redirection vers la page du média créé
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si les données envoyées sont invalides
      */
     public function store(Request $request)
     {
@@ -60,20 +92,21 @@ class MediaController extends Controller
             'chemin_local' => 'nullable|string|max:2048',
             'projet_id' => 'nullable|exists:projets,id',
             'professeur_id' => 'nullable|exists:professeurs,id',
-
             'properties' => 'nullable|array',
             'properties.*.key' => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
-
-            // On valide le tableau de participations
             'participations' => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
             'participations.*.role_id' => 'required|exists:roles,id',
-
-            /*'eleves' => 'nullable|array',
-            'eleves.*' => 'exists:eleves,id',
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',*/
+        ], [
+            'mtd_tech_titre.required' => 'Le titre est obligatoire.',
+            'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
+            'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
+            'projet_id.exists' => 'Le projet sélectionné est invalide.',
+            'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
+            'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
+            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
+            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
         ]);
 
         $properties = collect($request->input('properties', []))
@@ -136,7 +169,16 @@ class MediaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @brief Affiche les détails d’un média.
+     *
+     * Récupère les informations complètes du média via le MediaService
+     * (incluant éventuellement des données enrichies) et les transmet à la vue.
+     *
+     * @param string $id Identifiant du média
+     * @return \Illuminate\View\View Vue "video" avec les informations du média
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le média est introuvable
      */
     public function show(string $id)
     {
@@ -150,7 +192,16 @@ class MediaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * @brief Affiche le formulaire d’édition d’un média existant.
+     *
+     * Charge le média avec ses relations (professeur, projets, participations)
+     * ainsi que les données nécessaires aux champs de sélection.
+     *
+     * @param string $id Identifiant du média
+     * @return \Illuminate\View\View Vue du formulaire pré-rempli
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Si le média est introuvable
      */
     public function edit(string $id)
     {
@@ -167,34 +218,53 @@ class MediaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @brief Met à jour les métadonnées d’un média existant.
+     *
+     * Cette méthode :
+     * - Valide les données envoyées
+     * - Nettoie les champs texte
+     * - Met à jour les informations principales du média
+     * - Synchronise les projets associés (relation many-to-many)
+     * - Reconstruit les participations (élèves + rôles)
+     * - Gère les propriétés personnalisées
+     *
+     * Les URI (fichiers vidéo) ne sont pas modifiées ici.
+     *
+     * @param Request $request Requête HTTP contenant les données mises à jour
+     * @param string $id Identifiant du média
+     * @return \Illuminate\Http\RedirectResponse Redirection vers la page du média
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si les données sont invalides
      */
     public function update(Request $request, string $id)
     {
         $media = \App\Models\Media::findOrFail($id);
 
         $validated = $request->validate([
-            // Basic media fields (URIs are managed elsewhere, not in this form)
             'mtd_tech_titre' => 'required|string|max:255',
             'promotion' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',
             'theme' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:5000',
-
-            // Foreign keys
             'professeur_id' => 'nullable|exists:professeurs,id',
             'projet_ids' => 'nullable|array',
             'projet_ids.*' => 'exists:projets,id',
-
-            // Participations (array of student-role pairs)
             'participations' => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
             'participations.*.role_id' => 'required|exists:roles,id',
-
-            // propriétés personalisées
             'properties' => 'nullable|array',
             'properties.*.key' => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
+        ], [
+            'mtd_tech_titre.required' => 'Le titre est obligatoire.',
+            'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
+            'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
+            'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
+            'projet_ids.*.exists' => 'Un des projets sélectionnés est invalide.',
+            'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
+            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
+            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
         ]);
 
         // Sanitize single-line fields: remove newlines
@@ -274,7 +344,14 @@ class MediaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @brief Supprime un média ainsi que ses fichiers associés.
+     *
+     * Effectue :
+     * - Suppression des fichiers locaux liés au média
+     * - Suppression de l’entrée en base de données
+     *
+     * @param string $id Identifiant du média
+     * @return \Illuminate\Http\RedirectResponse Redirection vers la liste des médias
      */
     public function destroy(string $id)
     {
@@ -291,6 +368,18 @@ class MediaController extends Controller
             ->withErrors('Error deleting media');
     }
 
+    /**
+     * @brief Lance la synchronisation des médias depuis les différents disques.
+     *
+     * Déclenche des jobs asynchrones pour analyser les sources suivantes :
+     * - FTP ARCH
+     * - FTP PAD
+     * - Stockage local externe
+     *
+     * Permet de mettre à jour la base de données en fonction des fichiers présents.
+     *
+     * @return \Illuminate\Http\RedirectResponse Retour à la page précédente avec message de statut
+     */
     public function sync()
     {
         foreach ([
@@ -304,10 +393,24 @@ class MediaController extends Controller
         return back()->with('success', 'Synchronisation BD lancée !');
     }
 
+    /**
+     * @brief Synchronise un chemin local spécifique avec la base de données.
+     *
+     * Permet d’ajouter ou mettre à jour un média à partir d’un chemin fourni.
+     *
+     * @param Request $request Requête HTTP contenant le chemin à synchroniser
+     * @param MediaService $mediaService Service de gestion des médias
+     * @return \Illuminate\Http\JsonResponse Résultat de la synchronisation
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si le chemin n’est pas fourni ou invalide
+     */
     public function syncLocalPath(Request $request, MediaService $mediaService)
     {
         $request->validate([
             'path' => ['required', 'string'],
+        ], [
+            'path.required' => 'Le chemin est obligatoire.',
         ]);
 
         $success = $mediaService->syncLocalPath($request->path);

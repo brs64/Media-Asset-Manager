@@ -1,0 +1,9 @@
+<map id="App\Http\Controllers\FileExplorerController\scanResults" name="App\Http\Controllers\FileExplorerController\scanResults">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,30,172,85"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Services_1_1FfastransService.html#afd12d7538c3acc927dd210eb779caada" title=" " alt="" coords="220,37,439,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,55,206,55,206,60,172,60"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Services_1_1FfastransService.html#a24a706eb6b60ac41bec6a63d917f09e5" title=" " alt="" coords="487,5,705,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="438,42,473,37,473,43,439,47"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Services_1_1FfastransService.html#ae3bec7fff62b23f480d28770b73335e9" title="Helper to translate English statuses to French." alt="" coords="487,69,705,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="439,68,473,72,473,77,438,73"/>
+</map>

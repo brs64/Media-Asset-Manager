@@ -1,0 +1,7 @@
+<map id="App\Http\Requests\Auth\LoginRequest\ensureIsNotRateLimited" name="App\Http\Requests\Auth\LoginRequest\ensureIsNotRateLimited">
+<area shape="rect" id="Node000001" title="Ensure the login request is not rate limited." alt="" coords="604,5,831,60"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Requests_1_1Auth_1_1LoginRequest.html#a7be4cc5f6c415464b716807cc1b862ce" title="Attempt to authenticate the request&#39;s credentials." alt="" coords="356,13,556,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="590,35,556,35,556,30,590,30"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1Auth_1_1AuthenticatedSessionController.html#a0c8e698ebd6dd5f91721d442f53dbe66" title="Handle an incoming authentication request." alt="" coords="5,13,308,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="342,35,308,35,308,30,342,30"/>
+</map>

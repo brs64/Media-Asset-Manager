@@ -213,6 +213,13 @@ class AdminController extends Controller
             'prenom' => 'required|string|max:255',
             'identifiant' => 'required|string|unique:users,name',
             'mot_de_passe' => 'required|min:8',
+        ], [
+            'nom.required' => 'Le nom est obligatoire.',
+            'prenom.required' => 'Le prénom est obligatoire.',
+            'identifiant.required' => "L'identifiant est obligatoire.",
+            'identifiant.unique' => 'Cet identifiant est déjà utilisé.',
+            'mot_de_passe.required' => 'Le mot de passe est obligatoire.',
+            'mot_de_passe.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
         ]);
 
         // Créer d'abord le compte utilisateur
@@ -263,6 +270,9 @@ class AdminController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
+        ], [
+            'nom.required' => 'Le nom est obligatoire.',
+            'prenom.required' => 'Le prénom est obligatoire.',
         ]);
 
         Eleve::create($validated);
@@ -301,6 +311,8 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'libelle' => 'required|string|max:255',
+        ], [
+            'libelle.required' => 'Le libellé du projet est obligatoire.',
         ]);
 
         \App\Models\Projet::create($validated);
@@ -378,6 +390,10 @@ class AdminController extends Controller
             'backup_time' => 'required',
             'backup_day' => 'required',
             'backup_month' => 'required',
+        ], [
+            'backup_time.required' => "L'heure de sauvegarde est obligatoire.",
+            'backup_day.required' => 'Le jour de sauvegarde est obligatoire.',
+            'backup_month.required' => 'Le mois de sauvegarde est obligatoire.',
         ]);
 
         $this->updateEnvFile([
@@ -424,6 +440,10 @@ public function Ajouterelevedepuiscsv(Request $request)
 
     $request->validate([
         'fichier_csv' => 'required|file|mimes:csv,txt'
+    ], [
+        'fichier_csv.required' => 'Le fichier est obligatoire.',
+        'fichier_csv.file' => 'Le fichier est invalide.',
+        'fichier_csv.mimes' => 'Le fichier doit être au format CSV ou TXT.',
     ]);
 
     $file = $request->file('fichier_csv');
@@ -480,6 +500,11 @@ public function Ajouterelevedepuiscsv(Request $request)
             'user_id' => 'required|exists:users,id',
             'permission' => 'required|string',
             'grant' => 'required|boolean',
+        ], [
+            'user_id.required' => "L'utilisateur est obligatoire.",
+            'user_id.exists' => "L'utilisateur sélectionné n'existe pas.",
+            'permission.required' => 'La permission est obligatoire.',
+            'grant.required' => "L'action (accorder/révoquer) est obligatoire.",
         ]);
 
         $user = User::findOrFail($validated['user_id']);
@@ -508,6 +533,11 @@ public function Ajouterelevedepuiscsv(Request $request)
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'role' => 'required|string|in:admin,professeur,eleve',
+        ], [
+            'user_id.required' => "L'utilisateur est obligatoire.",
+            'user_id.exists' => "L'utilisateur sélectionné n'existe pas.",
+            'role.required' => 'Le rôle est obligatoire.',
+            'role.in' => 'Le rôle doit être admin, professeur ou eleve.',
         ]);
 
         $user = User::findOrFail($validated['user_id']);

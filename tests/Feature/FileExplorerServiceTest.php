@@ -31,7 +31,12 @@ class FileExplorerServiceTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un répertoire temporaire vide
+     * WHEN : on scanne ce répertoire
+     * THEN : le résultat est un tableau vide
+     */
     public function scanDisk_returns_empty_for_empty_directory()
     {
         $service = new FileExplorerService();
@@ -41,7 +46,12 @@ class FileExplorerServiceTest extends TestCase
         $this->assertEmpty($results);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un répertoire contenant un dossier, une vidéo .mp4 et un fichier .txt
+     * WHEN : on scanne ce répertoire
+     * THEN : seuls le dossier et la vidéo sont retournés, le fichier texte est ignoré
+     */
     public function scanDisk_returns_folders_and_videos_only()
     {
         // Création de dossiers et fichiers
@@ -64,7 +74,12 @@ class FileExplorerServiceTest extends TestCase
         $this->assertNotContains('text.txt', $names);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un disque Laravel simulé contenant un sous-dossier, une vidéo .mkv et un fichier .txt
+     * WHEN : on scanne ce disque
+     * THEN : seuls le dossier et la vidéo sont retournés, le fichier texte est ignoré
+     */
     public function scanDisk_handles_laravel_disks()
     {
         Storage::fake('test_disk');
@@ -88,7 +103,12 @@ class FileExplorerServiceTest extends TestCase
         $this->assertNotContains('hidden.txt', $names);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : un répertoire contenant un dossier et deux fichiers vidéo
+     * WHEN : on scanne récursivement ce répertoire avec un callback
+     * THEN : le callback est appelé pour chaque élément trouvé (dossier et vidéos)
+     */
     public function scanDiskRecursive_calls_callback_for_all_items()
     {
         // Setup dossiers et fichiers
@@ -108,7 +128,12 @@ class FileExplorerServiceTest extends TestCase
         $this->assertContains('video2.mkv', $found);
     }
 
-    /** @test */
+    /**
+     * @test
+     * GIVEN : des listes de noms de fichiers vidéo et non-vidéo
+     * WHEN : on vérifie chaque fichier avec la méthode isVideo
+     * THEN : les fichiers vidéo retournent true, les autres retournent false
+     */
     public function isVideo_returns_true_for_video_extensions()
     {
         $service = new FileExplorerService();

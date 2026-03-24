@@ -1,0 +1,5 @@
+<map id="App\Helpers\VideoHelper\forceExtensionMp4" name="App\Helpers\VideoHelper\forceExtensionMp4">
+<area shape="rect" id="Node000001" title="Force l&#39;extension d&#39;un fichier en .mp4." alt="" coords="5,5,191,45"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Helpers_1_1VideoHelper.html#ab2e7c9566176701ed22e38055f5bb78e" title="Récupère le nom du fichier sans son extension." alt="" coords="239,5,461,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,23,225,23,225,28,191,28"/>
+</map>

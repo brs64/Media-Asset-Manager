@@ -13,17 +13,44 @@ class TransfertController extends Controller
 {
     protected $ffastrans;
 
+    /**
+     * @brief Initialise le contrôleur avec le service FFAStrans.
+     *
+     * Permet d'interagir avec l’API FFAStrans pour gérer les jobs de transcodage.
+     *
+     * @param FfastransService $ffastrans Service pour la communication avec FFAStrans
+     */
     public function __construct(FfastransService $ffastrans)
     {
         $this->ffastrans = $ffastrans;
     }
 
+    /**
+     * @brief Affiche la vue principale des transferts.
+     *
+     * Charge la configuration du nombre maximum de transferts concurrents
+     * et transmet ces informations à la vue pour affichage.
+     *
+     * @return \Illuminate\View\View Vue contenant le tableau de bord des transferts
+     */
     public function index()
     {
-        $maxConcurrent = config('btsplay.process.max_videos');
+        $maxConcurrent = config('btsplay.process.max_concurrent_transferts');
         return view('admin.transferts', compact('maxConcurrent'));
     }
-    
+
+    /**
+     * @brief Liste tous les médias en cours ou en attente de transcodage.
+     *
+     * Fonctionnalités :
+     * - Récupère l’état des jobs actifs via FFAStrans
+     * - Filtre les médias présents en base mais non encore téléchargés localement
+     * - Mappe le statut des jobs en français pour l’affichage
+     * - Retourne la liste enrichie en JSON
+     *
+     * @param FfastransService $ffastrans Service pour récupérer les statuts des jobs
+     * @return \Illuminate\Http\JsonResponse Liste des médias avec statut, progression et info job
+     */
     public function list(FfastransService $ffastrans)
     {
         $query = Media::whereNull('chemin_local')
@@ -31,10 +58,9 @@ class TransfertController extends Controller
                 ->select('id', 'mtd_tech_titre', 'URI_NAS_PAD', 'URI_NAS_ARCH', 'transcode_status', 'transcode_job_id')
                 ->get();
 
-        $results = $query->map(function ($media) {
-            $availablePaths = [];
-            if (!empty($media->URI_NAS_PAD)) $availablePaths[] = ['label' => 'NAS_PAD', 'path' => $media->URI_NAS_PAD];
-            if (!empty($media->URI_NAS_ARCH)) $availablePaths[] = ['label' => 'NAS_ARCH', 'path' => $media->URI_NAS_ARCH];
+            foreach ($allJobs as $job) {
+                if (isset($job['filename'])) {
+                    $key = pathinfo($job['filename'], PATHINFO_FILENAME);
 
             $primaryPath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
             $primaryDisk = (!empty($media->URI_NAS_ARCH)) ? 'nas_arch' : 'ftp_pad';
@@ -93,46 +119,87 @@ class TransfertController extends Controller
             : response()->json(['success' => false, 'message' => 'Erreur lors du lancement FFAStrans'], 500);
     }
 
+    /**
+     * @brief Vérifie le statut d’un job FFAStrans.
+     *
+     * Fonctionnalités :
+     * - Interroge FFAStrans pour récupérer l’état et la progression
+     * - Traduit le statut en libellé français ('En cours', 'Terminé', 'Echoué', 'Annulé')
+     * - Met à jour la base de données pour le média associé
+     *
+     * @param string $jobId ID du job FFAStrans
+     * @return \Illuminate\Http\JsonResponse Progression, label français et indicateur de fin
+     */
     public function checkStatus($jobId)
     {
         try {
             $apiData = $this->ffastrans->getJobStatus($jobId);
-            $source = $apiData['source'] ?? 'not_found';
-            $rawState = strtolower($apiData['state'] ?? '');
-            
+            $rawState = $apiData['state'] ?? '';
             $progress = $apiData['progress'] ?? 0;
-            $finished = false;
-            $label = 'En cours';
 
-            // Find the media record to update its status in the DB during polling
-            $media = Media::where('transcode_job_id', $jobId)->first();
+            if ($progress == 0 && isset($apiData['variables']) && is_array($apiData['variables'])) {
+                foreach ($apiData['variables'] as $var) {
+                    if (in_array($var['name'], ['progress', 'i_progress', 's_progress'])) {
+                        $progress = (int) $var['data'];
+                    }
+                    if (in_array($var['name'], ['status', 's_status'])) {
+                        $rawState = $var['data'];
+                    }
+                }
+            }
 
-            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || ($source === 'history' && !in_array($rawState, ['error', 'failed']))) {
+            $stateLower = strtolower($rawState);
+
+            // FORCE FRENCH LABELS
+            $dbStatus = 'en_cours'; // Valeur par défaut pour la base
+            if (in_array($stateLower, ['success', 'finished', 'done', 'terminé'])) {
                 $label = 'Terminé';
-                $progress = 100;
                 $finished = true;
-                if ($media) $media->update(['transcode_status' => 'termine']);
-            } 
-            elseif (in_array($rawState, ['error', 'failed', 'aborted', 'echoué'])) {
+                $progress = 100;
+                $dbStatus = 'termine';
+            }
+            elseif (in_array($stateLower, ['error', 'failed', 'aborted', 'echoué'])) {
                 $label = 'Echoué';
                 $finished = true;
-                if ($media) $media->update(['transcode_status' => 'echoue']);
-            } 
-            elseif ($source === 'active') {
-                $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
+                $dbStatus = 'echoue';
+            }
+            elseif (in_array($stateLower, ['cancelled', 'canceled', 'annulé'])) {
+                $label = 'Annulé';
+                $finished = true;
+                $dbStatus = 'annule';
+            }
+            else {
+                // If unknown or empty, assume running
+                $label = 'En cours';
                 $finished = false;
-                if ($media && $media->transcode_status !== 'en_cours') {
-                    $media->update(['transcode_status' => 'en_cours']);
+                $dbStatus = 'en_cours';
+            }
+
+            // Mettre à jour le statut en base de données
+            $media = Media::where('transcode_job_id', $jobId)->first();
+            if ($media) {
+                $updateData = [
+                    'transcode_status' => $dbStatus,
+                    'transcode_progress' => $progress,
+                ];
+
+                // Si terminé, sauvegarder la date de fin
+                if ($finished) {
+                    $updateData['transcode_finished_at'] = now();
                 }
+
+                $media->update($updateData);
             }
 
             return response()->json([
                 'progress' => $progress,
                 'label' => $label,
-                'finished' => $finished
+                'finished' => $finished,
+                'debug_state' => $rawState
             ]);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Erreur de connexion'], 500);
         }
     }
 
@@ -152,7 +219,6 @@ class TransfertController extends Controller
             Media::where('transcode_job_id', $id)->update(['transcode_status' => 'annule']);
             return response()->json(['success' => true]);
         }
-        return response()->json(['success' => false], 500);
     }
 
 

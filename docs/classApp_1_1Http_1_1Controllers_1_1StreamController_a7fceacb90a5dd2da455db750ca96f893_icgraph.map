@@ -1,0 +1,11 @@
+<map id="App\Http\Controllers\StreamController\streamLocalVideo" name="App\Http\Controllers\StreamController\streamLocalVideo">
+<area shape="rect" id="Node000001" title="Stream un fichier vidéo local avec support des requêtes HTTP Range." alt="" coords="509,28,731,82"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a52014ee071992c1c616c21b17d560792" title="Point d&#39;entrée principal pour le streaming d’un média." alt="" coords="5,35,192,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="513,27,461,18,351,8,302,10,240,18,198,26,157,38,156,33,197,21,240,12,302,5,351,3,462,12,514,22"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a76998999bcadec59b3fb07f940064743" title="Tente de résoudre et streamer une vidéo locale à partir d’un modèle Media." alt="" coords="240,28,461,82"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="495,58,462,58,462,52,495,52"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a9e1dc23bd53086b4ef0c3dcb3aa3d75c" title="Stream une vidéo locale de test en fonction d’un mapping d’ID (dev uniquement)." alt="" coords="240,106,461,161"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="513,89,446,109,444,104,512,84"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="226,58,192,58,192,52,226,52"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="249,105,163,78,165,73,251,100"/>
+</map>

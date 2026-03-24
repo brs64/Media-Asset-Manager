@@ -1,0 +1,13 @@
+<map id="App\Services\FfastransService\client" name="App\Services\FfastransService\client">
+<area shape="rect" id="Node000001" title=" " alt="" coords="487,101,705,141"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Services_1_1FfastransService.html#a38bd90dafc9f5882b601b2e838a4f95f" title=" " alt="" coords="220,5,439,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="536,98,438,60,402,48,403,43,440,55,538,93"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Services_1_1FfastransService.html#afd12d7538c3acc927dd210eb779caada" title=" " alt="" coords="220,69,439,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="473,109,439,105,439,100,474,104"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Services_1_1FfastransService.html#af4bfe743eb59eedfba180fad25516f14" title=" " alt="" coords="220,133,439,173"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="474,139,439,143,439,138,473,133"/>
+<area shape="rect" id="Node000006" href="$classApp_1_1Services_1_1FfastransService.html#a57ba401cb3c3236dc5f04b99d8f429ca" title=" " alt="" coords="220,197,439,237"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="538,149,440,188,403,200,402,195,438,183,536,144"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Http_1_1Controllers_1_1FileExplorerController.html#af62cfae650ed7ee6eb832d0d38dffe34" title=" " alt="" coords="5,62,172,117"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,92,172,92,172,87,206,87"/>
+</map>

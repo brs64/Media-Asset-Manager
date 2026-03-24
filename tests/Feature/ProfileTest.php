@@ -10,6 +10,11 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * GIVEN : un utilisateur authentifié
+     * WHEN : il accède à la page de profil
+     * THEN : la page s'affiche correctement avec un statut 200
+     */
     public function test_profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
@@ -21,6 +26,11 @@ class ProfileTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * GIVEN : un utilisateur authentifié
+     * WHEN : il met à jour son nom via le formulaire de profil
+     * THEN : le nom est modifié en base et il est redirigé vers le profil
+     */
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();
@@ -29,7 +39,6 @@ class ProfileTest extends TestCase
             ->actingAs($user)
             ->patch('/profile', [
                 'name' => 'Test User',
-                'email' => 'test@example.com',
             ]);
 
         $response
@@ -39,29 +48,14 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
-    {
-        $user = User::factory()->create();
-
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => $user->email,
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
-
-        $this->assertNotNull($user->refresh()->email_verified_at);
-    }
-
-    public function test_user_can_delete_their_account(): void
+/**
+     * GIVEN : un utilisateur authentifié
+     * WHEN : il supprime son compte en fournissant le bon mot de passe
+     * THEN : le compte est supprimé, il est déconnecté et redirigé vers l'accueil
+     */
+public function test_user_can_delete_their_account(): void
     {
         $user = User::factory()->create();
 
@@ -79,6 +73,11 @@ class ProfileTest extends TestCase
         $this->assertNull($user->fresh());
     }
 
+    /**
+     * GIVEN : un utilisateur authentifié
+     * WHEN : il tente de supprimer son compte avec un mot de passe incorrect
+     * THEN : une erreur est retournée et le compte n'est pas supprimé
+     */
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
         $user = User::factory()->create();

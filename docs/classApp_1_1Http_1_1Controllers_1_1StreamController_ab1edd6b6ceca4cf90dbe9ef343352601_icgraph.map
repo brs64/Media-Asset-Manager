@@ -1,0 +1,5 @@
+<map id="App\Http\Controllers\StreamController\streamHLS" name="App\Http\Controllers\StreamController\streamHLS">
+<area shape="rect" id="Node000001" title="Stream une playlist HLS (.m3u8) depuis un stockage distant." alt="" coords="240,5,452,45"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a52014ee071992c1c616c21b17d560792" title="Point d&#39;entrée principal pour le streaming d’un média." alt="" coords="5,5,192,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,28,192,28,192,23,226,23"/>
+</map>

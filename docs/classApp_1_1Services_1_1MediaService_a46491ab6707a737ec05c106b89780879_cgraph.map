@@ -1,0 +1,11 @@
+<map id="App\Services\MediaService\getMediaInfo" name="App\Services\MediaService\getMediaInfo">
+<area shape="rect" id="Node000001" title="Get complete information about a media." alt="" coords="5,101,204,141"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Services_1_1MediaService.html#a42c1eb749472be378c0aae98fa0f65ee" title="Extract video title from filename Format: YEAR_PROJECT_TITLE.ext." alt="" coords="252,5,451,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,99,251,55,272,47,274,52,253,60,150,104"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Services_1_1MediaService.html#ad21fa960ad71133c6a04130b9d0dd78c" title="Format participations for display." alt="" coords="252,69,451,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,106,238,101,239,107,205,111"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Services_1_1MediaService.html#ad986ec9555250ab831c14f1950ff203d" title="Extract technical metadata from video via FTP without downloading." alt="" coords="252,133,451,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="205,132,239,136,238,141,204,137"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Services_1_1MediaService.html#a590b373c091be0fb7250c44225f8872e" title="Sanitize string for display: remove newlines." alt="" coords="252,197,451,237"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="150,139,253,183,274,190,272,195,251,188,148,144"/>
+</map>
