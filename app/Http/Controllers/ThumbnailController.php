@@ -13,7 +13,7 @@ class ThumbnailController extends Controller
 
     public function __construct()
     {
-        $this->localThumbnailsPath = storage_path('app/public/thumbnails');
+        $this->localThumbnailsPath = storage_path('/mnt/miniatures');
         $this->archivageMountPath = env('FILESYSTEM_LOCAL_PATH', '/mnt/archivage');
 
         if (!is_dir($this->localThumbnailsPath)) {
@@ -53,7 +53,7 @@ class ThumbnailController extends Controller
 
     /**
      * Build thumbnail path from video path.
-     * Thumbnails are in /mnt/archivage/Thumbnails/<year>/<project>/<filename>.jpg
+     * Thumbnails are in /mnt/Thumbnails/<year>/<project>/<filename>.jpg
      */
     protected function buildThumbnailPath(string $videoPath): ?string
     {
