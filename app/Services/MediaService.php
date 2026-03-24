@@ -251,16 +251,20 @@ public function searchMedia(array $filtres)
 {
     $query = Media::query();
 
+    // Garde uniquement les médias avec un chemin local valide
+    $query->whereNotNull('chemin_local');
+
+    // Recherche par mot-clé
     if (!empty($filtres['keyword'])) {
         $kw = $filtres['keyword'];
 
         $query->where(function($q) use ($kw) {
+
             // Recherche dans les colonnes directes
             $q->where('mtd_tech_titre', 'like', "%{$kw}%")
               ->orWhere('description', 'like', "%{$kw}%")
               ->orWhere('theme', 'like', "%{$kw}%")
-              ->orWhere('promotion', 'like', "%{$kw}%")
-              ->andWhere('chemin_local', 'exists', true);
+              ->orWhere('promotion', 'like', "%{$kw}%");
 
             // Recherche dans le nom du PROFESSEUR
             $q->orWhereHas('professeur', function($sq) use ($kw) {
@@ -268,7 +272,7 @@ public function searchMedia(array $filtres)
                    ->orWhere('prenom', 'like', "%{$kw}%");
             });
 
-            // Recherche dans le nom du PROJET (C'est ça qui manque !)
+            // Recherche dans le nom du PROJET
             $q->orWhereHas('projets', function($sq) use ($kw) {
                 $sq->where('libelle', 'like', "%{$kw}%");
             });
@@ -278,8 +282,7 @@ public function searchMedia(array $filtres)
     // Garde quand même les filtres spécifiques "au cas où" (pour les tests)
     if (!empty($filtres['projet'])) {
         $query->whereHas('projets', function ($q) use ($filtres) {
-            $q->where('projets.id', $filtres['projet'])
-              ->andWhere('chemin_local', 'exists', true);
+            $q->where('projets.id', $filtres['projet']);
         });
     }
     
@@ -287,6 +290,7 @@ public function searchMedia(array $filtres)
         $query->where('promotion', $filtres['promotion']);
     }
 
+    // Retourne les résultats paginés par date de création décroissante
     return $query->orderBy('created_at', 'desc')->paginate(20);
 }
 

@@ -14,6 +14,7 @@ class HomeController extends Controller
     {
         // Récupérer les derniers médias pour la grille principale (Pagination de 16)
         $medias = Media::with(['projets'])
+            ->whereNotNull('chemin_local')
             ->orderBy('created_at', 'desc')
             ->paginate(16);
 
