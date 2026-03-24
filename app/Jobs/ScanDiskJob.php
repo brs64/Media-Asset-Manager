@@ -11,6 +11,29 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @brief Job asynchrone de scan de disque avec feedback en temps réel.
+ *
+ * Ce job permet de scanner récursivement un disque (FTP, NAS, local) pour
+ * détecter tous les fichiers vidéo, avec mise à jour progressive de l'interface
+ * utilisateur pendant le scan.
+ *
+ * Fonctionnalités principales :
+ * - Scan récursif complet d'une arborescence de fichiers
+ * - Filtrage automatique sur les fichiers de type vidéo
+ * - Feedback en temps réel : mise à jour du compteur tous les 10 fichiers détectés
+ * - Stockage des résultats en cache pour récupération ultérieure
+ * - Gestion des erreurs avec statut d'échec
+ *
+ * Workflow :
+ * 1. L'utilisateur lance un scan via l'interface
+ * 2. Le job démarre en arrière-plan et stocke son statut dans le cache
+ * 3. Tous les 10 fichiers trouvés, le cache est mis à jour (compteur + liste)
+ * 4. L'interface peut interroger l'avancement via l'API de status
+ * 5. À la fin, le statut passe à 'done' et les résultats complets sont disponibles
+ *
+ * Identifiant de scan : UUID unique permettant de suivre l'avancement du job
+ */
 class ScanDiskJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -19,12 +42,19 @@ class ScanDiskJob implements ShouldQueue
     public string $path;
     public string $scanId;
 
-    // Timeout du job (secondes)
+    /** @brief Timeout du job en secondes (0 = illimité) */
     public $timeout = 0;
 
-    // Nombre de tentatives
+    /** @brief Nombre de tentatives en cas d'échec */
     public $tries = 1;
 
+    /**
+     * @brief Initialise le job de scan avec ses paramètres.
+     *
+     * @param string $disk Nom du disque Laravel à scanner (ex: ftp_pad, nas_arch)
+     * @param string $path Chemin de départ du scan
+     * @param string $scanId Identifiant unique (UUID) pour suivre l'avancement du scan
+     */
     public function __construct(string $disk, string $path, string $scanId)
     {
         $this->disk = $disk;
@@ -98,6 +128,27 @@ class ScanDiskJob implements ShouldQueue
         }
     } */
 
+    /**
+     * @brief Exécute le scan du disque avec feedback progressif.
+     *
+     * Processus :
+     * 1. Initialise un buffer temporaire pour accumuler les fichiers
+     * 2. Scan récursif via FileExplorerService avec callback sur chaque fichier
+     * 3. Tous les 10 fichiers vidéo détectés → flush du buffer vers le cache
+     * 4. Flush final du buffer pour sauvegarder les fichiers restants
+     * 5. Marquage du statut 'done' en cache
+     *
+     * En cas d'erreur, le statut passe à 'failed' et l'exception est loguée.
+     *
+     * Les données sont stockées dans le cache avec les clés :
+     * - scan:{scanId}:status : 'running', 'done' ou 'failed'
+     * - scan:{scanId}:results : tableau des fichiers détectés
+     * - scan:{scanId}:count : nombre de fichiers vidéo
+     *
+     * Durée de vie en cache : 2 heures
+     *
+     * @return void
+     */
     public function handle()
     {
         Log::info("Scan FTP démarré avec Live Feedback", ['scan_id' => $this->scanId]);
@@ -139,7 +190,21 @@ class ScanDiskJob implements ShouldQueue
         }
     }
 
-    // Helper function to keep code clean
+    /**
+     * @brief Vide le buffer de fichiers dans le cache pour mise à jour progressive.
+     *
+     * Cette méthode permet d'afficher le compteur de fichiers en temps réel
+     * dans l'interface utilisateur sans attendre la fin complète du scan.
+     *
+     * Fonctionnement :
+     * 1. Récupère la liste actuelle depuis le cache
+     * 2. Fusionne avec les nouveaux fichiers du buffer
+     * 3. Sauvegarde la liste mise à jour en cache
+     * 4. Met à jour le compteur visible (pour l'affichage frontend)
+     *
+     * @param array $newFiles Tableau de nouveaux fichiers à ajouter au cache
+     * @return void
+     */
     protected function flushBufferToCache(array $newFiles)
     {
         $cacheKey = "scan:{$this->scanId}:results";

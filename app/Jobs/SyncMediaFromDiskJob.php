@@ -12,6 +12,26 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @brief Job asynchrone de synchronisation des médias depuis un disque.
+ *
+ * Ce job permet de maintenir la cohérence entre les fichiers physiques présents
+ * sur les différents stockages (NAS, FTP, local) et les enregistrements en base de données.
+ *
+ * Fonctionnalités principales :
+ * - Scan récursif d'un disque pour détecter tous les fichiers vidéo
+ * - Création automatique de médias pour les nouveaux fichiers détectés
+ * - Mise à jour des chemins pour les médias existants
+ * - Nettoyage des chemins devenus invalides (fichiers supprimés)
+ * - Suppression optionnelle des médias orphelins (sans aucun fichier)
+ *
+ * Disques supportés :
+ * - ftp_arch : NAS d'archivage (URI_NAS_ARCH)
+ * - ftp_pad : NAS de production (URI_NAS_PAD)
+ * - external_local : Stockage local (chemin_local)
+ *
+ * Sécurité : Par défaut, aucun fichier local n'est supprimé (deleteLocalFiles = false)
+ */
 class SyncMediaFromDiskJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -28,11 +48,24 @@ class SyncMediaFromDiskJob implements ShouldQueue
     protected array $existingPaths = [];
 
     /**
-     * Sécurité :
+     * @brief Flag de sécurité pour autoriser la suppression de fichiers locaux.
+     *
      * false par défaut → AUCUNE suppression de fichiers locaux
+     * true → Autorise la suppression des fichiers locaux orphelins
      */
     public bool $deleteLocalFiles = false;
 
+    /**
+     * @brief Initialise le job de synchronisation pour un disque donné.
+     *
+     * Détermine automatiquement le champ de base de données correspondant
+     * au disque spécifié (URI_NAS_ARCH, URI_NAS_PAD ou chemin_local).
+     *
+     * @param string $disk Nom du disque Laravel (ftp_arch, ftp_pad, external_local)
+     * @param string $path Chemin de départ du scan (défaut : racine '/')
+     *
+     * @throws \InvalidArgumentException Si le disque n'est pas supporté
+     */
     public function __construct(string $disk, string $path = '/')
     {
         $this->disk = $disk;
@@ -46,6 +79,18 @@ class SyncMediaFromDiskJob implements ShouldQueue
         };
     }
 
+    /**
+     * @brief Exécute la synchronisation complète du disque.
+     *
+     * Processus en deux phases :
+     * 1. Scan du disque : parcourt récursivement tous les fichiers et met à jour la base
+     * 2. Nettoyage : supprime les références aux fichiers qui n'existent plus
+     *
+     * Chaque fichier vidéo trouvé est traité par handleItem() pour création ou mise à jour.
+     * Les fichiers disparus sont détectés et nettoyés par cleanupDatabase().
+     *
+     * @return void
+     */
     public function handle(): void
     {
         Log::info('Sync Media démarrée', ['disk' => $this->disk]);
@@ -70,7 +115,21 @@ class SyncMediaFromDiskJob implements ShouldQueue
     }
 
     /**
-     * Création / mise à jour + indexation des chemins existants
+     * @brief Traite un fichier vidéo trouvé lors du scan.
+     *
+     * Fonctionnalités :
+     * - Indexe le fichier dans la liste des chemins existants
+     * - Recherche un média existant avec un titre similaire (insensible à la casse)
+     * - Crée un nouveau média si aucun n'existe
+     * - Met à jour le champ URI approprié (ARCH, PAD ou local)
+     *
+     * Le matching des médias se fait sur le nom de fichier normalisé (sans extension, en minuscules).
+     *
+     * @param array $item Tableau associatif contenant les informations du fichier :
+     *                    - 'type' : type de fichier (video, directory, etc.)
+     *                    - 'name' : nom du fichier avec extension
+     *                    - 'path' : chemin complet du fichier
+     * @return void
      */
     protected function handleItem(array $item): void
     {
@@ -106,7 +165,19 @@ class SyncMediaFromDiskJob implements ShouldQueue
     }
 
     /**
-     * Supprime les chemins inexistants et les médias vides
+     * @brief Nettoie la base de données en supprimant les références obsolètes.
+     *
+     * Cette méthode parcourt tous les médias ayant un chemin sur le disque en cours
+     * de synchronisation et vérifie leur existence réelle.
+     *
+     * Actions effectuées :
+     * - Réinitialise le champ URI si le fichier n'existe plus
+     * - Supprime optionnellement le fichier local si tous les NAS sont vides (si deleteLocalFiles = true)
+     * - Supprime complètement le média si aucun fichier ne reste disponible
+     *
+     * Traitement par lots de 500 médias pour optimiser les performances et la mémoire.
+     *
+     * @return void
      */
     protected function cleanupDatabase(): void
     {

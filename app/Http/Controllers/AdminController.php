@@ -15,7 +15,13 @@ use App\Models\Eleve;
 class AdminController extends Controller
 {
     /**
-     * Vérifie que l'utilisateur a accès à l'admin
+     * @brief Vérifie que l'utilisateur connecté a les droits d'administration.
+     *
+     * Contrôle les autorisations avant chaque action sensible.
+     * Seuls les utilisateurs ayant le rôle "admin" ou "professeur" sont autorisés.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Erreur 403 si l'utilisateur n'est pas connecté ou n'a pas les permissions
      */
     private function checkAdminAccess()
     {
@@ -29,6 +35,21 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @brief Affiche la page de configuration système.
+     *
+     * Charge tous les paramètres depuis le fichier de configuration btsplay
+     * et les transmet à la vue pour affichage et modification.
+     *
+     * Catégories de paramètres :
+     * - URIs des différents stockages (PAD, ARCH, local, DIFF)
+     * - Informations de connexion FTP (3 NAS : PAD, ARCH, DIFF)
+     * - Configuration de la base de données
+     * - Paramètres de sauvegarde, logs et processus
+     * - Paramètres d'affichage
+     *
+     * @return \Illuminate\View\View Vue "admin.settings" avec tous les paramètres
+     */
     public function settings()
     {
         $this->checkAdminAccess();
@@ -87,7 +108,16 @@ class AdminController extends Controller
     }
 
     /**
-     * HANDLE SETTINGS UPDATE
+     * @brief Traite la mise à jour des paramètres de configuration système.
+     *
+     * Cette méthode :
+     * - Récupère les données du formulaire de paramètres
+     * - Mappe les champs du formulaire vers les variables d'environnement
+     * - Met à jour le fichier .env avec les nouvelles valeurs
+     * - Vide le cache de configuration pour appliquer les changements
+     *
+     * @param Request $request Requête HTTP contenant les nouveaux paramètres
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
      */
     public function updateSettings(Request $request)
     {
@@ -145,7 +175,16 @@ class AdminController extends Controller
     }
 
     /**
-     * HELPER: UPDATE .ENV FILE
+     * @brief Met à jour les valeurs dans le fichier .env de l'application.
+     *
+     * Fonctionnalités :
+     * - Recherche chaque clé dans le fichier .env existant
+     * - Remplace la valeur si la clé existe
+     * - Ajoute une nouvelle ligne si la clé n'existe pas
+     * - Gère automatiquement les guillemets pour les valeurs contenant des espaces
+     *
+     * @param array $values Tableau associatif [clé => valeur] à mettre à jour
+     * @return void
      */
     private function updateEnvFile(array $values)
     {
@@ -170,6 +209,14 @@ class AdminController extends Controller
         file_put_contents($path, $envContent);
     }
 
+    /**
+     * @brief Affiche les logs système de l'application.
+     *
+     * Charge les dernières lignes du fichier laravel.log et les affiche
+     * dans l'ordre chronologique ou antéchronologique selon la configuration.
+     *
+     * @return \Illuminate\View\View Vue "admin.logs" avec les lignes de log
+     */
     public function logs()
     {
         $this->checkAdminAccess();
@@ -188,6 +235,14 @@ class AdminController extends Controller
         return view('admin.logs', compact('logs'));
     }
 
+    /**
+     * @brief Affiche la page de gestion des utilisateurs (professeurs et élèves).
+     *
+     * Récupère la liste complète des professeurs et des élèves,
+     * avec le nombre de participations pour chaque élève.
+     *
+     * @return \Illuminate\View\View Vue "admin.users" avec les listes d'utilisateurs
+     */
     public function users()
     {
         $this->checkAdminAccess();
@@ -202,7 +257,19 @@ class AdminController extends Controller
     }
 
     /**
-     * Créer un professeur
+     * @brief Crée un nouveau compte professeur avec ses accès.
+     *
+     * Cette méthode :
+     * - Valide les informations saisies (nom, prénom, identifiant, mot de passe)
+     * - Crée un compte utilisateur avec authentification
+     * - Assigne le rôle "professeur"
+     * - Crée le profil professeur associé
+     *
+     * @param Request $request Requête HTTP contenant les données du formulaire
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si les données sont invalides ou si l'identifiant existe déjà
      */
     public function createProfesseur(Request $request)
     {
@@ -244,7 +311,16 @@ class AdminController extends Controller
     }
 
     /**
-     * Supprimer un professeur
+     * @brief Supprime un professeur et son compte utilisateur associé.
+     *
+     * Vérifie avant suppression que le professeur n'est pas référent de médias.
+     * Si c'est le cas, la suppression est refusée pour préserver l'intégrité des données.
+     *
+     * @param int $id Identifiant du professeur
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès ou d'erreur
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Si le professeur n'existe pas
      */
     public function deleteProfesseur($id)
     {
@@ -261,7 +337,16 @@ class AdminController extends Controller
     }
 
     /**
-     * Créer un élève
+     * @brief Crée un nouvel élève dans le système.
+     *
+     * Enregistre un élève avec son nom et prénom.
+     * Contrairement aux professeurs, les élèves n'ont pas de compte utilisateur associé.
+     *
+     * @param Request $request Requête HTTP contenant nom et prénom
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si le nom ou le prénom est manquant
      */
     public function createEleve(Request $request)
     {
@@ -280,7 +365,16 @@ class AdminController extends Controller
     }
 
     /**
-     * Supprimer un élève
+     * @brief Supprime un élève du système.
+     *
+     * Supprime l'élève ainsi que toutes ses participations associées
+     * (grâce aux contraintes de cascade en base de données).
+     *
+     * @param int $id Identifiant de l'élève
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Si l'élève n'existe pas
      */
     public function deleteEleve($id)
     {
@@ -292,7 +386,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Gestion des projets
+     * @brief Affiche la page de gestion des projets.
+     *
+     * Récupère tous les projets avec le nombre de médias associés à chacun.
+     * Les résultats sont paginés (20 par page).
+     *
+     * @return \Illuminate\View\View Vue "admin.projets" avec la liste paginée des projets
      */
     public function projets()
     {
@@ -303,7 +402,15 @@ class AdminController extends Controller
     }
 
     /**
-     * Créer un projet
+     * @brief Crée un nouveau projet dans le système.
+     *
+     * Un projet permet de regrouper plusieurs médias par thématique ou contexte.
+     *
+     * @param Request $request Requête HTTP contenant le libellé du projet
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si le libellé est manquant ou invalide
      */
     public function createProjet(Request $request)
     {
@@ -321,7 +428,16 @@ class AdminController extends Controller
     }
 
     /**
-     * Supprimer un projet
+     * @brief Supprime un projet du système.
+     *
+     * Vérifie avant suppression que le projet ne contient aucun média.
+     * Si des médias y sont rattachés, la suppression est refusée.
+     *
+     * @param int $id Identifiant du projet
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès ou d'erreur
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Si le projet n'existe pas
      */
     public function deleteProjet($id)
     {
@@ -338,6 +454,14 @@ class AdminController extends Controller
         return back()->with('success', 'Projet supprimé avec succès!');
     }
 
+    /**
+     * @brief Affiche la page de gestion de la base de données.
+     *
+     * Charge l'historique des sauvegardes depuis le fichier de log backup.log
+     * et l'affiche pour permettre à l'administrateur de suivre les opérations.
+     *
+     * @return \Illuminate\View\View Vue "admin.database" avec les logs de sauvegarde
+     */
     public function databaseView()
     {
         $this->checkAdminAccess();
@@ -355,6 +479,16 @@ class AdminController extends Controller
         return view('admin.database', compact('backupLogs'));
     }
 
+    /**
+     * @brief Lance une sauvegarde manuelle de la base de données.
+     *
+     * Fonctionnalités :
+     * - Exécute la commande Artisan "db:backup" avec le type "manual"
+     * - Enregistre le résultat (succès ou échec) dans le log backup.log
+     * - Affiche un message à l'utilisateur selon le résultat
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès ou d'erreur
+     */
     public function runBackup()
     {
         $this->checkAdminAccess();
@@ -382,6 +516,23 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @brief Enregistre les paramètres de planification des sauvegardes automatiques.
+     *
+     * Permet de configurer :
+     * - L'heure d'exécution (backup_time)
+     * - Le jour du mois (backup_day)
+     * - Le mois de l'année (backup_month)
+     *
+     * Ces paramètres sont utilisés par le scheduler Laravel pour déclencher
+     * les sauvegardes automatiques.
+     *
+     * @param Request $request Requête HTTP contenant les paramètres de planification
+     * @return \Illuminate\Http\RedirectResponse Redirection avec message de succès
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si les paramètres sont manquants ou invalides
+     */
     public function saveBackupSettings(Request $request)
     {
         $this->checkAdminAccess();
@@ -405,6 +556,14 @@ class AdminController extends Controller
         return back()->with('success', 'Planning de sauvegarde mis à jour !');
     }
 
+    /**
+     * @brief Affiche la page de réconciliation des fichiers.
+     *
+     * Interface permettant de synchroniser les fichiers présents sur les différents
+     * stockages avec les enregistrements en base de données.
+     *
+     * @return \Illuminate\View\View Vue "admin.reconciliation"
+     */
     public function reconciliation()
     {
         $this->checkAdminAccess();
@@ -412,6 +571,15 @@ class AdminController extends Controller
         return view('admin.reconciliation');
     }
 
+    /**
+     * @brief Lance le processus de réconciliation.
+     *
+     * Compare les fichiers physiques présents sur les stockages
+     * avec les enregistrements en base de données et effectue
+     * les synchronisations nécessaires.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirection avec résultat de la réconciliation
+     */
     public function runReconciliation()
     {
         $this->checkAdminAccess();
@@ -421,6 +589,15 @@ class AdminController extends Controller
         return back()->with('reconciliation_result', 'Réconciliation terminée. (Résultat simulé)');
     }
 
+    /**
+     * @brief Télécharge le fichier de logs système.
+     *
+     * Permet à l'administrateur de télécharger le fichier laravel.log
+     * pour analyse approfondie ou archivage.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
+     * Téléchargement du fichier ou redirection avec erreur si introuvable
+     */
     public function downloadLogs()
     {
         $this->checkAdminAccess();
@@ -432,7 +609,25 @@ class AdminController extends Controller
         return back()->with('error', 'Fichier log introuvable.');
     }
 
-public function Ajouterelevedepuiscsv(Request $request)
+    /**
+     * @brief Import en masse d'élèves depuis un fichier CSV.
+     *
+     * Fonctionnalités :
+     * - Accepte les fichiers CSV ou TXT
+     * - Détecte automatiquement le séparateur (virgule ou espace)
+     * - Formate automatiquement les noms (majuscules) et prénoms (première lettre majuscule)
+     * - Ignore les doublons existants en base
+     * - Traitement optimisé avec timeout étendu
+     *
+     * Format attendu : "nom,prenom" ou "nom prenom" (une ligne par élève)
+     *
+     * @param Request $request Requête HTTP contenant le fichier CSV uploadé
+     * @return \Illuminate\Http\RedirectResponse Redirection avec nombre d'élèves importés
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si le fichier est manquant ou au mauvais format
+     */
+    public function Ajouterelevedepuiscsv(Request $request)
 {
     $this->checkAdminAccess();
 
@@ -490,7 +685,20 @@ public function Ajouterelevedepuiscsv(Request $request)
 }
 
     /**
-     * Mettre à jour les permissions d'un utilisateur
+     * @brief Met à jour une permission spécifique d'un utilisateur.
+     *
+     * Permet d'accorder ou de révoquer une permission individuelle
+     * (modifier video, diffuser video, supprimer video, etc.)
+     * sans modifier le rôle global de l'utilisateur.
+     *
+     * Les permissions des administrateurs ne peuvent pas être modifiées
+     * via cette interface pour des raisons de sécurité.
+     *
+     * @param Request $request Requête HTTP contenant user_id, permission et grant (true/false)
+     * @return \Illuminate\Http\JsonResponse Réponse JSON indiquant le succès ou l'échec
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si les paramètres sont invalides
      */
     public function updatePermission(Request $request)
     {
@@ -524,7 +732,21 @@ public function Ajouterelevedepuiscsv(Request $request)
     }
 
     /**
-     * Mettre à jour le rôle d'un utilisateur
+     * @brief Change le rôle d'un utilisateur et applique les permissions par défaut.
+     *
+     * Fonctionnalités :
+     * - Supprime tous les rôles actuels de l'utilisateur
+     * - Assigne le nouveau rôle (admin, professeur ou eleve)
+     * - Applique automatiquement les permissions par défaut du rôle :
+     *   - admin : toutes les permissions
+     *   - professeur : modifier video
+     *   - eleve : aucune permission
+     *
+     * @param Request $request Requête HTTP contenant user_id et role
+     * @return \Illuminate\Http\JsonResponse Réponse JSON indiquant le succès
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * Si le rôle n'est pas parmi les valeurs autorisées
      */
     public function updateRole(Request $request)
     {
