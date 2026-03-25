@@ -13,7 +13,7 @@ class ThumbnailController extends Controller
 
     public function __construct()
     {
-        $this->localThumbnailsPath = storage_path('/mnt/miniatures');
+        $this->localThumbnailsPath = storage_path('app/public/thumbnails');
         $this->archivageMountPath = env('FILESYSTEM_LOCAL_PATH', '/mnt/archivage');
 
         if (!is_dir($this->localThumbnailsPath)) {
@@ -52,6 +52,8 @@ class ThumbnailController extends Controller
         if ($media && $media->chemin_local) {
             $ffastransThumbnail = $this->buildThumbnailPath($media->chemin_local);
 
+            Log::info("Path of Thumbnail for media #{$mediaId} should be {$ffastransThumbnail}");
+
             if ($ffastransThumbnail && file_exists($ffastransThumbnail)) {
                 // Copy to local storage for future requests
                 if (copy($ffastransThumbnail, $localPath)) {
@@ -83,8 +85,7 @@ class ThumbnailController extends Controller
         // Replace video extension with .jpg
         $thumbnailFilename = preg_replace('/\.(mp4|mov|mxf)$/i', '.jpg', $filename);
 
-        // Build full path, avoiding double slashes
-        $basePath = rtrim($this->archivageMountPath, '/');
-        return "{$basePath}/{$thumbnailDir}/{$thumbnailFilename}";
+        // Build full path
+        return "/mnt/miniatures/{$thumbnailDir}/{$thumbnailFilename}";
     }
 }
