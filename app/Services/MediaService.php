@@ -604,7 +604,7 @@ public function searchMedia(array $filtres)
 
         // Use ffprobe to extract metadata
         $command = sprintf(
-            'ffprobe -v quiet -print_format json -show_format -show_streams %s 2>&1',
+            'timeout 10 ffprobe -v quiet -print_format json -show_format -show_streams %s 2>&1',
             escapeshellarg($ftpUrl)
         );
 
@@ -710,7 +710,7 @@ public function searchMedia(array $filtres)
     private function extractMetadataFromFile(string $filePath): ?array
     {
         $command = sprintf(
-            'ffprobe -v quiet -print_format json -show_format -show_streams %s 2>&1',
+            'timeout 10 ffprobe -v quiet -print_format json -show_format -show_streams %s 2>&1',
             escapeshellarg($filePath)
         );
 
