@@ -109,7 +109,7 @@ class ProcessTranscodingQueueJob implements ShouldQueue
 
     protected function submitMedia(Media $media, FfastransService $ffastrans)
     {
-        $filePath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
+        $filePath = $media->URI_NAS_ARCH ?: $media->URI_NAS_PAD;
         $disk = (!empty($media->URI_NAS_ARCH)) ? 'nas_arch' : 'ftp_pad';
         $workflowId = config('btsplay.process.workflow_id');
         $windowsRoot = ($disk === 'nas_arch') ? env('URI_NAS_ARCH_WIN') : env('URI_NAS_PAD_WIN');

@@ -13,7 +13,8 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
-      - /c/Archivage:/mnt/archivage:z
+      - /c/Archivage/H264:/mnt/archivage:z
+      - /c/Archivage/Thumbnails:/mnt/miniatures:z
     networks:
       - app-network
     depends_on:
@@ -35,7 +36,8 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
-      - /c/Archivage:/mnt/archivage:z
+      - /c/Archivage/H264:/mnt/archivage:z
+      - /c/Archivage/Thumbnails:/mnt/miniatures:z
     networks:
       - app-network
     depends_on:
