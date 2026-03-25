@@ -31,5 +31,5 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Start php-fpm
-exec php-fpm
+# Start the main process (php-fpm by default, or whatever CMD/command is set)
+exec "$@"

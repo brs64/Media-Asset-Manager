@@ -27,7 +27,8 @@ services:
       target: final
     container_name: btsplay-queue
     restart: unless-stopped
-    command: php artisan queue:work --tries=3 --timeout=180 --sleep=3 --max-jobs=1000
+    entrypoint: []
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=180", "--sleep=3", "--max-jobs=1000"]
     environment:
       SERVICE_NAME: queue
       SERVICE_TAGS: prod
