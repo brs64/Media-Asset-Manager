@@ -214,12 +214,23 @@ class FileExplorerController extends Controller
         if (!$column) return response()->json(['success' => false, 'message' => 'Disque non supporté'], 400);
 
         $count = 0;
+        
+        // We use the recursive scan to find all files inside the folder
         \App\Services\FileExplorerService::scanDiskRecursive($disk, $path, function($item) use ($column, &$count) {
             if ($item['type'] === 'video') {
-                $media = Media::where($column, $item['path'])
-                            ->whereNull('chemin_local')
-                            ->where('transcode_status', 'disponible')
-                            ->first();
+                
+                // Clean the path from the scanner (remove double slashes and leading/trailing slashes)
+                $cleanPath = trim(str_replace('//', '/', $item['path']), '/');
+
+                // Look for the media using flexible path matching
+                $media = Media::whereNull('chemin_local')
+                    ->where('transcode_status', 'disponible')
+                    ->where(function($q) use ($column, $cleanPath) {
+                        $q->where($column, $cleanPath)
+                        ->orWhere($column, '/' . $cleanPath)
+                        ->orWhere($column, 'LIKE', '%' . $cleanPath); // Last resort for partial matches
+                    })
+                    ->first();
 
                 if ($media) {
                     $media->update(['transcode_status' => 'en_attente']);
@@ -229,12 +240,18 @@ class FileExplorerController extends Controller
         });
 
         if ($count > 0) {
+            // Kickstart the background job logic
             \App\Jobs\ProcessTranscodingQueueJob::dispatch()
                     ->onQueue('transcoding')
-                    ->delay(now()->subSeconds(3605)); // Dispatch with a past delay to trigger immediately
+                    ->delay(now()->subSeconds(3605));
             
-            $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
-            exec($command);
+            // Helper logic to start the worker ONLY if it isn't already running
+            $isWorkerRunning = shell_exec('ps aux | grep "queue:work --queue=transcoding" | grep -v grep');
+
+            if (!$isWorkerRunning) {
+                $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
+                exec($command);
+            }
         }
 
         return response()->json([

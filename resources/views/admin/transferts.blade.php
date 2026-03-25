@@ -138,6 +138,11 @@
             
             init() {
                 this.fetchData();
+
+                window.addEventListener('refresh-transfers', () => {
+                    console.log("Transfers: Signal received. Refreshing list...");
+                    this.fetchData();
+                });
             },
 
             fetchData() {

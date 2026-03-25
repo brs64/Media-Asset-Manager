@@ -252,6 +252,7 @@
                 .then(data => {
                     // You could replace this alert with a Toast notification later!
                     alert(data.message);
+                    window.dispatchEvent(new CustomEvent('refresh-transfers'));
                 })
                 .catch(err => console.error("Erreur:", err));
             }
