@@ -28,6 +28,11 @@ class TransfertController extends Controller
     {
         $query = Media::whereNull('chemin_local')
                 ->where('transcode_status', '!=', 'termine')
+                ->orderByRaw("CASE 
+                    WHEN transcode_status = 'en_cours' THEN 1 
+                    WHEN transcode_status = 'en_attente' THEN 2 
+                    ELSE 3 END ASC")
+                ->orderByRaw("COALESCE(URI_NAS_ARCH, URI_NAS_PAD) ASC")
                 ->select('id', 'mtd_tech_titre', 'URI_NAS_PAD', 'URI_NAS_ARCH', 'transcode_status', 'transcode_job_id')
                 ->get();
 
@@ -78,10 +83,13 @@ class TransfertController extends Controller
                     ->onQueue('transcoding')
                     ->delay(now()->subSeconds(3605)); // Dispatch with a past delay to trigger immediately
 
-            /*$command = 'php ' . base_path('artisan') . ' queue:work --stop-when-empty > /dev/null 2>&1 &';
-            pclose(popen($command, "r"));*/
-            $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
-            exec($command);
+            // Helper logic to start the worker ONLY if it isn't already running
+            $isWorkerRunning = shell_exec('ps aux | grep "queue:work --queue=transcoding" | grep -v grep');
+
+            if (!$isWorkerRunning) {
+                $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
+                exec($command);
+            }
 
             return response()->json(['success' => true]);
         }
@@ -104,26 +112,28 @@ class TransfertController extends Controller
             $finished = false;
             $label = 'En cours';
 
-            // Find the media record to update its status in the DB during polling
-            $media = Media::where('transcode_job_id', $jobId)->first();
-
-            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || ($source === 'history' && !in_array($rawState, ['error', 'failed']))) {
+            // 1. SUCCESS
+            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || 
+            ($source === 'history' && !in_array($rawState, ['error', 'failed', 'aborted', 'canceled', 'echoué', 'annulé']))) {
                 $label = 'Terminé';
                 $progress = 100;
                 $finished = true;
-                if ($media) $media->update(['transcode_status' => 'termine']);
             } 
-            elseif (in_array($rawState, ['error', 'failed', 'aborted', 'echoué'])) {
+            // 2. CANCELLED / ABORTING (Broader check to catch "Aborting" state)
+            elseif (str_contains($rawState, 'abort') || str_contains($rawState, 'cancel') || str_contains($rawState, 'annul')) {
+                $label = 'Annulé';
+                $finished = true;
+                $progress = 0;
+            }
+            // 3. FAILED (Catch variations like "failure" or "err")
+            elseif (str_contains($rawState, 'fail') || str_contains($rawState, 'err') || str_contains($rawState, 'echou')) {
                 $label = 'Echoué';
                 $finished = true;
-                if ($media) $media->update(['transcode_status' => 'echoue']);
             } 
+            // 4. ACTIVE PROCESSING
             elseif ($source === 'active') {
                 $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
                 $finished = false;
-                if ($media && $media->transcode_status !== 'en_cours') {
-                    $media->update(['transcode_status' => 'en_cours']);
-                }
             }
 
             return response()->json([

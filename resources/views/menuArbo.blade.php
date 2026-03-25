@@ -75,31 +75,63 @@
          x-cloak>
         
         <div class="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-md overflow-hidden p-6 text-center" 
-             @click.away="isOpen = false">
+             @click.away="if(!loading) isOpen = false">
             
+            {{-- ICON LOGIC --}}
             <div class="flex justify-center mb-4">
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                    </svg>
-                </div>
+                <template x-if="!resultMode">
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </div>
+                </template>
+                <template x-if="resultMode === 'success'">
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </template>
             </div>
 
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmation de transcodage</h3>
-            <p class="text-sm text-gray-500 mb-6">
-                Voulez-vous vraiment lancer le transcodage de tous les fichiers du dossier : <br>
-                <span class="font-mono text-blue-600 break-all" x-text="path"></span> ?
-            </p>
+            {{-- TEXT CONTENT --}}
+            <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="title"></h3>
+            
+            <div class="text-sm text-gray-500 mb-6">
+                <template x-if="!resultMode">
+                    <p>
+                        Voulez-vous vraiment lancer le transcodage de tous les fichiers du dossier : <br>
+                        <span class="font-mono text-blue-600 break-all" x-text="path"></span> ?
+                    </p>
+                </template>
+                <template x-if="resultMode">
+                    <p x-text="message"></p>
+                </template>
+            </div>
 
+            {{-- BUTTONS --}}
             <div class="flex flex-col sm:flex-row-reverse gap-2 justify-center">
-                <button @click="confirm()" 
-                        class="bg-[#2C3E50] text-white px-6 py-2 rounded shadow hover:bg-[#34495e] font-bold transition">
-                    Oui, Transcoder
-                </button>
-                <button @click="isOpen = false" 
-                        class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded shadow hover:bg-gray-50 transition">
-                    Annuler
-                </button>
+                <template x-if="!resultMode">
+                    <div class="flex gap-2">
+                        <button @click="confirm()" 
+                                :disabled="loading"
+                                class="bg-[#2C3E50] text-white px-6 py-2 rounded shadow hover:bg-[#34495e] font-bold transition disabled:opacity-50">
+                            <span x-show="!loading">Oui, Transcoder</span>
+                            <span x-show="loading">Traitement...</span>
+                        </button>
+                        <button @click="isOpen = false" 
+                                class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded shadow hover:bg-gray-50 transition">
+                            Annuler
+                        </button>
+                    </div>
+                </template>
+                <template x-if="resultMode">
+                    <button @click="isOpen = false" 
+                            class="bg-[#2C3E50] text-white px-8 py-2 rounded shadow hover:bg-[#34495e] font-bold transition">
+                        Fermer
+                    </button>
+                </template>
             </div>
         </div>
     </div>
@@ -227,19 +259,25 @@
     function transcodeModal() {
         return {
             isOpen: false,
+            loading: false,
+            resultMode: null, // 'success' or 'error'
+            title: 'Confirmation de transcodage',
+            message: '',
             disk: '',
             path: '',
 
             open(data) {
                 this.disk = data.disk;
                 this.path = data.path;
+                this.resultMode = null;
+                this.loading = false;
+                this.title = 'Confirmation de transcodage';
                 this.isOpen = true;
             },
 
             confirm() {
-                this.isOpen = false;
+                this.loading = true;
                 
-                // Call the actual transcode function
                 fetch('/explorer/transcode-folder', {
                     method: 'POST',
                     headers: { 
@@ -250,10 +288,21 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    // You could replace this alert with a Toast notification later!
-                    alert(data.message);
+                    this.loading = false;
+                    this.resultMode = 'success';
+                    this.title = 'Succès';
+                    this.message = data.message;
+                    
+                    // Refresh background lists if present
+                    window.dispatchEvent(new CustomEvent('refresh-transfers'));
                 })
-                .catch(err => console.error("Erreur:", err));
+                .catch(err => {
+                    this.loading = false;
+                    this.resultMode = 'error';
+                    this.title = 'Erreur';
+                    this.message = "Une erreur est survenue lors de la communication avec le serveur.";
+                    console.error("Erreur:", err);
+                });
             }
         }
     }
