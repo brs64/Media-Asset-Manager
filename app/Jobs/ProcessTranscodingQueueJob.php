@@ -40,8 +40,9 @@ class ProcessTranscodingQueueJob implements ShouldQueue
                 if (($status['source'] === 'history' && $status['progress'] == 100) || 
                     in_array($state, ['success', 'finished', 'done', 'terminé'])) {
                     
-                    $pathOnNas = $m->URI_NAS_ARCH ?? $m->URI_NAS_PAD;
-                    $localFileName = ltrim($pathOnNas, '/\\');
+                    // TODO: Récupérer le chemin en sortie depuis FFAStrans et ne pas le deviner serait plus propre..
+                    $pathOnNas = $m->URI_NAS_ARCH ?: $m->URI_NAS_PAD;
+                    $localFileName = preg_replace('/\.(mxf|mov|avi|mkv)$/i', '.mp4', ltrim($pathOnNas, '/\\'));
 
                     $fullLocalPath = config('filesystems.disks.external_local.root') . DIRECTORY_SEPARATOR . $localFileName;
 
