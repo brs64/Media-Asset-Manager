@@ -57,11 +57,6 @@ FROM base AS final
 RUN rm -rf /var/www/*
 COPY --from=build --chown=www-data:www-data /var/www/ /var/www/
 
-# Cache Laravel config & routes
-RUN php artisan config:cache || true \
-    && php artisan route:cache || true \
-    && php artisan view:cache || true
-
 USER www-data
 
 CMD ["php-fpm"]

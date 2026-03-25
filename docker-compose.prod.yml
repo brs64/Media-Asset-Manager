@@ -7,12 +7,12 @@ services:
       target: final
     container_name: btsplay-laravel
     restart: unless-stopped
-    env_file: .env
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: prod
     working_dir: /var/www
     volumes:
+      - ./.env:/var/www/.env:ro
       - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network
@@ -27,12 +27,12 @@ services:
     container_name: btsplay-queue
     restart: unless-stopped
     command: php artisan queue:work --tries=3 --timeout=180 --sleep=3 --max-jobs=1000
-    env_file: .env
     environment:
       SERVICE_NAME: queue
       SERVICE_TAGS: prod
     working_dir: /var/www
     volumes:
+      - ./.env:/var/www/.env:ro
       - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network

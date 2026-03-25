@@ -6,8 +6,6 @@ services:
       dockerfile: Dockerfile.dev
     container_name: btsplay-laravel
     restart: unless-stopped
-    tty: true
-    env_file: .env
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: dev
@@ -30,7 +28,6 @@ services:
     container_name: btsplay-queue
     restart: unless-stopped
     command: php artisan queue:work --tries=3 --timeout=180 --sleep=3 --max-jobs=1000
-    env_file: .env
     environment:
       SERVICE_NAME: queue
       SERVICE_TAGS: dev
