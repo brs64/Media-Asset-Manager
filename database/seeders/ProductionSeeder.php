@@ -19,7 +19,7 @@ class ProductionSeeder extends Seeder
             [
                 'nom' => 'Administrateur',
                 'prenom' => 'Compte',
-                'password' => bcrypt('BTSplay2026!'),
+                'password' => bcrypt(env('ADMIN_PASSWORD', 'admin')),
             ]
         );
 

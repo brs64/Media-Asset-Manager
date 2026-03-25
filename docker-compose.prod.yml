@@ -12,7 +12,7 @@ services:
       SERVICE_TAGS: prod
     working_dir: /var/www
     volumes:
-      - ./.env:/var/www/.env:ro
+      - ./.env.prod:/var/www/.env
       - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network
@@ -32,7 +32,7 @@ services:
       SERVICE_TAGS: prod
     working_dir: /var/www
     volumes:
-      - ./.env:/var/www/.env:ro
+      - ./.env.prod:/var/www/.env
       - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network
@@ -67,6 +67,19 @@ services:
       - dbdata-prod:/var/lib/mysql:z
     networks:
       - app-network
+
+  btsplay-phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    container_name: btsplay-phpmyadmin
+    environment:
+      PMA_HOST: btsplay-mysql
+    ports:
+      - "8001:80"
+    networks:
+      - app-network
+    depends_on:
+      - btsplay-mysql
 
 networks:
   app-network:
