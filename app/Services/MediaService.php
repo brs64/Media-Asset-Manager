@@ -14,13 +14,46 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Media management service
- * Contains all business logic for media operations
+ * @brief Service central de gestion des médias.
+ *
+ * Ce service contient toute la logique métier pour les opérations sur les médias.
+ * Il sert d'interface unifiée entre les controllers et les modèles pour toutes
+ * les opérations CRUD et de recherche.
+ *
+ * Responsabilités principales :
+ * - Récupération et enrichissement des informations média
+ * - Gestion des métadonnées (techniques, éditoriales, personnalisées)
+ * - Recherche multicritères avec filtres
+ * - Gestion des participations (élèves, rôles)
+ * - Extraction de métadonnées vidéo via FFprobe
+ * - Synchronisation fichiers/base de données
+ * - Opérations de suppression avec nettoyage des fichiers
+ *
+ * Sources de métadonnées :
+ * - Base de données : informations éditoriales
+ * - FFprobe : métadonnées techniques (durée, résolution, codec, bitrate)
+ * - Filesystem : existence et taille des fichiers
  */
 class MediaService
 {
     /**
-     * Get complete information about a media
+     * @brief Récupère toutes les informations complètes d'un média.
+     *
+     * Cette méthode centralise la récupération de toutes les données associées
+     * à un média pour affichage dans l'interface de détail.
+     *
+     * Informations récupérées :
+     * - Données de base (titre, description, promotion, type, thème)
+     * - Relations (professeur référent, projets, participations élèves)
+     * - Métadonnées techniques (via FFprobe)
+     * - Chemins de streaming et miniatures
+     * - Métadonnées personnalisées (properties JSON)
+     *
+     * @param int $idMedia Identifiant du média
+     * @return array|null Tableau associatif complet ou null si le média n'existe pas.
+     *                    Contient les clés : media, idMedia, nomFichier, titreVideo, description,
+     *                    promotion, type, theme, sourceVideo, chemins, URIS, mtdTech, mtdEdito,
+     *                    mtdCustom, mtdRoles
      */
     public function getMediaInfo(int $idMedia): ?array
     {
@@ -109,7 +142,23 @@ class MediaService
     }
 
     /**
-     * Update media metadata
+     * @brief Met à jour les métadonnées d'un média.
+     *
+     * Cette méthode permet de modifier toutes les informations éditoriales
+     * d'un média (professeur référent, promotion, projet, description, participations).
+     *
+     * Fonctionnement :
+     * - Utilise une transaction DB pour garantir la cohérence
+     * - Crée automatiquement les professeurs et projets s'ils n'existent pas
+     * - Reconstruit complètement les participations (suppression + recréation)
+     *
+     * @param int $idMedia Identifiant du média à modifier
+     * @param string $profReferent Nom complet du professeur référent ("Nom Prénom")
+     * @param string|null $promotion Nom de la promotion/classe
+     * @param string|null $projet Libellé du projet
+     * @param string|null $description Description du média
+     * @param array $roles Tableau associatif [nom_role => "Nom1, Nom2, Nom3"]
+     * @return bool true si la mise à jour a réussi, false en cas d'erreur
      */
     public function updateMetadata(
         int $idMedia,
@@ -156,7 +205,15 @@ class MediaService
     }
 
     /**
-     * Assign participants with their roles to a media
+     * @brief Assigne des participants avec leurs rôles à un média.
+     *
+     * Crée automatiquement les élèves et rôles s'ils n'existent pas encore en base.
+     * Utilise updateOrCreate pour éviter les doublons de participations.
+     *
+     * @param int $idMedia Identifiant du média
+     * @param string $nomRole Nom du rôle (ex: "Réalisateur", "Acteur", "Cadreur")
+     * @param array $personnes Liste de noms complets ("Nom Prénom")
+     * @return void
      */
     public function assignRoles(int $idMedia, string $nomRole, array $personnes): void
     {
@@ -177,7 +234,13 @@ class MediaService
     }
 
     /**
-     * Delete a media and its participations
+     * @brief Supprime un média et ses participations associées.
+     *
+     * Effectue une suppression complète en transaction pour garantir la cohérence.
+     * Ne supprime PAS les fichiers physiques (voir clearLocalFiles pour cela).
+     *
+     * @param int $idMedia Identifiant du média à supprimer
+     * @return bool true si la suppression a réussi, false en cas d'erreur
      */
     public function deleteMedia(int $idMedia): bool
     {
@@ -203,6 +266,19 @@ class MediaService
         }
     }
 
+    /**
+     * @brief Supprime les fichiers locaux associés à un média.
+     *
+     * Supprime la vidéo transcodée et sa miniature du stockage local.
+     * Le champ chemin_local reste inchangé (doit être mis à null manuellement si nécessaire).
+     *
+     * Chemins cibles :
+     * - Vidéo : /mnt/archivage/H264/{chemin_local}
+     * - Miniature : /mnt/archivage/Thumbnails/{chemin_local sans .mp4}.jpg
+     *
+     * @param int $idMedia Identifiant du média
+     * @return bool true si la suppression a réussi ou si aucun fichier local n'existe
+     */
     public function clearLocalFiles(int $idMedia): bool
     {
         try {
@@ -233,7 +309,13 @@ class MediaService
     }
 
     /**
-     * Get recently modified media
+     * @brief Récupère les médias récemment modifiés.
+     *
+     * Retourne les médias triés par date de dernière modification décroissante.
+     * Inclut les relations professeur et projets pour affichage.
+     *
+     * @param int $limit Nombre maximum de médias à retourner (défaut : 20)
+     * @return array Tableau de médias sous forme de tableaux associatifs
      */
     public function getRecentMedia(int $limit = 20): array
     {
@@ -245,7 +327,25 @@ class MediaService
     }
 
     /**
-     * Search media with filters (Title, Description, Project Name)
+     * @brief Recherche de médias avec filtres multiples.
+     *
+     * Permet une recherche multicritères sur les médias avec pagination.
+     *
+     * Critères de recherche supportés :
+     * - keyword : mot-clé recherché dans titre, description, thème, promotion, nom du professeur, nom du projet
+     * - projet : ID d'un projet spécifique
+     * - promotion : nom exact de la promotion
+     *
+     * Le filtre keyword effectue une recherche large (OR) sur tous les champs textuels.
+     * Les autres filtres sont cumulatifs (AND).
+     *
+     * Seuls les médias ayant un chemin_local (transcodés et disponibles) sont retournés.
+     *
+     * @param array $filtres Tableau associatif des filtres :
+     *                       - 'keyword' : string (optionnel)
+     *                       - 'projet' : int (optionnel)
+     *                       - 'promotion' : string (optionnel)
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Résultats paginés (20 par page)
      */
 public function searchMedia(array $filtres)
 {
@@ -297,7 +397,13 @@ public function searchMedia(array $filtres)
     // --- Private utility methods ---
 
     /**
-     * Find or create a professor from their full name
+     * @brief Recherche ou crée un professeur à partir de son nom complet.
+     *
+     * Parsing du nom : le dernier mot est considéré comme le prénom, le reste comme le nom.
+     * Si le professeur n'existe pas, crée également un compte utilisateur associé.
+     *
+     * @param string $fullName Nom complet au format "Nom Prénom"
+     * @return Professeur Instance du professeur (existant ou nouvellement créé)
      */
     private function findOrCreateProfessor(string $fullName): Professeur
     {
@@ -328,7 +434,10 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Find or create a project
+     * @brief Recherche ou crée un projet.
+     *
+     * @param string $libelle Libellé du projet
+     * @return Projet Instance du projet (existant ou nouvellement créé)
      */
     private function findOrCreateProject(string $libelle): Projet
     {
@@ -336,7 +445,14 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Update all participations for a media
+     * @brief Met à jour toutes les participations d'un média.
+     *
+     * Supprime toutes les anciennes participations et crée les nouvelles.
+     * Parse les listes CSV de noms pour chaque rôle.
+     *
+     * @param int $idMedia Identifiant du média
+     * @param array $roles Tableau associatif [nom_role => "Nom1, Nom2, Nom3"]
+     * @return void
      */
     private function updateParticipations(int $idMedia, array $roles): void
     {
@@ -355,7 +471,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Format participations for display
+     * @brief Formate les participations pour affichage.
+     *
+     * Regroupe les participants par rôle et les concatène en chaînes CSV.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $participations Collection de participations
+     * @return array Tableau associatif [nom_role => "Nom1, Nom2, Nom3"]
      */
     private function formatParticipations($participations): array
     {
@@ -381,8 +502,13 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Extract video title from filename
-     * Format: YEAR_PROJECT_TITLE.ext
+     * @brief Extrait le titre d'une vidéo depuis son nom de fichier.
+     *
+     * Format attendu : ANNEE_PROJET_TITRE.ext
+     * Si le format ne correspond pas, retourne le nom de fichier sans extension.
+     *
+     * @param string $filename Nom du fichier vidéo
+     * @return string Titre extrait
      */
     private function extractVideoTitle(string $filename): string
     {
@@ -394,7 +520,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Extract person's last name (before last space)
+     * @brief Extrait le nom de famille d'une personne.
+     *
+     * Considère le dernier mot comme le prénom et tout le reste comme le nom.
+     *
+     * @param string $fullName Nom complet ("Nom Prénom")
+     * @return string Nom de famille
      */
     private function extractLastName(string $fullName): string
     {
@@ -407,7 +538,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Extract person's first name (after last space)
+     * @brief Extrait le prénom d'une personne.
+     *
+     * Considère le dernier mot comme le prénom.
+     *
+     * @param string $fullName Nom complet ("Nom Prénom")
+     * @return string Prénom
      */
     private function extractFirstName(string $fullName): string
     {
@@ -416,7 +552,23 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Extract technical metadata from video via FTP without downloading
+     * @brief Extrait les métadonnées techniques d'une vidéo via FFprobe.
+     *
+     * Interroge FFprobe pour récupérer les informations techniques sans télécharger
+     * la vidéo complète (fonctionne sur FTP).
+     *
+     * Métadonnées extraites :
+     * - Durée (secondes et format HH:MM:SS)
+     * - Résolution (largeur x hauteur)
+     * - FPS (images par seconde)
+     * - Codec vidéo et audio
+     * - Bitrate
+     * - Taille du fichier
+     *
+     * Ordre de priorité : chemin_local > URI_NAS_ARCH > URI_NAS_PAD
+     *
+     * @param Media $media Modèle du média
+     * @return array|null Tableau de métadonnées ou null en cas d'échec
      */
     public function getTechnicalMetadata(Media $media): ?array
     {
@@ -552,7 +704,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Format file size in bytes to readable format
+     * @brief Formate une taille de fichier en octets vers une forme lisible.
+     *
+     * Conversion automatique vers l'unité appropriée (B, KB, MB, GB, TB).
+     *
+     * @param int $bytes Taille en octets
+     * @return string Taille formatée avec unité (ex: "1.5 GB")
      */
     private function formatFileSize(int $bytes): string
     {
@@ -563,7 +720,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Extract metadata from local file using ffprobe
+     * @brief Extrait les métadonnées d'un fichier vidéo local via FFprobe.
+     *
+     * Variante de getTechnicalMetadata optimisée pour les fichiers locaux.
+     *
+     * @param string $filePath Chemin absolu vers le fichier vidéo local
+     * @return array|null Tableau de métadonnées ou null en cas d'échec
      */
     private function extractMetadataFromFile(string $filePath): ?array
     {
@@ -630,7 +792,12 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Sanitize string for display: remove newlines
+     * @brief Nettoie une chaîne pour affichage sécurisé.
+     *
+     * Supprime les retours à la ligne pour éviter les problèmes d'affichage.
+     *
+     * @param string|null $value Chaîne à nettoyer
+     * @return string Chaîne nettoyée (vide si null)
      */
     private function sanitizeForDisplay(?string $value): string
     {
@@ -641,8 +808,16 @@ public function searchMedia(array $filtres)
     }
 
     /**
-     * Synchronise un chemin local avec un media existant
-     * IMPORTANT : Ne crée jamais de media dans le cas ou aucune correspondance n'est faite en BDD
+     * @brief Synchronise un chemin local avec un média existant.
+     *
+     * Recherche un média par titre normalisé (sans extension, insensible à la casse)
+     * et met à jour son chemin_local.
+     *
+     * IMPORTANT : Ne crée JAMAIS de média si aucun ne correspond en base.
+     * Cette méthode ne fait que mettre à jour des médias existants.
+     *
+     * @param string $path Chemin complet du fichier local
+     * @return bool true si un média a été trouvé et mis à jour, false sinon
      */
     public function syncLocalPath(string $path): bool
     {
