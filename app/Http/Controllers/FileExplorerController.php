@@ -280,7 +280,7 @@ class FileExplorerController extends Controller
         $count = 0;
         
         // We use the recursive scan to find all files inside the folder
-        \App\Services\FileExplorerService::scanDiskRecursive($disk, $path, function($item) use ($column, &$count) {
+        $this->fileExplorer->scanDiskRecursive($disk, $path, function($item) use ($column, &$count) {
             if ($item['type'] === 'video') {
                 
                 // Clean the path from the scanner (remove double slashes and leading/trailing slashes)

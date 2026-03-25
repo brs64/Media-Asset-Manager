@@ -47,6 +47,8 @@ class SyncMediaFromDiskJob implements ShouldQueue
     /** @var array<string, bool> */
     protected array $existingPaths = [];
 
+    private FileExplorerService $fileExplorerService;
+
     /**
      * @brief Flag de sécurité pour autoriser la suppression de fichiers locaux.
      *
@@ -70,6 +72,8 @@ class SyncMediaFromDiskJob implements ShouldQueue
     {
         $this->disk = $disk;
         $this->path = $path;
+
+        $this->fileExplorerService = new FileExplorerService();
 
         $this->uriField = match ($disk) {
             'ftp_arch'       => 'URI_NAS_ARCH',
@@ -98,7 +102,7 @@ class SyncMediaFromDiskJob implements ShouldQueue
         /**
          * Scan disque → index mémoire + upsert media
          */
-        FileExplorerService::scanDiskRecursive(
+        $this->fileExplorerService->scanDiskRecursive(
             $this->disk,
             $this->path,
             function (array $item) {

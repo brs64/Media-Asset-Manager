@@ -36,6 +36,9 @@ use Illuminate\Support\Facades\Log;
  */
 class ScanDiskJob implements ShouldQueue
 {
+
+    private FileExplorerService $fileExplorerService;
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $disk;
@@ -60,6 +63,7 @@ class ScanDiskJob implements ShouldQueue
         $this->disk = $disk;
         $this->path = $path;
         $this->scanId = $scanId;
+        $this->fileExplorerService = new FileExplorerService();
     }
 
     /* public function handle()
@@ -157,7 +161,7 @@ class ScanDiskJob implements ShouldQueue
         $buffer = []; 
 
         try {
-            FileExplorerService::scanDiskRecursive(
+            $this->fileExplorerService->scanDiskRecursive(
                 $this->disk, 
                 $this->path, 
                 function ($item) use (&$buffer) {

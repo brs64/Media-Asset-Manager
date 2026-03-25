@@ -58,11 +58,7 @@ services:
     image: mysql:5.7
     container_name: btsplay-mysql
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
+    env_file: .env.prod
     volumes:
       - dbdata-prod:/var/lib/mysql:z
     networks:
