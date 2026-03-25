@@ -402,7 +402,7 @@ public function searchMedia(array $filtres)
         $email = strtolower(substr($firstName, 0, 1) . '.' . $lastName) . '@mediamanager.fr';
         $user = \App\Models\User::firstOrCreate(
             ['email' => $email],
-            ['name' => $firstName . ' ' . $lastName, 'password' => bcrypt(env('DEFAULT_USER_PASSWORD', 'password'))]
+            ['name' => $firstName . ' ' . $lastName, 'password' => bcrypt(config('app.default_user_password', 'password'))]
         );
 
         // Create Professor

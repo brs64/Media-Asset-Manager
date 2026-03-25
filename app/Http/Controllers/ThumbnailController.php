@@ -14,7 +14,7 @@ class ThumbnailController extends Controller
     public function __construct()
     {
         $this->localThumbnailsPath = storage_path('app/public/thumbnails');
-        $this->archivageMountPath = env('FILESYSTEM_LOCAL_PATH', '/mnt/archivage');
+        $this->archivageMountPath = config('filesystems.disks.external_local.root', '/mnt/archivage');
 
         if (!is_dir($this->localThumbnailsPath)) {
             mkdir($this->localThumbnailsPath, 0755, true);

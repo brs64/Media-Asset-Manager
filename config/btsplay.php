@@ -7,6 +7,8 @@ return [
         'nas_arch'       => env('URI_RACINE_NAS_ARCH'),
         'local'          => env('URI_RACINE_STOCKAGE_LOCAL'),
         'nas_diff'       => env('URI_RACINE_NAS_DIFF'),
+        'nas_pad_win'    => env('URI_NAS_PAD_WIN'),
+        'nas_arch_win'   => env('URI_NAS_ARCH_WIN'),
     ],
     'ftp' => [
         'pad' => [

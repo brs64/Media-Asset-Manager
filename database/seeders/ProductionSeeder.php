@@ -19,7 +19,7 @@ class ProductionSeeder extends Seeder
             [
                 'nom' => 'Administrateur',
                 'prenom' => 'Compte',
-                'password' => bcrypt(env('ADMIN_PASSWORD', 'admin')),
+                'password' => bcrypt(config('app.admin_password', 'admin')),
             ]
         );
 

@@ -41,7 +41,7 @@ class StreamController extends Controller
             $media = Media::findOrFail($mediaId);
 
             // En mode développement local, utiliser les vidéos locales
-            if (env('APP_ENV') === 'local' && env('LOCAL_VIDEO_PATH')) {
+            if (config('app.env') === 'local' && config('app.local_video_path')) {
                 return $this->streamLocalMediaVideo($media, $request);
             }
 
@@ -59,7 +59,7 @@ class StreamController extends Controller
             }
 
             // Si pas de connexion FTP configurée, essayer en local
-            if (!env('FTP_PAD_HOST') && !env('FTP_ARCH_HOST')) {
+            if (!config('filesystems.disks.ftp_pad.host') && !config('filesystems.disks.ftp_arch.host')) {
                 return $this->streamLocalMediaVideo($media, $request);
             }
 
@@ -68,7 +68,7 @@ class StreamController extends Controller
             Log::warning("Database/Media error: " . $e->getMessage());
 
             // En mode dev, essayer de mapper l'ID à une vidéo locale
-            if (env('APP_ENV') === 'local' && env('LOCAL_VIDEO_PATH')) {
+            if (config('app.env') === 'local' && config('app.local_video_path')) {
                 return $this->streamLocalVideoByMapping($mediaId, $request);
             }
 
@@ -330,7 +330,7 @@ class StreamController extends Controller
      */
     private function streamLocalMediaVideo(Media $media, Request $request)
     {
-        $localPath = env('LOCAL_VIDEO_PATH', 'storage/app/TestFolder');
+        $localPath = config('app.local_video_path', 'storage/app/TestFolder');
         $cleanPath = str_replace('storage/app/', '', $localPath);
 
         // Essayer plusieurs formats de nom de fichier possibles
@@ -393,7 +393,7 @@ class StreamController extends Controller
      */
     private function streamLocalVideoByMapping($mediaId, Request $request)
     {
-        $localPath = env('LOCAL_VIDEO_PATH', 'storage/app/TestFolder');
+        $localPath = config('app.local_video_path', 'storage/app/TestFolder');
         $cleanPath = str_replace('storage/app/', '', $localPath);
 
         // Mapping simple des IDs aux vidéos de test

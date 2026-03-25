@@ -18,10 +18,10 @@ class DatabaseBackup extends Command
         
         // 1. Determine Folder based on Type
         if ($type === 'manual') {
-            $relativePath = rtrim(env('URI_FICHIER_GENERES'), '/\\');
+            $relativePath = rtrim(config('btsplay.backup.uri_generated'), '/\\');
             $logPrefix = '[MANUAL]';
         } else {
-            $relativePath = rtrim(env('URI_DUMP_SAUVEGARDE'), '/\\');
+            $relativePath = rtrim(config('btsplay.backup.uri_dump'), '/\\');
             $logPrefix = '[AUTO]';
         }
 
@@ -32,7 +32,7 @@ class DatabaseBackup extends Command
         // 2. Build Filename
         // Format: sauvegarde-2026-01-16_14-30-00.sql
         $timestamp = Carbon::now()->format('Y-m-d_H-i-s');
-        $extension = env('SUFFIXE_FICHIER_DUMP_SAUVEGARDE', '.sql');
+        $extension = config('btsplay.backup.suffix_dump', '.sql');
         $filename = "sauvegarde-{$timestamp}{$extension}";
         
         $fullPath = $directory . DIRECTORY_SEPARATOR . $filename;

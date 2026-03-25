@@ -126,7 +126,7 @@ class FileExplorerController extends Controller
     {
         $disk = $request->query('disk', "ftp_pad");
 
-        $envPath = env('URI_RACINE_NAS_PAD');
+        $envPath = config('btsplay.uris.nas_pad');
         $path = $request->input('path') ?: $envPath ?: '/';
 
         $forceRefresh = $request->boolean('force');

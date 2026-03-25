@@ -172,7 +172,7 @@ class TransfertController extends Controller
         $filePath = $media->URI_NAS_ARCH ?? $media->URI_NAS_PAD;
         $workflowId = config('btsplay.process.workflow_id');
 
-        $windowsRoot = ($disk === 'nas_arch') ? env('URI_NAS_ARCH_WIN') : env('URI_NAS_PAD_WIN');
+        $windowsRoot = ($disk === 'nas_arch') ? config('btsplay.uris.nas_arch_win') : config('btsplay.uris.nas_pad_win');
         $uncInputFile = rtrim(str_replace('/', '\\', $windowsRoot), '\\') . '\\' . ltrim(str_replace('/', '\\', $filePath), '\\');
         $variableData = ltrim(str_replace('/', '\\', dirname($filePath)), '\\') . '\\';
 

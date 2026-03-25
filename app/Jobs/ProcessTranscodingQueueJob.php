@@ -66,7 +66,7 @@ class ProcessTranscodingQueueJob implements ShouldQueue
             }
 
             // B. START NEW VIDEOS (Respect the NB_VIDEOS_FFASTRANS limit)
-            $limit = (int) env('NB_VIDEOS_FFASTRANS', 2);
+            $limit = (int) config('btsplay.process.max_videos', 2);
             $activeJobs = $ffastrans->getFullStatusList();
             $activeCount = collect($activeJobs)->where('is_finished', false)->count();
 
@@ -112,7 +112,7 @@ class ProcessTranscodingQueueJob implements ShouldQueue
         $filePath = $media->URI_NAS_ARCH ?: $media->URI_NAS_PAD;
         $disk = (!empty($media->URI_NAS_ARCH)) ? 'nas_arch' : 'ftp_pad';
         $workflowId = config('btsplay.process.workflow_id');
-        $windowsRoot = ($disk === 'nas_arch') ? env('URI_NAS_ARCH_WIN') : env('URI_NAS_PAD_WIN');
+        $windowsRoot = ($disk === 'nas_arch') ? config('btsplay.uris.nas_arch_win') : config('btsplay.uris.nas_pad_win');
         
         $uncInputFile = rtrim(str_replace('/', '\\', $windowsRoot), '\\') . '\\' . ltrim(str_replace('/', '\\', $filePath), '\\');
         $variableData = ltrim(str_replace('/', '\\', dirname($filePath)), '\\') . '\\';

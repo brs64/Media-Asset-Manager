@@ -28,6 +28,12 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'local_video_path' => env('LOCAL_VIDEO_PATH', 'storage/app/TestFolder'),
+
+    'default_user_password' => env('DEFAULT_USER_PASSWORD', 'password'),
+
+    'admin_password' => env('ADMIN_PASSWORD', 'admin'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
