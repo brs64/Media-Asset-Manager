@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BTSPlay - Media Asset Manager:  Fichier source de tests/Feature/SearchControllerTest.php</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<script type="text/javascript" src="darkmode_toggle.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">BTSPlay - Media Asset Manager
+   </div>
+   <div id="projectbrief">Système de gestion de médias audiovisuels - BTS Audiovisuel Biarritz</div>
+  </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Recherche" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Généré par Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('SearchControllerTest_8php_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Chargement...</div>
+<div class="SRStatus" id="Searching">Recherche...</div>
+<div class="SRStatus" id="NoMatches">Aucune correspondance</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SearchControllerTest.php</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="SearchControllerTest_8php.html">Aller à la documentation de ce fichier.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>&lt;?php</div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceTests_1_1Feature.html">Tests\Feature</a>;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>use <a class="code hl_class" href="classTests_1_1TestCase.html">Tests\TestCase</a>;</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>use Illuminate\Foundation\Testing\RefreshDatabase;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>use <a class="code hl_class" href="classApp_1_1Services_1_1MediaService.html">App\Services\MediaService</a>;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>use <a class="code hl_class" href="classApp_1_1Models_1_1Media.html">App\Models\Media</a>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>use <a class="code hl_class" href="classApp_1_1Models_1_1Projet.html">App\Models\Projet</a>;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>use <a class="code hl_class" href="classApp_1_1Models_1_1Professeur.html">App\Models\Professeur</a>;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>use <a class="code hl_class" href="classApp_1_1Models_1_1User.html">App\Models\User</a>;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="foldopen" id="foldopen00013" data-start="{" data-end="};">
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html">   13</a></span><span class="keyword">class </span><a class="code hl_class" href="classTests_1_1Feature_1_1SearchControllerTest.html">SearchControllerTest</a> <span class="keyword">extends</span> <a class="code hl_class" href="classTests_1_1TestCase.html">TestCase</a></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>{</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    use RefreshDatabase;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a89ae87ff208bd3a9b3d9b36f79936ec6">   23</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a89ae87ff208bd3a9b3d9b36f79936ec6">index_displays_search_page_without_results_when_no_query</a>()</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>));</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        $response-&gt;assertViewIs(<span class="stringliteral">&#39;recherche&#39;</span>);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        $response-&gt;assertViewHas([<span class="stringliteral">&#39;medias&#39;</span>, <span class="stringliteral">&#39;listeProjet&#39;</span>, <span class="stringliteral">&#39;listeProf&#39;</span>, <span class="stringliteral">&#39;description&#39;</span>]);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    }</div>
+</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#acfb9dc36d8ed6fdf8c606f1f527fe5cd">   38</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#acfb9dc36d8ed6fdf8c606f1f527fe5cd">index_searches_with_description_parameter</a>()</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        $media = Media::factory()-&gt;create([<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;Test description unique&#39;</span>]);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        Media::factory()-&gt;count(3)-&gt;create();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;unique&#39;</span>]));</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        $response-&gt;assertViewIs(<span class="stringliteral">&#39;recherche&#39;</span>);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        $medias = $response-&gt;viewData(<span class="stringliteral">&#39;medias&#39;</span>);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        $this-&gt;assertCount(1, $medias);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        $this-&gt;assertEquals($media-&gt;id, $medias-&gt;first()-&gt;id);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    }</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00059" data-start="{" data-end="}">
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a10be79e77fe3c5e5b455cc39b49a4e36">   59</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a10be79e77fe3c5e5b455cc39b49a4e36">index_searches_with_motCle_parameter</a>()</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        $media = Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;VideoTest123&#39;</span>]);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        Media::factory()-&gt;count(3)-&gt;create();</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [<span class="stringliteral">&#39;motCle&#39;</span> =&gt; <span class="stringliteral">&#39;VideoTest123&#39;</span>]));</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        $medias = $response-&gt;viewData(<span class="stringliteral">&#39;medias&#39;</span>);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        $this-&gt;assertCount(1, $medias);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        $this-&gt;assertEquals($media-&gt;id, $medias-&gt;first()-&gt;id);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    }</div>
+</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#ae123d8fe3268d9efd20fbef0ac5e279c">   79</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#ae123d8fe3268d9efd20fbef0ac5e279c">index_prioritizes_description_over_motCle</a>()</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    {</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        $media = Media::factory()-&gt;create([<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;SearchTerm&#39;</span>]);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            <span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;SearchTerm&#39;</span>,</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            <span class="stringliteral">&#39;motCle&#39;</span> =&gt; <span class="stringliteral">&#39;OtherTerm&#39;</span>,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        ]));</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        $description = $response-&gt;viewData(<span class="stringliteral">&#39;description&#39;</span>);</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        $this-&gt;assertEquals(<span class="stringliteral">&#39;SearchTerm&#39;</span>, $description);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="foldopen" id="foldopen00098" data-start="{" data-end="}">
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a3893f537c9d1c6835b23926e9b43207b">   98</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a3893f537c9d1c6835b23926e9b43207b">index_loads_projets_and_professeurs_for_filters</a>()</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        Projet::factory()-&gt;count(3)-&gt;create();</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        Professeur::factory()-&gt;count(5)-&gt;create();</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>));</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        $projets = $response-&gt;viewData(<span class="stringliteral">&#39;listeProjet&#39;</span>);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        $profs = $response-&gt;viewData(<span class="stringliteral">&#39;listeProf&#39;</span>);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        $this-&gt;assertCount(3, $projets);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        $this-&gt;assertCount(5, $profs);</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    }</div>
+</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
+<div class="foldopen" id="foldopen00120" data-start="{" data-end="}">
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#accdc44ede148d35f1474fea1e4d3530f">  120</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#accdc44ede148d35f1474fea1e4d3530f">index_paginates_results</a>()</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    {</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        Media::factory()-&gt;count(25)-&gt;create([<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;Common description&#39;</span>]);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;Common&#39;</span>]));</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        $medias = $response-&gt;viewData(<span class="stringliteral">&#39;medias&#39;</span>);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        $this-&gt;assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $medias);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    }</div>
+</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="foldopen" id="foldopen00136" data-start="{" data-end="}">
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a8698c877e91fb87336cc4a52650c9cf8">  136</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a8698c877e91fb87336cc4a52650c9cf8">index_appends_query_parameters_to_pagination</a>()</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        Media::factory()-&gt;count(25)-&gt;create([<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;Test&#39;</span>]);</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;Test&#39;</span>]));</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span> </div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        $medias = $response-&gt;viewData(<span class="stringliteral">&#39;medias&#39;</span>);</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        $this-&gt;assertStringContainsString(<span class="stringliteral">&#39;description=Test&#39;</span>, $medias-&gt;url(2));</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    }</div>
+</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span> </div>
+<div class="foldopen" id="foldopen00152" data-start="{" data-end="}">
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a4924b1c36fe4280cd9e2395d3cb052f0">  152</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a4924b1c36fe4280cd9e2395d3cb052f0">autocomplete_returns_matching_titles</a>()</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    {</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;DocumentaireNature&#39;</span>]);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;DocumentaireHistoire&#39;</span>]);</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;FictionDrame&#39;</span>]);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;Documentaire&#39;</span>]));</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        $response-&gt;assertJsonCount(2);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        $response-&gt;assertJsonFragment([<span class="stringliteral">&#39;DocumentaireNature&#39;</span>]);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        $response-&gt;assertJsonFragment([<span class="stringliteral">&#39;DocumentaireHistoire&#39;</span>]);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    }</div>
+</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="foldopen" id="foldopen00173" data-start="{" data-end="}">
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a0cb674f42f0380b5f19f272a47400915">  173</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a0cb674f42f0380b5f19f272a47400915">autocomplete_limits_results_to_10</a>()</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    {</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        Media::factory()-&gt;count(15)-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;TestVideo&#39;</span>]);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span> </div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;Test&#39;</span>]));</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        $response-&gt;assertJsonCount(10);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    }</div>
+</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="foldopen" id="foldopen00190" data-start="{" data-end="}">
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#aec9f978cf59f3206945315bf498f5ed4">  190</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#aec9f978cf59f3206945315bf498f5ed4">autocomplete_returns_empty_array_when_no_matches</a>()</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    {</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        Media::factory()-&gt;count(5)-&gt;create();</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;NonExistentTerm&#39;</span>]));</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        $response-&gt;assertJsonCount(0);</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    }</div>
+</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="foldopen" id="foldopen00207" data-start="{" data-end="}">
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#add652ce4e89ca82b52f906939653d400">  207</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#add652ce4e89ca82b52f906939653d400">autocomplete_handles_empty_term</a>()</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    {</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        Media::factory()-&gt;count(15)-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;Video&#39;</span>]);</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;&#39;</span>]));</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>        <span class="comment">// Should return up to 10 results</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        $response-&gt;assertJsonCount(10);</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    }</div>
+</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="foldopen" id="foldopen00225" data-start="{" data-end="}">
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#aa37c5b792eceef3d30372dd9927c5236">  225</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#aa37c5b792eceef3d30372dd9927c5236">autocomplete_is_case_insensitive</a>()</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    {</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;VideoTest&#39;</span>]);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;videotest&#39;</span>]));</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span> </div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        $response-&gt;assertJsonFragment([<span class="stringliteral">&#39;VideoTest&#39;</span>]);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    }</div>
+</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="foldopen" id="foldopen00242" data-start="{" data-end="}">
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a27863b57d6682c4221b41bd13b3ebc12">  242</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a27863b57d6682c4221b41bd13b3ebc12">autocomplete_searches_partial_matches</a>()</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    {</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        $user = User::factory()-&gt;create();</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;MyLongVideoTitle&#39;</span>]);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span> </div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>        $response = $this-&gt;actingAs($user)-&gt;getJson(route(<span class="stringliteral">&#39;search.autocomplete&#39;</span>, [<span class="stringliteral">&#39;term&#39;</span> =&gt; <span class="stringliteral">&#39;Long&#39;</span>]));</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>        $response-&gt;assertJsonFragment([<span class="stringliteral">&#39;MyLongVideoTitle&#39;</span>]);</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    }</div>
+</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
+<div class="foldopen" id="foldopen00259" data-start="{" data-end="}">
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#af303663cd5ebd17d89c38c807d6b31cf">  259</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#af303663cd5ebd17d89c38c807d6b31cf">index_uses_media_service_for_search</a>()</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>    {</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        $media = Media::factory()-&gt;create([<span class="stringliteral">&#39;mtd_tech_titre&#39;</span> =&gt; <span class="stringliteral">&#39;ServiceTest&#39;</span>]);</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        $mockService = $this-&gt;mock(MediaService::class);</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        $mockService-&gt;shouldReceive(<span class="stringliteral">&#39;searchMedia&#39;</span>)</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            -&gt;once()</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>            -&gt;with([<span class="stringliteral">&#39;keyword&#39;</span> =&gt; <span class="stringliteral">&#39;ServiceTest&#39;</span>])</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            -&gt;andReturn(<span class="keyword">new</span> \Illuminate\Pagination\LengthAwarePaginator(</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>                [$media],</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>                1,</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>                20</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>            ));</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>, [<span class="stringliteral">&#39;description&#39;</span> =&gt; <span class="stringliteral">&#39;ServiceTest&#39;</span>]));</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span> </div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        $response-&gt;assertStatus(200);</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    }</div>
+</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
+<div class="foldopen" id="foldopen00284" data-start="{" data-end="}">
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno"><a class="line" href="classTests_1_1Feature_1_1SearchControllerTest.html#a85e86f2225548f28b44a70289838461d">  284</a></span>    <span class="keyword">public</span> <span class="keyword">function</span> <a class="code hl_function" href="classTests_1_1Feature_1_1SearchControllerTest.html#a85e86f2225548f28b44a70289838461d">index_returns_all_medias_when_no_search_term</a>()</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    {</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>        Media::factory()-&gt;count(10)-&gt;create();</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        $response = $this-&gt;<span class="keyword">get</span>(route(<span class="stringliteral">&#39;search&#39;</span>));</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span> </div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        $medias = $response-&gt;viewData(<span class="stringliteral">&#39;medias&#39;</span>);</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>        $this-&gt;assertEquals(10, $medias-&gt;total());</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    }</div>
+</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>}</div>
+</div>
+<div class="ttc" id="aclassApp_1_1Models_1_1Media_html"><div class="ttname"><a href="classApp_1_1Models_1_1Media.html">App\Models\Media</a></div><div class="ttdef"><b>Definition</b> <a href="Media_8php_source.html#l00011">Media.php:12</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1Professeur_html"><div class="ttname"><a href="classApp_1_1Models_1_1Professeur.html">App\Models\Professeur</a></div><div class="ttdef"><b>Definition</b> <a href="Professeur_8php_source.html#l00009">Professeur.php:10</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1Projet_html"><div class="ttname"><a href="classApp_1_1Models_1_1Projet.html">App\Models\Projet</a></div><div class="ttdef"><b>Definition</b> <a href="Projet_8php_source.html#l00009">Projet.php:10</a></div></div>
+<div class="ttc" id="aclassApp_1_1Models_1_1User_html"><div class="ttname"><a href="classApp_1_1Models_1_1User.html">App\Models\User</a></div><div class="ttdef"><b>Definition</b> <a href="User_8php_source.html#l00013">User.php:14</a></div></div>
+<div class="ttc" id="aclassApp_1_1Services_1_1MediaService_html"><div class="ttname"><a href="classApp_1_1Services_1_1MediaService.html">App\Services\MediaService</a></div><div class="ttdoc">Media management service Contains all business logic for media operations.</div><div class="ttdef"><b>Definition</b> <a href="MediaService_8php_source.html#l00020">MediaService.php:21</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html">Tests\Feature\SearchControllerTest</a></div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00013">SearchControllerTest.php:14</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a0cb674f42f0380b5f19f272a47400915"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a0cb674f42f0380b5f19f272a47400915">Tests\Feature\SearchControllerTest\autocomplete_limits_results_to_10</a></div><div class="ttdeci">autocomplete_limits_results_to_10()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00173">SearchControllerTest.php:173</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a10be79e77fe3c5e5b455cc39b49a4e36"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a10be79e77fe3c5e5b455cc39b49a4e36">Tests\Feature\SearchControllerTest\index_searches_with_motCle_parameter</a></div><div class="ttdeci">index_searches_with_motCle_parameter()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00059">SearchControllerTest.php:59</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a27863b57d6682c4221b41bd13b3ebc12"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a27863b57d6682c4221b41bd13b3ebc12">Tests\Feature\SearchControllerTest\autocomplete_searches_partial_matches</a></div><div class="ttdeci">autocomplete_searches_partial_matches()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00242">SearchControllerTest.php:242</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a3893f537c9d1c6835b23926e9b43207b"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a3893f537c9d1c6835b23926e9b43207b">Tests\Feature\SearchControllerTest\index_loads_projets_and_professeurs_for_filters</a></div><div class="ttdeci">index_loads_projets_and_professeurs_for_filters()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00098">SearchControllerTest.php:98</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a4924b1c36fe4280cd9e2395d3cb052f0"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a4924b1c36fe4280cd9e2395d3cb052f0">Tests\Feature\SearchControllerTest\autocomplete_returns_matching_titles</a></div><div class="ttdeci">autocomplete_returns_matching_titles()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00152">SearchControllerTest.php:152</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a85e86f2225548f28b44a70289838461d"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a85e86f2225548f28b44a70289838461d">Tests\Feature\SearchControllerTest\index_returns_all_medias_when_no_search_term</a></div><div class="ttdeci">index_returns_all_medias_when_no_search_term()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00284">SearchControllerTest.php:284</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a8698c877e91fb87336cc4a52650c9cf8"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a8698c877e91fb87336cc4a52650c9cf8">Tests\Feature\SearchControllerTest\index_appends_query_parameters_to_pagination</a></div><div class="ttdeci">index_appends_query_parameters_to_pagination()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00136">SearchControllerTest.php:136</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_a89ae87ff208bd3a9b3d9b36f79936ec6"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#a89ae87ff208bd3a9b3d9b36f79936ec6">Tests\Feature\SearchControllerTest\index_displays_search_page_without_results_when_no_query</a></div><div class="ttdeci">index_displays_search_page_without_results_when_no_query()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00023">SearchControllerTest.php:23</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_aa37c5b792eceef3d30372dd9927c5236"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#aa37c5b792eceef3d30372dd9927c5236">Tests\Feature\SearchControllerTest\autocomplete_is_case_insensitive</a></div><div class="ttdeci">autocomplete_is_case_insensitive()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00225">SearchControllerTest.php:225</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_accdc44ede148d35f1474fea1e4d3530f"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#accdc44ede148d35f1474fea1e4d3530f">Tests\Feature\SearchControllerTest\index_paginates_results</a></div><div class="ttdeci">index_paginates_results()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00120">SearchControllerTest.php:120</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_acfb9dc36d8ed6fdf8c606f1f527fe5cd"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#acfb9dc36d8ed6fdf8c606f1f527fe5cd">Tests\Feature\SearchControllerTest\index_searches_with_description_parameter</a></div><div class="ttdeci">index_searches_with_description_parameter()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00038">SearchControllerTest.php:38</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_add652ce4e89ca82b52f906939653d400"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#add652ce4e89ca82b52f906939653d400">Tests\Feature\SearchControllerTest\autocomplete_handles_empty_term</a></div><div class="ttdeci">autocomplete_handles_empty_term()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00207">SearchControllerTest.php:207</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_ae123d8fe3268d9efd20fbef0ac5e279c"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#ae123d8fe3268d9efd20fbef0ac5e279c">Tests\Feature\SearchControllerTest\index_prioritizes_description_over_motCle</a></div><div class="ttdeci">index_prioritizes_description_over_motCle()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00079">SearchControllerTest.php:79</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_aec9f978cf59f3206945315bf498f5ed4"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#aec9f978cf59f3206945315bf498f5ed4">Tests\Feature\SearchControllerTest\autocomplete_returns_empty_array_when_no_matches</a></div><div class="ttdeci">autocomplete_returns_empty_array_when_no_matches()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00190">SearchControllerTest.php:190</a></div></div>
+<div class="ttc" id="aclassTests_1_1Feature_1_1SearchControllerTest_html_af303663cd5ebd17d89c38c807d6b31cf"><div class="ttname"><a href="classTests_1_1Feature_1_1SearchControllerTest.html#af303663cd5ebd17d89c38c807d6b31cf">Tests\Feature\SearchControllerTest\index_uses_media_service_for_search</a></div><div class="ttdeci">index_uses_media_service_for_search()</div><div class="ttdef"><b>Definition</b> <a href="SearchControllerTest_8php_source.html#l00259">SearchControllerTest.php:259</a></div></div>
+<div class="ttc" id="aclassTests_1_1TestCase_html"><div class="ttname"><a href="classTests_1_1TestCase.html">Tests\TestCase</a></div><div class="ttdef"><b>Definition</b> <a href="TestCase_8php_source.html#l00007">TestCase.php:8</a></div></div>
+<div class="ttc" id="anamespaceTests_1_1Feature_html"><div class="ttname"><a href="namespaceTests_1_1Feature.html">Tests\Feature</a></div><div class="ttdef"><b>Definition</b> <a href="AdminControllerTest_8php_source.html#l00003">AdminControllerTest.php:3</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_59425e443f801f1f2fd8bbe4959a3ccf.html">tests</a></li><li class="navelem"><a class="el" href="dir_1057ba24cb36a192ee1f0da6482e35b0.html">Feature</a></li><li class="navelem"><a class="el" href="SearchControllerTest_8php.html">SearchControllerTest.php</a></li>
+    <li class="footer">Généré par <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

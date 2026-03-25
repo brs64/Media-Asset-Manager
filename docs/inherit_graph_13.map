@@ -1,0 +1,15 @@
+<map id="Graphe hiérarchique des classes" name="Graphe hiérarchique des classes">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,129,68,155"/>
+<area shape="rect" id="Node000001" href="$classApp_1_1Models_1_1Eleve.html" title=" " alt="" coords="138,5,277,31"/>
+<area shape="poly" id="edge44_Node000000_Node000001" title=" " alt="" coords="49,115,76,76,94,57,115,40,137,28,140,33,117,44,97,60,80,80,53,118"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Models_1_1Media.html" title=" " alt="" coords="136,55,279,80"/>
+<area shape="poly" id="edge45_Node000000_Node000002" title=" " alt="" coords="64,119,115,89,147,78,148,83,117,94,67,123"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Models_1_1Participation.html" title=" " alt="" coords="116,104,299,129"/>
+<area shape="poly" id="edge46_Node000000_Node000003" title=" " alt="" coords="81,133,121,127,122,132,82,138"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Models_1_1Professeur.html" title=" " alt="" coords="122,153,293,179"/>
+<area shape="poly" id="edge47_Node000000_Node000004" title=" " alt="" coords="82,146,122,151,121,157,81,151"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Models_1_1Projet.html" title=" " alt="" coords="137,203,277,228"/>
+<area shape="poly" id="edge48_Node000000_Node000005" title=" " alt="" coords="68,160,117,188,152,200,150,205,115,192,66,165"/>
+<area shape="rect" id="Node000006" href="$classApp_1_1Models_1_1Role.html" title=" " alt="" coords="142,252,273,277"/>
+<area shape="poly" id="edge49_Node000000_Node000006" title=" " alt="" coords="54,165,80,203,98,221,117,237,143,250,141,254,115,242,94,225,76,206,49,168"/>
+</map>

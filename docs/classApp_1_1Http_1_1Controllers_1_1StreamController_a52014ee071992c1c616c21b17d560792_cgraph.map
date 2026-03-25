@@ -1,0 +1,15 @@
+<map id="App\Http\Controllers\StreamController\stream" name="App\Http\Controllers\StreamController\stream">
+<area shape="rect" id="Node000001" title="Point d&#39;entrée principal pour le streaming d’un média." alt="" coords="5,143,192,183"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#ab1edd6b6ceca4cf90dbe9ef343352601" title="Stream une playlist HLS (.m3u8) depuis un stockage distant." alt="" coords="245,5,457,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,140,172,98,239,55,254,48,257,53,241,60,175,102,123,144"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a76998999bcadec59b3fb07f940064743" title="Tente de résoudre et streamer une vidéo locale à partir d’un modèle Media." alt="" coords="240,70,461,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,140,231,126,233,131,177,145"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a7fceacb90a5dd2da455db750ca96f893" title="Stream un fichier vidéo local avec support des requêtes HTTP Range." alt="" coords="509,135,731,190"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="192,160,495,160,495,165,192,165"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a9e1dc23bd53086b4ef0c3dcb3aa3d75c" title="Stream une vidéo locale de test en fonction d’un mapping d’ID (dev uniquement)." alt="" coords="240,201,461,255"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="177,180,233,195,231,200,176,185"/>
+<area shape="rect" id="Node000006" href="$classApp_1_1Http_1_1Controllers_1_1StreamController.html#a9d88586972b21603c653a3d4e3fd8855" title="Stream un fichier vidéo MP4 depuis un stockage distant avec support HTTP Range." alt="" coords="243,280,458,320"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="124,181,175,223,241,264,260,273,258,278,239,269,172,227,120,185"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="462,122,496,130,495,135,461,127"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="461,199,495,190,496,195,462,204"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="App\Http\Controllers\DocumentationController\checkAdminAccess" name="App\Http\Controllers\DocumentationController\checkAdminAccess">
+<area shape="rect" id="Node000001" title="Vérifie que l&#39;utilisateur est admin ou professeur." alt="" coords="244,203,435,257"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#acf30e47c658b6b73b955ab17d4283848" title="Admin &#45; Base de données." alt="" coords="5,5,196,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="309,193,260,133,228,101,194,74,176,62,179,58,198,69,232,97,264,129,314,190"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#a4db7d43c9f68465c9d7ae2dae14d24a3" title="Admin &#45; Vue d&#39;ensemble." alt="" coords="5,84,196,139"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="280,198,195,152,170,141,172,136,197,148,282,193"/>
+<area shape="rect" id="Node000004" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#aa6a25b8b950183ae1cd26d28e3bd959c" title="Admin &#45; Réconciliation." alt="" coords="5,163,196,217"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="230,214,196,209,197,203,231,209"/>
+<area shape="rect" id="Node000005" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#aaabb1b6d7e1b8db860608d91856ea898" title="Admin &#45; Paramètres." alt="" coords="5,241,196,296"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="231,250,197,256,196,251,230,245"/>
+<area shape="rect" id="Node000006" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#ac5e2dc6057759804425c08540fba6f8a" title="Admin &#45; Transferts et transcodage." alt="" coords="5,320,196,375"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="279,267,197,310,170,322,167,318,195,305,277,262"/>
+<area shape="rect" id="Node000007" href="$classApp_1_1Http_1_1Controllers_1_1DocumentationController.html#a86018ba676c3444c0f9934bea0706b66" title="Admin &#45; Gestion des utilisateurs." alt="" coords="5,399,196,453"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="313,270,263,330,231,361,198,388,177,401,174,396,194,384,228,357,259,326,308,267"/>
+</map>

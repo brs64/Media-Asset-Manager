@@ -1,0 +1,7 @@
+<map id="App\Http\Controllers\AdminController\updateSettings" name="App\Http\Controllers\AdminController\updateSettings">
+<area shape="rect" id="Node000001" title="HANDLE SETTINGS UPDATE." alt="" coords="5,49,240,89"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Http_1_1Controllers_1_1AdminController.html#ad730b5c6ea161056a400d2da532bc5c7" title="Vérifie que l&#39;utilisateur a accès à l&#39;admin." alt="" coords="294,5,510,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,51,280,46,281,51,240,56"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Http_1_1Controllers_1_1AdminController.html#a7952b5ffe43638e3515737d54d7deeef" title="HELPER: UPDATE .ENV FILE." alt="" coords="288,85,516,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,81,275,86,274,91,240,86"/>
+</map>

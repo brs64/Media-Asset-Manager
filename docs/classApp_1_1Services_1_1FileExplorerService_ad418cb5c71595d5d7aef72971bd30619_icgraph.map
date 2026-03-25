@@ -1,0 +1,8 @@
+<map id="App\Services\FileExplorerService\isVideo" name="App\Services\FileExplorerService\isVideo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="485,29,672,69"/>
+<area shape="rect" id="Node000002" href="$classApp_1_1Services_1_1FileExplorerService.html#adf13d084070f2ea8c643eb346a69ff65" title="Scan un dossier (1 seul niveau) Retourne uniquement :" alt="" coords="251,29,437,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,52,438,52,438,47,472,47"/>
+<area shape="rect" id="Node000003" href="$classApp_1_1Services_1_1FileExplorerService.html#a52c3719a8b86aea98b5ad808069550f7" title=" " alt="" coords="5,29,203,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="237,52,203,52,203,47,237,47"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="145,18,130,11,104,8,81,10,67,15,62,21,64,28,59,30,57,20,64,10,80,5,104,3,132,6,147,13"/>
+</map>

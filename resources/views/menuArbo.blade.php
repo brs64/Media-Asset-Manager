@@ -63,6 +63,48 @@
 
 <div class="voile" onclick="toggleMenuArbo()"></div>
 
+{{-- Alpine.js Transcode Modal --}}
+<div x-data="transcodeModal()" 
+     @open-transcode-modal.window="open($event.detail)"
+     class="relative">
+    
+    <div x-show="isOpen" 
+         x-transition.opacity
+         class="fixed inset-0 z-[2000] flex items-center justify-center backdrop-blur-sm p-4" 
+         style="background-color: rgba(0, 0, 0, 0.5);" 
+         x-cloak>
+        
+        <div class="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-md overflow-hidden p-6 text-center" 
+             @click.away="isOpen = false">
+            
+            <div class="flex justify-center mb-4">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmation de transcodage</h3>
+            <p class="text-sm text-gray-500 mb-6">
+                Voulez-vous vraiment lancer le transcodage de tous les fichiers du dossier : <br>
+                <span class="font-mono text-blue-600 break-all" x-text="path"></span> ?
+            </p>
+
+            <div class="flex flex-col sm:flex-row-reverse gap-2 justify-center">
+                <button @click="confirm()" 
+                        class="bg-[#2C3E50] text-white px-6 py-2 rounded shadow hover:bg-[#34495e] font-bold transition">
+                    Oui, Transcoder
+                </button>
+                <button @click="isOpen = false" 
+                        class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded shadow hover:bg-gray-50 transition">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 
@@ -140,5 +182,80 @@
                 container.innerHTML = '<div class="text-red-400 text-sm p-2">Erreur de chargement</div>';
             });
     };
+
+    window.toggleActionMenu = function(e, btn) {
+        e.stopPropagation();
+        const dropdown = btn.nextElementSibling;
+        
+        // Close other open menus
+        document.querySelectorAll('.action-dropdown').forEach(el => {
+            if (el !== dropdown) el.classList.add('hidden');
+        });
+        
+        const isHidden = dropdown.classList.toggle('hidden');
+        
+        // If we just opened it, calculate the "break out" position
+        if (!isHidden) {
+            const rect = btn.getBoundingClientRect();
+            
+            // 1. Position slightly under the "+" (5px)
+            dropdown.style.top = (rect.bottom + 5) + 'px';
+            
+            // 2. Position it to protrude halfway (Sidebar is 400px, menu is 128px)
+            // We set the left so that 64px (half) is inside and 64px is outside
+            dropdown.style.left = '336px'; 
+        }
+    };
+
+    // Close the menu if the user scrolls the sidebar (so the menu doesn't "float" away)
+    document.querySelector('.menuArbo').addEventListener('scroll', () => {
+        document.querySelectorAll('.action-dropdown').forEach(el => el.classList.add('hidden'));
+    }, { passive: true });
+
+    // Close the menu if you click anywhere else on the page
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.action-dropdown').forEach(el => el.classList.add('hidden'));
+    });
+
+    // Function to bridge our plain JS sidebar with the Alpine Modal
+    window.openTranscodeModal = function(disk, path) {
+        window.dispatchEvent(new CustomEvent('open-transcode-modal', { 
+            detail: { disk: disk, path: path } 
+        }));
+    };
+
+    function transcodeModal() {
+        return {
+            isOpen: false,
+            disk: '',
+            path: '',
+
+            open(data) {
+                this.disk = data.disk;
+                this.path = data.path;
+                this.isOpen = true;
+            },
+
+            confirm() {
+                this.isOpen = false;
+                
+                // Call the actual transcode function
+                fetch('/explorer/transcode-folder', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') 
+                    },
+                    body: JSON.stringify({ disk: this.disk, path: this.path })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    // You could replace this alert with a Toast notification later!
+                    alert(data.message);
+                })
+                .catch(err => console.error("Erreur:", err));
+            }
+        }
+    }
 </script>
 @endpush

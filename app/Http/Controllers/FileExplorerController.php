@@ -14,13 +14,26 @@ class FileExplorerController extends Controller
 {
     protected FileExplorerService $fileExplorer;
 
+    /**
+     * @brief Initialise le contrôleur avec le service d’exploration de fichiers.
+     *
+     * Permet de déléguer toutes les opérations sur le filesystem au
+     * FileExplorerService.
+     *
+     * @param FileExplorerService $fileExplorer Service gérant l’exploration de fichiers
+     */
     public function __construct(FileExplorerService $fileExplorer)
     {
         $this->fileExplorer = $fileExplorer;
     }
 
     /**
-     * Affiche la racine de l’explorateur
+     * @brief Affiche la racine de l’explorateur de fichiers.
+     *
+     * Charge le contenu du disque par défaut (ici "external_local") à la racine
+     * et le transmet à la vue pour affichage.
+     *
+     * @return \Illuminate\View\View Vue de l’explorateur avec la liste des fichiers et dossiers
      */
     public function index()
     {
@@ -33,7 +46,20 @@ class FileExplorerController extends Controller
     }
 
     /**
-     * Scan un dossier au clic (AJAX)
+     * @brief Scanne un dossier spécifique pour une requête AJAX.
+     *
+     * Fonctionnalités :
+     * - Récupère le disque et le chemin depuis la requête
+     * - Vérifie que le disque est autorisé
+     * - Scanne le dossier via FileExplorerService
+     * - Enrichit les fichiers vidéo avec les médias existants en base
+     * - Retourne un rendu HTML partiel pour le front-end (AJAX)
+     *
+     * @param Request $request Requête HTTP contenant 'disk' et 'path'
+     * @return string HTML du fragment d’explorateur pour le front-end
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * Si le disque est interdit ou non configuré
      */
     public function scan(Request $request)
     {
@@ -84,6 +110,18 @@ class FileExplorerController extends Controller
         ])->render();
     }
 
+    /**
+     * @brief Lance un scan asynchrone d’un disque et chemin donné.
+     *
+     * Fonctionnement :
+     * - Vérifie si un scan est déjà en cache pour ce chemin/disque
+     * - Génère un identifiant unique pour le scan
+     * - Stocke l’état du scan dans le cache
+     * - Déclenche le job ScanDiskJob pour exécution asynchrone
+     *
+     * @param Request $request Requête HTTP avec paramètres 'disk', 'path' et 'force'
+     * @return \Illuminate\Http\JsonResponse Informations sur le scan lancé
+     */
     public function startScan(Request $request)
     {
         $disk = $request->query('disk', "ftp_pad");
@@ -123,6 +161,14 @@ class FileExplorerController extends Controller
         ]);
     }
 
+    /**
+     * @brief Récupère le statut d’un scan en cours ou terminé.
+     *
+     * Retourne l’état courant du scan ainsi que le nombre d’éléments traités.
+     *
+     * @param string $scanId Identifiant du scan
+     * @return \Illuminate\Http\JsonResponse Statut et compte des éléments scannés
+     */
     public function scanStatus(string $scanId)
     {
         return response()->json([
@@ -131,6 +177,19 @@ class FileExplorerController extends Controller
         ]);
     }
 
+    /**
+     * @brief Récupère les résultats d’un scan terminé.
+     *
+     * Fonctionnalités :
+     * - Vérifie si le scan est terminé ('done')
+     * - Filtre les fichiers vidéo déjà archivés
+     * - Enrichit les fichiers avec les jobs actifs FFAStrans si existants
+     * - Retourne une liste unifiée des fichiers vidéo prêts à être traités
+     *
+     * @param string $scanId Identifiant du scan
+     * @param FfastransService $ffastrans Service permettant de récupérer l’état des jobs FFAStrans
+     * @return \Illuminate\Http\JsonResponse Liste des fichiers vidéo scannés, leur état et progression
+     */
     public function scanResults(string $scanId, FfastransService $ffastrans)
     {
         $status = Cache::get("scan:{$scanId}:status", 'unknown');
@@ -201,6 +260,50 @@ class FileExplorerController extends Controller
             'status' => 'done',
             'count'  => count($unifiedList),
             'results'=> $unifiedList,
+        ]);
+    }
+
+    // Envoyer des videos en transcodage par dossier entier
+    public function transcodeFolder(Request $request)
+    {
+        $disk = $request->input('disk');
+        $path = $request->input('path');
+
+        $column = match ($disk) {
+            'ftp_pad'  => 'URI_NAS_PAD',
+            'ftp_arch' => 'URI_NAS_ARCH',
+            default    => null,
+        };
+
+        if (!$column) return response()->json(['success' => false, 'message' => 'Disque non supporté'], 400);
+
+        $count = 0;
+        \App\Services\FileExplorerService::scanDiskRecursive($disk, $path, function($item) use ($column, &$count) {
+            if ($item['type'] === 'video') {
+                $media = Media::where($column, $item['path'])
+                            ->whereNull('chemin_local')
+                            ->where('transcode_status', 'disponible')
+                            ->first();
+
+                if ($media) {
+                    $media->update(['transcode_status' => 'en_attente']);
+                    $count++;
+                }
+            }
+        });
+
+        if ($count > 0) {
+            \App\Jobs\ProcessTranscodingQueueJob::dispatch()
+                    ->onQueue('transcoding')
+                    ->delay(now()->subSeconds(3605)); // Dispatch with a past delay to trigger immediately
+            
+            $command = 'php ' . base_path('artisan') . ' queue:work --queue=transcoding --stop-when-empty > /dev/null 2>&1 &';
+            exec($command);
+        }
+
+        return response()->json([
+            'success' => true, 
+            'message' => "$count vidéos ajoutées à la file d'attente."
         ]);
     }
 }
