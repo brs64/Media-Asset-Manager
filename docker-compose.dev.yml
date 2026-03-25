@@ -15,7 +15,7 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
-      - /c/Archivage/H264:/mnt/archivage:z
+      - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network
     depends_on:
@@ -38,6 +38,7 @@ services:
     volumes:
       - .:/var/www:z
       - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:z
+      - /c/Archivage:/mnt/archivage:z
     networks:
       - app-network
     depends_on:
@@ -65,10 +66,10 @@ services:
     container_name: btsplay-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: user
-      MYSQL_USER: user
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
     ports:
       - "3306:3306"
     volumes:

@@ -12,14 +12,8 @@ class ProfesseurSeeder extends Seeder
      */
     public function run(): void
     {
-        // Créer un administrateur
-        $adminUser = \App\Models\User::create([
-            'name' => 'admin',
-            'password' => bcrypt('admin'),
-            'nom' => 'Admin',
-            'prenom' => 'Système',
-        ]);
-        $adminUser->assignRole('admin');
+        // Récupérer l'admin créé par ProductionSeeder
+        $adminUser = \App\Models\User::where('name', 'admin')->first();
 
         \App\Models\Professeur::create([
             'user_id' => $adminUser->id,
