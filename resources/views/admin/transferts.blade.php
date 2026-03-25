@@ -182,9 +182,14 @@
 
             get statusColorClass() {
                 let s = String(this.status).toLowerCase();
+                
+                // Explicitly check for cancellation first
+                if (s.includes('annul') || this.isCancelled) return 'text-red-600';
+                if (s.includes('echou') || s.includes('erreur')) return 'text-red-600';
+                
                 if (s.includes('termin') || s.includes('success')) return 'text-green-600'; 
-                if (s.includes('echou') || s.includes('erreur') || s.includes('annul')) return 'text-red-600';
                 if (s.includes('attente') || s.includes('file')) return 'text-orange-500'; 
+                
                 return 'text-blue-600';
             },
 
@@ -254,13 +259,17 @@
             startPolling() {
                 if (this.poller) clearInterval(this.poller);
                 this.poller = setInterval(() => {
-                    if (!document.getElementById('row-' + this.id) || this.finished) {
-                        clearInterval(this.poller); return; 
+                    // If the row was manually finished or cancelled, STOP everything
+                    if (!document.getElementById('row-' + this.id) || this.finished || this.isCancelled) {
+                        clearInterval(this.poller); 
+                        return; 
                     }
 
                     fetch(`/admin/transferts/status/${this.job_id}`)
                         .then(res => res.ok ? res.json() : Promise.reject())
                         .then(data => {
+                            if (this.isCancelled) return;
+                            
                             this.progress = Number(data.progress);
                             this.status = data.label;
                             this.finished = data.finished;
@@ -289,6 +298,10 @@
 
             executeCancel() {
                 const cancelId = this.job_id || `queue-${this.id}`;
+
+                if (this.poller) clearInterval(this.poller);
+                if (this.syncTimer) clearInterval(this.syncTimer);
+
                 fetch(`/admin/transferts/cancel/${cancelId}`, {
                     method: 'POST',
                     headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}

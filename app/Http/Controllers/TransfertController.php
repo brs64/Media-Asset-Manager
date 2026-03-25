@@ -112,18 +112,25 @@ class TransfertController extends Controller
             $finished = false;
             $label = 'En cours';
 
-            // IMPROVEMENT: Read-Only logic
-            // We let the background job update the database. 
-            // We only decide here what LABEL to show to the user in real-time.
-            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || ($source === 'history' && !in_array($rawState, ['error', 'failed']))) {
+            // 1. SUCCESS
+            if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || 
+            ($source === 'history' && !in_array($rawState, ['error', 'failed', 'aborted', 'canceled', 'echoué', 'annulé']))) {
                 $label = 'Terminé';
                 $progress = 100;
                 $finished = true;
             } 
-            elseif (in_array($rawState, ['error', 'failed', 'aborted', 'echoué'])) {
+            // 2. CANCELLED / ABORTING (Broader check to catch "Aborting" state)
+            elseif (str_contains($rawState, 'abort') || str_contains($rawState, 'cancel') || str_contains($rawState, 'annul')) {
+                $label = 'Annulé';
+                $finished = true;
+                $progress = 0;
+            }
+            // 3. FAILED (Catch variations like "failure" or "err")
+            elseif (str_contains($rawState, 'fail') || str_contains($rawState, 'err') || str_contains($rawState, 'echou')) {
                 $label = 'Echoué';
                 $finished = true;
             } 
+            // 4. ACTIVE PROCESSING
             elseif ($source === 'active') {
                 $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
                 $finished = false;

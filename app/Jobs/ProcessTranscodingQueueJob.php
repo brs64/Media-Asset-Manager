@@ -55,8 +55,12 @@ class ProcessTranscodingQueueJob implements ShouldQueue
                         Log::warning("Engine: FFAStrans says finished, but file not yet visible at: {$fullLocalPath}");
                         // The job stays 'en_cours' and will check again in 30 seconds.
                     }
-                    
-                } elseif (in_array($state, ['error', 'failed', 'echoué'])) {
+                }    
+                elseif (str_contains($state, 'abort') || str_contains($state, 'cancel')) {
+                    // Handle Aborted jobs in the background engine
+                    $m->update(['transcode_status' => 'annule']);
+                }
+                elseif (str_contains($state, 'fail') || str_contains($state, 'err') || str_contains($state, 'echou')) {
                     $m->update(['transcode_status' => 'echoue']);
                 }
             }
