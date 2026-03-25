@@ -58,6 +58,8 @@ RUN rm -rf /var/www/*
 COPY --from=build --chown=www-data:www-data /var/www/ /var/www/
 
 COPY docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+# Windows...
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
 
 USER www-data
 
