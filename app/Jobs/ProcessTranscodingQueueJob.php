@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessTranscodingQueueJob implements ShouldQueue
 {
@@ -21,9 +22,13 @@ class ProcessTranscodingQueueJob implements ShouldQueue
 
     public function handle(FfastransService $ffastrans)
     {
-        // 1. SINGLETON LOCK: Prevents multiple "Engines" from fighting (Fixes Deadlocks)
-        if (Cache::has('transcode_engine_lock')) return;
-        Cache::put('transcode_engine_lock', true, 600); // 10 min safety window
+        // Use an atomic lock with an owner ID. 
+        // If the lock is already taken, this job exits immediately.
+        $lock = Cache::lock('transcode_engine_lock', 90); // Lock for 2 minutes
+
+        if (!$lock->get()) {
+            return; // Another worker is already doing the work. Safe exit.
+        }
 
         try {
             // A. UPDATE STATUSES
@@ -33,41 +38,49 @@ class ProcessTranscodingQueueJob implements ShouldQueue
                 ->get();
 
             foreach ($runningMedias as $m) {
-                $status = $ffastrans->getJobStatus($m->transcode_job_id);
-                $state = strtolower($status['state'] ?? '');
-                
-                // SAFETY: Require 100% progress in history to prevent "Heavy Video" premature finishing
-                if (($status['source'] === 'history' && $status['progress'] == 100) || 
-                    in_array($state, ['success', 'finished', 'done', 'terminé'])) {
+                try {
+                    $status = $ffastrans->getJobStatus($m->transcode_job_id);
+
+                    if (in_array($status['source'], ['timeout', 'pending'])) {
+                        continue; 
+                    }
+
+                    $state = strtolower($status['state'] ?? '');
                     
-                    // TODO: Récupérer le chemin en sortie depuis FFAStrans et ne pas le deviner serait plus propre..
-                    $pathOnNas = $m->URI_NAS_ARCH ?: $m->URI_NAS_PAD;
-                    $localFileName = preg_replace('/\.(mxf|mov|avi|mkv)$/i', '.mp4', ltrim($pathOnNas, '/\\'));
+                    /*$isApiFinished = ($status['source'] === 'history' && $state === 'success') || 
+                         ($status['source'] === 'active' && in_array($state, ['success', 'finished', 'done', 'terminé']));*/
 
-                    $fullLocalPath = config('filesystems.disks.external_local.root') . DIRECTORY_SEPARATOR . $localFileName;
+                    $isApiFinished = ($status['source'] === 'history' && $state === 'success');
 
-                    if (file_exists($fullLocalPath)) {
+                    if ($isApiFinished) {
+                        // TODO: Récupérer le chemin en sortie depuis FFAStrans et ne pas le deviner serait plus propre..
+                        $pathOnNas = $m->URI_NAS_ARCH ?: $m->URI_NAS_PAD;
+                        $localFileName = preg_replace('/\.(mxf|mov|avi|mkv)$/i', '.mp4', ltrim($pathOnNas, '/\\'));
+
+                        $diskRoot = rtrim(config('filesystems.disks.external_local.root'), '/\\');
+                        $fullLocalPath = $diskRoot . '/' . ltrim($localFileName, '/');
+
                         $m->update([
                             'transcode_status' => 'termine',
-                            'chemin_local' => $localFileName
+                            'chemin_local' => $localFileName 
                         ]);
-                        Log::info("Engine: Media {$m->id} finalized successfully.");
-                    } else {
-                        Log::warning("Engine: FFAStrans says finished, but file not yet visible at: {$fullLocalPath}");
-                        // The job stays 'en_cours' and will check again in 30 seconds.
+
+                        Log::info("Engine Success: Media {$m->id} finalized. API trusted.");
+                    }    
+                    elseif (str_contains($state, 'abort') || str_contains($state, 'cancel')) {
+                        // Handle Aborted jobs in the background engine
+                        $m->update(['transcode_status' => 'annule']);
                     }
-                }    
-                elseif (str_contains($state, 'abort') || str_contains($state, 'cancel')) {
-                    // Handle Aborted jobs in the background engine
-                    $m->update(['transcode_status' => 'annule']);
-                }
-                elseif (str_contains($state, 'fail') || str_contains($state, 'err') || str_contains($state, 'echou')) {
-                    $m->update(['transcode_status' => 'echoue']);
+                    elseif (str_contains($state, 'fail') || str_contains($state, 'err') || str_contains($state, 'echou')) {
+                        $m->update(['transcode_status' => 'echoue']);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Transcode Engine Error: " . $e->getMessage());
                 }
             }
 
             // B. START NEW VIDEOS (Respect the NB_VIDEOS_FFASTRANS limit)
-            $limit = (int) config('btsplay.process.max_videos', 2);
+            $limit = (int) config('btsplay.process.max_videos');
             $activeJobs = $ffastrans->getFullStatusList();
             $activeCount = collect($activeJobs)->where('is_finished', false)->count();
 
@@ -93,8 +106,10 @@ class ProcessTranscodingQueueJob implements ShouldQueue
         $hasWork = Media::whereIn('transcode_status', ['en_attente', 'en_cours'])->exists();
         
         if ($hasWork) {
+            sleep(10);
+            $lock->release(); // Release the lock before re-dispatching
             // Schedule the next check in 30 seconds
-            self::dispatch()->onQueue('transcoding')->delay(now()->addSeconds(30));
+            self::dispatch()->onQueue('transcoding');
             
             // Helper logic to start the worker ONLY if it isn't already running
             $isWorkerRunning = shell_exec('ps aux | grep "queue:work --queue=transcoding" | grep -v grep');

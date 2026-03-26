@@ -64,7 +64,7 @@ class FfastransService
      */
     protected function client()
     {
-        $client = Http::connectTimeout(3)->timeout(10)->acceptJson();
+        $client = Http::connectTimeout(15)->timeout(10)->acceptJson();
         if ($this->username && $this->password) {
             $client->withBasicAuth($this->username, $this->password);
         }
@@ -261,39 +261,62 @@ class FfastransService
      */
     public function getJobStatus(string $jobId)
     {
-        $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
-        $response = $this->client()->get($endpoint);
+        try {
+            // 1. Check Active Jobs
+            $endpoint = "{$this->baseUrl}/api/json/v2/jobs/{$jobId}";
+            $response = $this->client()->get($endpoint);
 
-        if ($response->successful()) {
-            $data = $response->json();
-            
-            if (!empty($data['jobs'])) {
-                $job = $data['jobs'][0];
-                return [
-                    'source'   => 'active',
-                    'progress' => $job['progress'] ?? 0,
-                    'state'    => $job['state'] ?? 'Running',
-                    'status'   => $job['status'] ?? '',
-                    'steps'    => $job['steps'] ?? '',
-                    'proc'     => $job['proc'] ?? ''
-                ];
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // DEBUG: Log the raw active response
+                Log::info("FFAStrans Raw Active ({$jobId}): Found " . (empty($data['jobs']) ? '0' : '1') . " active jobs.");
+
+                // Ensure the jobs array actually contains our job
+                if (!empty($data['jobs']) && isset($data['jobs'][0])) {
+                    $job = $data['jobs'][0];
+                    return [
+                        'source'   => 'active',
+                        'progress' => $job['progress'] ?? 0,
+                        'state'    => $job['state'] ?? 'Running',
+                    ];
+                }
             }
+
+            // 2. Check History
+            $historyEndpoint = "{$this->baseUrl}/api/json/v2/history/{$jobId}";
+            $historyResponse = $this->client()->get($historyEndpoint);
+
+            if ($historyResponse->successful()) {
+                $historyData = $historyResponse->json();
+                
+                if (!empty($historyData['history'])) {
+                    // CRITICAL FIX: Loop through history to find the MATCHING Job ID
+                    foreach ($historyData['history'] as $entry) {
+                        if (($entry['job_id'] ?? '') === $jobId) {
+                            Log::info("FFAStrans Match Found in History for {$jobId}");
+                            $rawResult = strtolower($entry['result'] ?? '');
+                            $rawState = $entry['state'] ?? null;
+
+                            return [
+                                'source'    => 'history',
+                                'state'     => ($rawResult === 'success' || $rawState == 1) ? 'success' : $rawResult,
+                                'progress'  => 100,
+                                'raw_state' => $rawState
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // 3. If not found in either, it's likely still being "ingested" by the API
+            Log::info("FFAStrans Job {$jobId} not found yet (Pending).");
+            return ['source' => 'pending', 'state' => 'Initializing'];
+
+        } catch (\Exception $e) {
+            Log::error("FFAStrans API Error for job {$jobId}: " . $e->getMessage());
+            return ['source' => 'timeout', 'state' => 'Waiting'];
         }
-
-        $historyEndpoint = "{$this->baseUrl}/api/json/v2/history/{$jobId}";
-        $historyResponse = $this->client()->get($historyEndpoint);
-
-        if ($historyResponse->successful()) {
-            $historyData = $historyResponse->json();
-            return [
-                'source'   => 'history',
-                'state'    => $historyData['result'] ?? 'Success',
-                'progress' => 100,
-                'message'  => $historyData['msg'] ?? ''
-            ];
-        }
-
-        return ['source' => 'not_found', 'state' => 'Error'];
     }
 
     /**

@@ -108,32 +108,43 @@ class TransfertController extends Controller
             $source = $apiData['source'] ?? 'not_found';
             $rawState = strtolower($apiData['state'] ?? '');
             
+            // 1. HANDLING PENDING/TIMEOUT (Keeps UI "frozen" on last known good progress)
+            if ($source === 'pending' || $source === 'timeout') {
+                return response()->json([
+                    'progress' => null, 
+                    'label'    => 'Synchronisation...', 
+                    'finished' => false,
+                    'is_pending' => true
+                ]);
+            }
+
             $progress = $apiData['progress'] ?? 0;
             $finished = false;
             $label = 'En cours';
 
-            // 1. SUCCESS
+            // 2. SUCCESS/HISTORY
             if (in_array($rawState, ['success', 'finished', 'done', 'terminé']) || 
-            ($source === 'history' && !in_array($rawState, ['error', 'failed', 'aborted', 'canceled', 'echoué', 'annulé']))) {
+            ($source === 'history' && !in_array($rawState, ['error', 'failed', 'aborted', 'canceled']))) {
                 $label = 'Terminé';
                 $progress = 100;
                 $finished = true;
             } 
-            // 2. CANCELLED / ABORTING (Broader check to catch "Aborting" state)
-            elseif (str_contains($rawState, 'abort') || str_contains($rawState, 'cancel') || str_contains($rawState, 'annul')) {
+            // 3. CANCELLED / ABORTED
+            elseif (str_contains($rawState, 'abort') || str_contains($rawState, 'cancel')) {
                 $label = 'Annulé';
                 $finished = true;
                 $progress = 0;
             }
-            // 3. FAILED (Catch variations like "failure" or "err")
-            elseif (str_contains($rawState, 'fail') || str_contains($rawState, 'err') || str_contains($rawState, 'echou')) {
+            // 4. FAILED
+            elseif (str_contains($rawState, 'fail') || str_contains($rawState, 'err')) {
                 $label = 'Echoué';
                 $finished = true;
+                $progress = 100; 
             } 
-            // 4. ACTIVE PROCESSING
+            // 5. ACTIVE PROCESSING (Best for UI feedback)
             elseif ($source === 'active') {
                 $label = "Node " . ($apiData['steps'] ?? '?') . ": " . ($apiData['proc'] ?? 'Traitement');
-                $finished = false;
+                $progress = $apiData['progress'] ?? 0;
             }
 
             return response()->json([
@@ -142,7 +153,9 @@ class TransfertController extends Controller
                 'finished' => $finished
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            // Log the error but don't crash the JS poller
+            Log::error("checkStatus Exception: " . $e->getMessage());
+            return response()->json(['progress' => null, 'label' => 'Reconnexion...', 'finished' => false]);
         }
     }
 
@@ -222,7 +235,8 @@ class TransfertController extends Controller
 
             return response()->json([
                 'job_id' => $media->transcode_job_id,
-                'status' => $statusLabelMap[$media->transcode_status] ?? 'Disponible'
+                'status' => $statusLabelMap[$media->transcode_status] ?? 'Disponible',
+                'is_finished' => in_array($media->transcode_status, ['echoue', 'annule', 'termine'])
             ]);
         } catch (\Exception $e) {
             // Log the error but return a valid JSON so the JS doesn't crash

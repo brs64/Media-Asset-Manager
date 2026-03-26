@@ -197,10 +197,32 @@
                 if (this.isCancelled) { this.job_id = null; }
                 
                 if (this.job_id && !this.finished) { 
+                    this.updateStatus();
                     this.startPolling(); // Ask FFAStrans for %
                 } else if (this.isQueued && !this.finished) {
                     this.waitForJobId(); // Ask DB for Job ID
                 }
+            },
+
+            updateStatus() {
+                if (!this.job_id || this.finished) return;
+
+                fetch(`/admin/transferts/status/${this.job_id}`)
+                    .then(res => res.ok ? res.json() : Promise.reject())
+                    .then(data => {
+                        if (this.isCancelled) return;
+
+                        // Update progress only if it's a real number and moving forward
+                        if (data.progress !== null && Number(data.progress) >= this.progress) {
+                            this.progress = Number(data.progress);
+                        }
+                        
+                        this.status = data.label;
+
+                        if (data.finished || this.progress == 100) {
+                            this.checkFinalDatabaseStatus();
+                        }
+                    });
             },
 
             waitForJobId() {
@@ -230,9 +252,22 @@
                     fetch(`/admin/transferts/db-status/${this.id}`)
                         .then(res => res.ok ? res.json() : Promise.reject())
                         .then(data => {
+                            this.status = data.status;
+
+                            if (data.is_finished) {
+                                this.isQueued = false;
+                                this.finished = true;
+                                clearInterval(this.syncTimer);
+                                this.syncTimer = null;
+                                return;
+                            }
+
                             if (data.job_id) {
                                 this.job_id = data.job_id;
-                                this.status = data.status;
+                                this.isQueued = false;
+                                this.startPolling(); 
+                                clearInterval(this.syncTimer);
+                                this.syncTimer = null;
                             }
                         })
                         .catch(err => console.warn("Sync: Retrying Media " + this.id));
@@ -259,33 +294,31 @@
             startPolling() {
                 if (this.poller) clearInterval(this.poller);
                 this.poller = setInterval(() => {
-                    // If the row was manually finished or cancelled, STOP everything
                     if (!document.getElementById('row-' + this.id) || this.finished || this.isCancelled) {
                         clearInterval(this.poller); 
                         return; 
                     }
-
-                    fetch(`/admin/transferts/status/${this.job_id}`)
-                        .then(res => res.ok ? res.json() : Promise.reject())
-                        .then(data => {
-                            if (this.isCancelled) return;
-                            
-                            this.progress = Number(data.progress);
-                            this.status = data.label;
-                            this.finished = data.finished;
-
-                            if (this.finished && (data.progress == 100 || data.label === 'Terminé')) {
-                                this.progress = 100;
-                                // Sync path once finished
-                                fetch('/admin/media/sync-local-path', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                                    body: JSON.stringify({ path: this.path })
-                                });
-                            }
-                        })
-                        .catch(() => {});
+                    this.updateStatus();
                 }, 3000); 
+            },
+
+            checkFinalDatabaseStatus() {
+                if (this.finished) return;
+
+                fetch(`/admin/transferts/db-status/${this.id}`)
+                    .then(res => res.json())
+                    .then(dbData => {
+                        if (dbData.is_finished) {
+                            this.status = dbData.status;
+                            this.finished = true;
+                            this.progress = 100;
+                            this.$dispatch('refresh-transfers'); 
+                            clearInterval(this.poller);
+                        } else {
+                            // If DB isn't ready, update label to show we are waiting for the engine
+                            this.status = "Finalisation...";
+                        }
+                    });
             },
             
             askCancel() { 

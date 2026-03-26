@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @brief Service d'exploration de fichiers sur différents types de stockage.
@@ -49,38 +50,8 @@ class FileExplorerService
      */
     public function scanDisk(string $diskName, string $directory): array
     {
+
         $directory = rtrim($directory, '/\\');
-
-        // Cas particulier : disque local absolu (Windows / Linux)
-        if ($diskName === 'external_local') {
-            if (!is_dir($directory)) return [];
-
-            $results = [];
-            foreach (scandir($directory) as $file) {
-                if ($file === '.' || $file === '..') continue;
-                $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
-
-                if (is_dir($fullPath)) {
-                    $results[] = [
-                        'type' => 'folder',
-                        'name' => $file,
-                        'path' => $fullPath,
-                        'disk' => $diskName,
-                    ];
-                } elseif ($this->isVideo($file)) {
-                    $results[] = [
-                        'type' => 'video',
-                        'name' => $file,
-                        'path' => $fullPath,
-                        'disk' => $diskName,
-                        'id'   => null,
-                    ];
-                }
-            }
-
-            usort($results, fn($a, $b) => strcasecmp($a['name'], $b['name']));
-            return $results;
-        }
 
         // Cas normal : NAS / FTP / disque Laravel
         $disk = Storage::disk($diskName);
@@ -96,11 +67,17 @@ class FileExplorerService
                     'path' => $dirPath,
                     'disk' => $diskName,
                 ];
+                if ($diskName === 'external_local') {
+                    Log::info("En local : {$dirPath} trouvé");
+                }
             }
 
             $files = $disk->files($directory);
             sort($files);
             foreach ($files as $filePath) {
+                if ($diskName === 'external_local') {
+                    Log::info("En local : {$filePath} trouvé");
+                }
                 $fileName = basename($filePath);
                 if ($fileName === '.gitkeep' || str_starts_with($fileName, '.')) continue;
                 if ($this->isVideo($fileName)) {
@@ -148,7 +125,12 @@ class FileExplorerService
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', 600);
 
+        if ($diskName === "external_local") {
+            Log::info("Scan du chemin local {$path}");
+        }
+
         $allFiles = [];
+        
         $items = $this->scanDisk($diskName, $path);
 
         foreach ($items as $item) {
