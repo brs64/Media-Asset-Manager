@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       target: final
+    image: btsplay-app:prod
     container_name: btsplay-laravel
     restart: unless-stopped
     environment:
@@ -21,10 +22,7 @@ services:
       - btsplay-mysql
 
   btsplay-queue:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-      target: final
+    image: btsplay-app:prod
     container_name: btsplay-queue
     restart: unless-stopped
     entrypoint: []
