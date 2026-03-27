@@ -266,6 +266,10 @@ class FileExplorerController extends Controller
     // Envoyer des videos en transcodage par dossier entier
     public function transcodeFolder(Request $request)
     {
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Accès interdit.'], 403);
+        }
+
         $disk = $request->input('disk');
         $path = $request->input('path');
 
