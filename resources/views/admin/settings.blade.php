@@ -69,7 +69,7 @@
 
             <section id="section-ftp" class="scroll-mt-32">
                 <h3 class="text-lg font-bold text-[#b91c1c] border-b border-[#b91c1c] mb-4">Connexions FTP</h3>
-                @foreach(['nas_pad' => 'NAS PAD', 'nas_arch' => 'NAS ARCH', 'nas_diff' => 'NAS DIFF'] as $prefix => $title)
+                @foreach(['nas_pad' => 'NAS PAD', 'nas_arch' => 'NAS ARCH'] as $prefix => $title)
                 <div class="mb-8 bg-gray-50 p-5 rounded-lg border border-gray-200">
                     <h4 class="font-bold text-gray-800 mb-4 uppercase tracking-wide border-b pb-1 text-sm">{{ $title }}</h4>
                     <div class="space-y-4">
@@ -92,7 +92,6 @@
                                 </div>
                             </div>
                         </div>
-                        @if($prefix !== 'nas_diff')
                         <div class="pt-4 border-t border-gray-200 mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -110,7 +109,6 @@
                                 </div>
                             </div>
                         </div>
-                        @endif
                     </div>
                 </div>
                 @endforeach
@@ -199,21 +197,7 @@
                     </div>
                     <div>
                         <label class="block font-bold text-gray-700 mb-1 text-sm">ID du Workflow :</label>
-                        <input type="number" name="workflow_id" value="{{ $settings['workflow_id'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
-                    </div>
-                </div>
-            </section>
-
-            <section id="section-perso" class="scroll-mt-32">
-                <h3 class="text-lg font-bold text-[#b91c1c] border-b border-[#b91c1c] mb-4">Personnalisation</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-1 text-sm">Nombre de vidéos dans le carrousel de la page d'accueil:</label>
-                        <input type="number" name="disp_swiper" value="{{ $settings['disp_swiper'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
-                    </div>
-                     <div>
-                        <label class="block font-bold text-gray-700 mb-1 text-sm">Nombre de vidéos dans l'historique:</label>
-                        <input type="number" name="disp_history" value="{{ $settings['disp_history'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
+                        <input type="text" name="workflow_id" value="{{ $settings['workflow_id'] ?? '' }}" class="w-full rounded border-gray-300 shadow-sm">
                     </div>
                 </div>
             </section>

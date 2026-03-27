@@ -31,5 +31,10 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+# Start default queue workers for file synchronization
+php artisan queue:work --timeout 3600 &
+php artisan queue:work --timeout 3600 &
+php artisan queue:work --timeout 3600 &
+
 # Start the main process (php-fpm by default, or whatever CMD/command is set)
 exec "$@"

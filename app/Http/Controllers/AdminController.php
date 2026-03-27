@@ -98,7 +98,7 @@ class AdminController extends Controller
             'log_recent'        => config('btsplay.logs.recent_first'),
 
             'max_videos'        => config('btsplay.process.max_videos'),
-            'Workflow_id'       => config('btsplay.process.workflow_id'),
+            'workflow_id'       => config('btsplay.process.workflow_id'),
 
             'disp_swiper'       => config('btsplay.display.swiper_count'),
             'disp_history'      => config('btsplay.display.history_count'),
