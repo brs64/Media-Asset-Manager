@@ -26,8 +26,15 @@ class TransfertController extends Controller
     
     public function list(FfastransService $ffastrans)
     {
+        $padRoot = config('btsplay.uris.nas_pad');
+        $archRoot = config('btsplay.uris.nas_arch');
+
         $query = Media::whereNull('chemin_local')
                 ->where('transcode_status', '!=', 'termine')
+                ->where(function ($q) use ($padRoot, $archRoot) {
+                    $q->where('URI_NAS_PAD', 'LIKE', $padRoot . '%')
+                    ->orWhere('URI_NAS_ARCH', 'LIKE', $archRoot . '%');
+                })
                 ->orderByRaw("CASE 
                     WHEN transcode_status = 'en_cours' THEN 1 
                     WHEN transcode_status = 'en_attente' THEN 2 

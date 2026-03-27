@@ -141,7 +141,7 @@
 <script>
 
     window.fileExplorerConfig = {
-        local: @json(config('filesystems.disks.external_local.root')),
+        local: '/',
         pad: @json(config('filesystems.disks.ftp_pad.root')),
         arch: @json(config('filesystems.disks.ftp_arch.root'))
     };
@@ -306,5 +306,15 @@
             }
         }
     }
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. On s'assure que le bouton radio "local" est coché
+        const radioLocal = document.querySelector('input[value="local"]');
+        if (radioLocal) radioLocal.checked = true;
+
+        // 2. On appelle la fonction pour synchroniser l'affichage
+        // Cela va gérer les classes 'hidden' correctement dès le départ
+        changerSource('local');
+    });
 </script>
 @endpush

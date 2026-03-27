@@ -14,8 +14,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./.env.prod:/var/www/.env
-      - /c/Archivage/H264:/mnt/archivage:z
-      - /c/Archivage/Thumbnails:/mnt/miniatures:z
+      - /k/Archivage/H264:/mnt/archivage:z
+      - /k/Archivage/Thumbnails:/mnt/miniatures:z
     networks:
       - app-network
     depends_on:
