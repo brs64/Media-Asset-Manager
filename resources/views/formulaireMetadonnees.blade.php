@@ -66,27 +66,30 @@
                     <label class="form-label">Projets</label>
                     <div id="projets-container">
                         @php
-                            $oldProjetIds = old('projet_ids', []);
-                            if (isset($media) && empty($oldProjetIds)) {
-                                $oldProjetIds = $media->projets->pluck('id')->toArray();
-                            }
+                            $projetList = $projets->pluck('libelle')->toArray();
+                            $oldProjetNoms = old('projet_noms', (isset($media) ? $media->projets->pluck('libelle')->toArray() : []));
                         @endphp
 
-                        @forelse($oldProjetIds as $index => $projetId)
-                            <div class="projet-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
-                                <select name="projet_ids[]" class="form-select" style="flex: 1;">
-                                    <option value="">-- Sélectionner un projet --</option>
-                                    @foreach($projets as $projet)
-                                        <option value="{{ $projet->id }}" {{ $projetId == $projet->id ? 'selected' : '' }}>
-                                            {{ $projet->libelle }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        @foreach($oldProjetNoms as $projetLibelle)
+                            <div class="projet-item autocomplete-wrapper" 
+                                data-options="{{ json_encode($projetList) }}"
+                                x-data="searchableInput(@js($projetLibelle))" 
+                                style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                
+                                <div class="grow relative">
+                                    <input type="text" name="projet_noms[]" class="form-select w-full" 
+                                        autocomplete="off" x-model="value" @focus="open = true" 
+                                        @click.away="open = false" placeholder="Nom du projet">
+                                    
+                                    <div x-show="open && filteredOptions.length > 0" class="autocomplete-list" x-cloak>
+                                        <template x-for="opt in filteredOptions" :key="opt">
+                                            <div class="autocomplete-item" x-text="opt" @click="selectOption(opt)"></div>
+                                        </template>
+                                    </div>
+                                </div>
                                 <button type="button" class="remove-projet" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
                             </div>
-                        @empty
-                            {{-- Empty state --}}
-                        @endforelse
+                        @endforeach
                     </div>
                     <button type="button" id="add-projet" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter un projet</button>
                 </div>
@@ -118,56 +121,69 @@
                            value="{{ old('theme', $media->theme ?? '') }}">
                 </div>
 
-{{-- Participations (Élèves & Rôles) --}}
-<div class="form-field">
-    <label class="form-label">Participations (Élèves & Rôles)</label>
-    <div id="participations-container">
-        @php
-            $oldParticipations = old('participations', []);
-            if (isset($media) && empty($oldParticipations)) {
-                $oldParticipations = $media->participations->map(fn($p) => [
-                    'eleve_nom' => trim(($p->eleve->nom ?? '') . ' ' . ($p->eleve->prenom ?? '')),
-                    'role_id' => $p->role_id
-                ])->toArray();
-            }
-        @endphp
+                <div class="form-field">
+                    <label class="form-label">Participations (Élèves & Rôles)</label>
+                    <div id="participations-container">
+                        @php
+                            $eleveList = $eleves->map(fn($e) => trim($e->nom . ' ' . $e->prenom))->toArray();
+                            $roleList = $roles->pluck('libelle')->toArray();
 
-        @forelse($oldParticipations as $index => $participation)
-            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
-                {{-- Input text avec datalist pour permettre la saisie de nouveaux noms --}}
-                <input type="text"
-                       name="participations[{{ $index }}][eleve_nom]"
-                       class="form-select"
-                       style="flex: 1;"
-                       list="eleves-list"
-                       placeholder="Nom de l'élève"
-                       value="{{ $participation['eleve_nom'] ?? '' }}"
-                       required>
+                            $oldParticipations = old('participations', []);
+                            if (isset($media) && empty($oldParticipations)) {
+                                $oldParticipations = $media->participations->map(fn($p) => [
+                                    'eleve_nom' => trim(($p->eleve->nom ?? '') . ' ' . ($p->eleve->prenom ?? '')),
+                                    'role_nom' => $p->role->libelle ?? ''
+                                ])->toArray();
+                            }
+                        @endphp
 
-                <select name="participations[{{ $index }}][role_id]" class="form-select" style="flex: 1;" required>
-                    <option value="">-- Rôle --</option>
-                    @foreach($roles as $role)
-                        <option value="{{ $role->id }}" {{ ($participation['role_id'] ?? '') == $role->id ? 'selected' : '' }}>
-                            {{ $role->libelle }}
-                        </option>
+                        @foreach($oldParticipations as $index => $participation)
+                            <div class="participation-item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;">
+                                
+                                {{-- Student --}}
+                                <div class="grow autocomplete-wrapper" 
+                                    data-options="{{ json_encode($eleveList) }}"
+                                    x-data="searchableInput(@js($participation['eleve_nom'] ?? ''))">
+                                    <input type="text" name="participations[{{ $index }}][eleve_nom]" 
+                                        class="form-select w-full" autocomplete="off" placeholder="Nom de l'élève"
+                                        x-model="value" @focus="open = true" @click.away="open = false" required>
+                                    
+                                    <div x-show="open && filteredOptions.length > 0" class="autocomplete-list" x-cloak>
+                                        <template x-for="opt in filteredOptions" :key="opt">
+                                            <div class="autocomplete-item" x-text="opt" @click="selectOption(opt)"></div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                {{-- Role --}}
+                                <div class="grow autocomplete-wrapper" 
+                                    data-options="{{ json_encode($roleList) }}"
+                                    x-data="searchableInput(@js($participation['role_nom'] ?? ''))">
+                                    <input type="text" name="participations[{{ $index }}][role_nom]" 
+                                        class="form-select w-full" autocomplete="off" placeholder="Rôle"
+                                        x-model="value" @focus="open = true" @click.away="open = false" required>
+                                    
+                                    <div x-show="open && filteredOptions.length > 0" class="autocomplete-list" x-cloak>
+                                        <template x-for="opt in filteredOptions" :key="opt">
+                                            <div class="autocomplete-item" x-text="opt" @click="selectOption(opt)"></div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer; height: 38px;">×</button>
+                            </div>
+                        @endforeach
+                    </div>
+                    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
+                </div>
+
+                {{-- Liste de suggestions (à placer juste ici) --}}
+                <datalist id="eleves-list">
+                    @foreach($eleves as $eleve)
+                        <option value="{{ $eleve->nom }} {{ $eleve->prenom }}">
                     @endforeach
-                </select>
+                </datalist>
 
-                <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
-            </div>
-        @empty
-            {{-- Laisser vide, le bouton ajouter créera la première ligne --}}
-        @endforelse
-    </div>
-    <button type="button" id="add-participation" class="form-button" style="margin-top: 10px; background: #28a745;">+ Ajouter une participation</button>
-</div>
-
-{{-- Liste de suggestions (à placer juste ici) --}}
-<datalist id="eleves-list">
-    @foreach($eleves as $eleve)
-        <option value="{{ $eleve->nom }} {{ $eleve->prenom }}">
-    @endforeach
-</datalist>
                 {{-- Propriétés libres --}}
                 <div class="form-field">
                     <label class="form-label">Propriétés personnalisées</label>
@@ -186,23 +202,11 @@
 
                         @foreach($oldProperties as $index => $property)
                             <div class="property-item" style="display:flex; gap:10px; margin-bottom:10px;">
-                                <input
-                                        type="text"
-                                        name="properties[{{ $index }}][key]"
-                                        class="form-input"
-                                        placeholder="Nom du champ"
-                                        value="{{ $property['key'] ?? '' }}"
-                                >
-
-                                <input
-                                        type="text"
-                                        name="properties[{{ $index }}][value]"
-                                        class="form-input"
-                                        placeholder="Valeur"
-                                        value="{{ $property['value'] ?? '' }}"
-                                >
-
-                                <button type="button" class="remove-property">×</button>
+                                <input type="text" name="properties[{{ $index }}][key]" class="form-input" 
+                                       placeholder="Nom du champ" value="{{ $property['key'] ?? '' }}">
+                                <input type="text" name="properties[{{ $index }}][value]" class="form-input" 
+                                       placeholder="Valeur" value="{{ $property['value'] ?? '' }}">
+                                <button type="button" class="remove-property" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
                             </div>
                         @endforeach
                     </div>
@@ -234,11 +238,34 @@
 
 @push('scripts')
 <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('searchableInput', (initialValue) => ({
+        value: initialValue,
+        open: false,
+        options: [],
+        init() {
+            const raw = this.$el.getAttribute('data-options');
+            this.options = raw ? JSON.parse(raw) : [];
+        },
+        get filteredOptions() {
+            if (!this.value) return this.options.slice(0, 10);
+            const search = this.value.toLowerCase();
+            return this.options
+                .filter(opt => opt.toLowerCase().includes(search))
+                .slice(0, 15); 
+        },
+        selectOption(opt) {
+            this.value = opt;
+            this.open = false;
+        }
+    }));
+});
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Data for dynamic generation
-    const projets = @json($projets);
-    const eleves = @json($eleves);
-    const roles = @json($roles);
+    // 1. Prepare clean data arrays
+    const projets = @json($projets->pluck('libelle'));
+    const eleves = @json($eleves->map(fn($e) => trim($e->nom . ' ' . $e->prenom)));
+    const roles = @json($roles->pluck('libelle'));
 
     // ==== PROJETS ====
     const projetsContainer = document.getElementById('projets-container');
@@ -249,92 +276,116 @@ document.addEventListener('DOMContentLoaded', function() {
         item.className = 'projet-item';
         item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
 
-        item.innerHTML = `
-            <select name="projet_ids[]" class="form-select" style="flex: 1;">
-                <option value="">-- Sélectionner un projet --</option>
-                ${projets.map(p => `<option value="${p.id}">${p.libelle}</option>`).join('')}
-            </select>
-            <button type="button" class="remove-projet" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+        const wrapper = document.createElement('div');
+        wrapper.className = 'grow autocomplete-wrapper';
+        wrapper.setAttribute('data-options', JSON.stringify(projets));
+        wrapper.setAttribute('x-data', "searchableInput('')");
+
+        wrapper.innerHTML = `
+            <div class="grow relative">
+                <input type="text" name="projet_noms[]" class="form-select w-full" autocomplete="off" 
+                    x-model="value" @focus="open = true" @click.away="open = false" placeholder="Nom du projet">
+                <div x-show="open && filteredOptions.length > 0" class="autocomplete-list" x-cloak>
+                    <template x-for="opt in filteredOptions" :key="opt">
+                        <div class="autocomplete-item" x-text="opt" @click="selectOption(opt)"></div>
+                    </template>
+                </div>
+            </div>
         `;
 
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-projet';
+        removeBtn.style.cssText = 'background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;';
+        removeBtn.innerText = '×';
+
+        item.appendChild(wrapper);
+        item.appendChild(removeBtn);
         projetsContainer.appendChild(item);
+        
+        if (window.Alpine) { window.Alpine.initTree(item); }
     });
 
-    // Remove projet (delegated event)
-    projetsContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-projet')) {
-            e.target.closest('.projet-item').remove();
-        }
-    });
-
- // ==== PARTICIPATIONS ====
+    // ==== PARTICIPATIONS ====
     const participationsContainer = document.getElementById('participations-container');
     const addParticipationButton = document.getElementById('add-participation');
 
-    let participationIndex = {{ count($oldParticipations ?? []) }};
+    let participationIndex = document.querySelectorAll('.participation-item').length;
 
     addParticipationButton.addEventListener('click', function() {
         const item = document.createElement('div');
         item.className = 'participation-item';
-        item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+        item.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;';
 
-        item.innerHTML = `
-            <input type="text" name="participations[${participationIndex}][eleve_nom]"
-                   list="eleves-list" class="form-select" style="flex: 1;"
-                   placeholder="Nom de l'élève" required>
+        const createField = (name, dataList) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'grow autocomplete-wrapper';
+            wrapper.setAttribute('data-options', JSON.stringify(dataList));
+            wrapper.setAttribute('x-data', "searchableInput('')");
 
-            <select name="participations[${participationIndex}][role_id]" class="form-select" style="flex: 1;" required>
-                <option value="">-- Rôle --</option>
-                ${roles.map(r => `<option value="${r.id}">${r.libelle}</option>`).join('')}
-            </select>
+            wrapper.innerHTML = `
+                <input type="text" name="${name}" 
+                    class="form-select w-full" autocomplete="off" 
+                    placeholder="${name.includes('role') ? 'Rôle' : 'Nom de l\'élève'}" 
+                    x-model="value" @focus="open = true" @click.away="open = false" required>
+                <div x-show="open && filteredOptions.length > 0" class="autocomplete-list" x-cloak>
+                    <template x-for="opt in filteredOptions" :key="opt">
+                        <div class="autocomplete-item" x-text="opt" @click="selectOption(opt)"></div>
+                    </template>
+                </div>
+            `;
+            return wrapper;
+        };
 
-            <button type="button" class="remove-participation" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
-        `;
+        const studentField = createField(`participations[${participationIndex}][eleve_nom]`, eleves);
+        const roleField = createField(`participations[${participationIndex}][role_nom]`, roles);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-participation';
+        removeBtn.style.cssText = 'background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer; height: 38px;';
+        removeBtn.innerText = '×';
+
+        item.appendChild(studentField);
+        item.appendChild(roleField);
+        item.appendChild(removeBtn);
 
         participationsContainer.appendChild(item);
+        
+        if (window.Alpine) { window.Alpine.initTree(item); }
         participationIndex++;
     });
-    // Remove participation (delegated event)
-    participationsContainer.addEventListener('click', function(e) {
+
+    // ==== GLOBAL EVENT DELEGATION ====
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-projet')) {
+            e.target.closest('.projet-item').remove();
+        }
         if (e.target.classList.contains('remove-participation')) {
             e.target.closest('.participation-item').remove();
         }
+        if (e.target.classList.contains('remove-property')) {
+            e.target.closest('.property-item').remove();
+        }
+    });
+
+    // ==== PROPERTIES ====
+    const propertiesContainer = document.getElementById('properties-container');
+    const addPropertyButton = document.getElementById('add-property');
+    let propertyIndex = document.querySelectorAll('.property-item').length;
+
+    addPropertyButton.addEventListener('click', () => {
+        const div = document.createElement('div');
+        div.className = 'property-item';
+        div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
+        div.innerHTML = `
+            <input type="text" name="properties[${propertyIndex}][key]" class="form-input" placeholder="Nom du champ">
+            <input type="text" name="properties[${propertyIndex}][value]" class="form-input" placeholder="Valeur">
+            <button type="button" class="remove-property" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 8px 12px; cursor: pointer;">×</button>
+        `;
+        propertiesContainer.appendChild(div);
+        propertyIndex++;
     });
 });
-
-const propertiesContainer = document.getElementById('properties-container');
-const addPropertyButton = document.getElementById('add-property');
-
-let propertyIndex = {{ count($oldProperties ?? []) }};
-
-addPropertyButton.addEventListener('click', () => {
-    const div = document.createElement('div');
-    div.className = 'property-item';
-    div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
-
-    div.innerHTML = `
-        <input type="text"
-               name="properties[${propertyIndex}][key]"
-               class="form-input"
-               placeholder="Nom libre">
-
-        <input type="text"
-               name="properties[${propertyIndex}][value]"
-               class="form-input"
-               placeholder="Valeur libre">
-
-        <button type="button" class="remove-property">×</button>
-    `;
-
-    propertiesContainer.appendChild(div);
-    propertyIndex++;
-});
-
-propertiesContainer.addEventListener('click', e => {
-    if (e.target.classList.contains('remove-property')) {
-        e.target.closest('.property-item').remove();
-    }
-});
-
 </script>
 @endpush

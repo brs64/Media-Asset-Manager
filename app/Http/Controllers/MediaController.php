@@ -81,34 +81,31 @@ class MediaController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Validation: Changed to expect 'noms' (strings) instead of 'ids'
         $validated = $request->validate([
             'mtd_tech_titre' => 'required|string|max:255',
-            'promotion' => 'nullable|string|max:255',
-            'type' => 'nullable|string|max:255',
-            'theme' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:5000',
-            'URI_NAS_ARCH' => 'nullable|string|max:2048',
-            'URI_NAS_PAD' => 'nullable|string|max:2048',
-            'chemin_local' => 'nullable|string|max:2048',
-            'projet_id' => 'nullable|exists:projets,id',
-            'professeur_id' => 'nullable|exists:professeurs,id',
-            'properties' => 'nullable|array',
-            'properties.*.key' => 'nullable|string|max:255',
+            'promotion'      => 'nullable|string|max:255',
+            'type'           => 'nullable|string|max:255',
+            'theme'          => 'nullable|string|max:255',
+            'description'    => 'nullable|string|max:5000',
+            'URI_NAS_ARCH'   => 'nullable|string|max:2048',
+            'URI_NAS_PAD'    => 'nullable|string|max:2048',
+            'chemin_local'   => 'nullable|string|max:2048',
+            'professeur_id'  => 'nullable|exists:professeurs,id',
+            'projet_noms'    => 'nullable|array',
+            'properties'     => 'nullable|array',
+            'properties.*.key'   => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
-            'participations' => 'nullable|array',
+            'participations'     => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
-            'participations.*.role_id' => 'required|exists:roles,id',
+            'participations.*.role_nom'  => 'required|string',
         ], [
             'mtd_tech_titre.required' => 'Le titre est obligatoire.',
-            'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
-            'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
-            'projet_id.exists' => 'Le projet sélectionné est invalide.',
-            'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
             'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
-            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
-            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
+            'participations.*.role_nom.required'  => 'Le rôle est obligatoire.',
         ]);
 
+        // 2. Sanitize properties
         $properties = collect($request->input('properties', []))
             ->filter(fn ($item) => !empty($item['key']))
             ->mapWithKeys(fn ($item) => [
@@ -116,56 +113,75 @@ class MediaController extends Controller
             ])
             ->toArray();
 
-        // Sanitize single-line fields: remove newlines
+        // 3. Sanitize text fields
         foreach (['mtd_tech_titre', 'promotion', 'type', 'theme'] as $field) {
             if (!empty($validated[$field])) {
                 $validated[$field] = preg_replace('/[\r\n]+/', ' ', trim($validated[$field]));
             }
         }
 
-        // Création du média
-        $media = \App\Models\Media::create($validated);
+        \DB::beginTransaction();
+        try {
+            // 4. Create Media
+            $media = \App\Models\Media::create([
+                'mtd_tech_titre' => $validated['mtd_tech_titre'],
+                'promotion'      => $validated['promotion'],
+                'type'           => $validated['type'],
+                'theme'          => $validated['theme'],
+                'description'    => $validated['description'],
+                'URI_NAS_ARCH'   => $validated['URI_NAS_ARCH'],
+                'URI_NAS_PAD'    => $validated['URI_NAS_PAD'],
+                'chemin_local'   => $validated['chemin_local'],
+                'professeur_id'  => $validated['professeur_id'],
+                'properties'     => $properties,
+            ]);
 
-        // Ajout des participations élèves
-        // --- LOGIQUE AUTO-CRÉATION ÉLÈVES ---
-        if (!empty($request->participations)) {
-            foreach ($request->participations as $item) {
-                $nomSaisi = trim($item['eleve_nom']);
-
-                if ($nomSaisi) {
-                    // Séparation Nom/Prénom (le dernier mot est considéré comme le prénom)
-                    $parts = explode(' ', $nomSaisi);
-                    $prenom = count($parts) > 1 ? array_pop($parts) : '';
-                    $nom = implode(' ', $parts) ?: $prenom;
-
-                    // Crée l'élève s'il n'existe pas
-                    $eleve = \App\Models\Eleve::firstOrCreate(
-                        ['nom' => $nom, 'prenom' => $prenom]
-                    );
-
-                    \App\Models\Participation::create([
-                        'media_id' => $media->id,
-                        'eleve_id' => $eleve->id,
-                        'role_id'  => $item['role_id'],
-                    ]);
+            // 5. Projects Logic (firstOrCreate)
+            $projetIds = [];
+            if ($request->has('projet_noms')) {
+                foreach ($request->input('projet_noms') as $nomProjet) {
+                    if ($nomProjet = trim($nomProjet)) {
+                        $projet = \App\Models\Projet::firstOrCreate(['libelle' => $nomProjet]);
+                        $projetIds[] = $projet->id;
+                    }
                 }
             }
+            $media->projets()->sync($projetIds);
+
+            // 6. Participations Logic (Students & Roles)
+            if (!empty($validated['participations'])) {
+                foreach ($validated['participations'] as $item) {
+                    $nomEleveSaisi = trim($item['eleve_nom']);
+                    $nomRoleSaisi  = trim($item['role_nom']);
+
+                    if ($nomEleveSaisi && $nomRoleSaisi) {
+                        // Process Student Name
+                        $parts = explode(' ', $nomEleveSaisi);
+                        $prenom = count($parts) > 1 ? array_pop($parts) : '';
+                        $nom = implode(' ', $parts) ?: $prenom;
+
+                        $eleve = \App\Models\Eleve::firstOrCreate(['nom' => $nom, 'prenom' => $prenom]);
+                        
+                        // Process Role
+                        $role = \App\Models\Role::firstOrCreate(['libelle' => $nomRoleSaisi]);
+
+                        \App\Models\Participation::create([
+                            'media_id' => $media->id,
+                            'eleve_id' => $eleve->id,
+                            'role_id'  => $role->id,
+                        ]);
+                    }
+                }
+            }
+
+            \DB::commit();
+            return redirect()->route('medias.show', $media->id)->with('success', 'Média créé avec succès!');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Store Media Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création : ' . $e->getMessage()]);
         }
-       /* if ($request->has('eleves') && $request->has('roles')) {
-            foreach ($request->eleves as $index => $eleveId) {
-                $roleId = $request->roles[$index] ?? null;
-                if ($roleId) {
-                    \App\Models\Participation::create([
-                        'media_id' => $media->id,
-                        'eleve_id' => $eleveId,
-                        'role_id' => $roleId,
-                    ]);
-                }
-            }
-        }*/
-
-        return redirect()->route('medias.show', $media->id)
-            ->with('success', 'Média ajouté avec succès!');
     }
 
     /**
@@ -248,11 +264,10 @@ class MediaController extends Controller
             'theme' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:5000',
             'professeur_id' => 'nullable|exists:professeurs,id',
-            'projet_ids' => 'nullable|array',
-            'projet_ids.*' => 'exists:projets,id',
+            'projet_noms' => 'nullable|array',
             'participations' => 'nullable|array',
             'participations.*.eleve_nom' => 'required|string',
-            'participations.*.role_id' => 'required|exists:roles,id',
+            'participations.*.role_nom' => 'required|string',
             'properties' => 'nullable|array',
             'properties.*.key' => 'nullable|string|max:255',
             'properties.*.value' => 'nullable',
@@ -261,10 +276,8 @@ class MediaController extends Controller
             'mtd_tech_titre.max' => 'Le titre ne doit pas dépasser 255 caractères.',
             'description.max' => 'La description ne doit pas dépasser 5000 caractères.',
             'professeur_id.exists' => 'Le professeur sélectionné est invalide.',
-            'projet_ids.*.exists' => 'Un des projets sélectionnés est invalide.',
             'participations.*.eleve_nom.required' => "Le nom de l'élève est obligatoire.",
-            'participations.*.role_id.required' => 'Le rôle est obligatoire.',
-            'participations.*.role_id.exists' => 'Le rôle sélectionné est invalide.',
+            'participations.*.role_nom.required' => 'Le rôle est obligatoire.',
         ]);
 
         // Sanitize single-line fields: remove newlines
@@ -294,39 +307,43 @@ class MediaController extends Controller
                 'properties' => $properties,
             ]);
 
-            // Sync projets (many-to-many)
-            if (isset($validated['projet_ids'])) {
-                $media->projets()->sync($validated['projet_ids']);
-            } else {
-                $media->projets()->sync([]);
+            // --- LOGIQUE AUTO-CRÉATION PROJETS ---
+            $projetIds = [];
+            if ($request->has('projet_noms')) {
+                foreach ($request->input('projet_noms') as $nomProjet) {
+                    if ($nomProjet = trim($nomProjet)) {
+                        $projet = \App\Models\Projet::firstOrCreate(['libelle' => $nomProjet]);
+                        $projetIds[] = $projet->id;
+                    }
+                }
             }
+            $media->projets()->sync($projetIds);
 
-            // Update participations: delete old, create new
-            // We don't use sync() here cause we have 3 columns
+            // --- LOGIQUE AUTO-CRÉATION ÉLÈVES & RÔLES ---
             $media->participations()->delete();
-           if (!empty($validated['participations'])) {
-        foreach ($validated['participations'] as $participation) {
-            $nomSaisi = trim($participation['eleve_nom']);
+            if (!empty($validated['participations'])) {
+                foreach ($validated['participations'] as $participation) {
+                    $nomEleveSaisi = trim($participation['eleve_nom']);
+                    $nomRoleSaisi = trim($participation['role_nom']);
 
-            if ($nomSaisi) {
-                // Découpage du nom et prénom
-                $parts = explode(' ', $nomSaisi);
-                $prenom = count($parts) > 1 ? array_pop($parts) : '';
-                $nom = implode(' ', $parts) ?: $prenom;
+                    if ($nomEleveSaisi && $nomRoleSaisi) {
+                        // Process Student (Your existing logic)
+                        $parts = explode(' ', $nomEleveSaisi);
+                        $prenom = count($parts) > 1 ? array_pop($parts) : '';
+                        $nom = implode(' ', $parts) ?: $prenom;
+                        $eleve = \App\Models\Eleve::firstOrCreate(['nom' => $nom, 'prenom' => $prenom]);
 
-                // Cherche l'élève ou le crée s'il est nouveau
-                $eleve = \App\Models\Eleve::firstOrCreate(
-                    ['nom' => $nom, 'prenom' => $prenom]
-                );
+                        // Process Role (New string-based logic)
+                        $role = \App\Models\Role::firstOrCreate(['libelle' => $nomRoleSaisi]);
 
-                // Crée le lien dans la table pivot
-                \App\Models\Participation::create([
-                    'media_id' => $media->id,
-                    'eleve_id' => $eleve->id,
-                    'role_id'  => $participation['role_id'],
-                ]);
+                        \App\Models\Participation::create([
+                            'media_id' => $media->id,
+                            'eleve_id' => $eleve->id,
+                            'role_id'  => $role->id,
+                        ]);
+                    }
+                }
             }
-            }}
 
             \DB::commit();
 
