@@ -32,3 +32,6 @@ Thumbs.db
 
 /.npm
 *.lock
+
+# Tests
+/storage/framework/testing
