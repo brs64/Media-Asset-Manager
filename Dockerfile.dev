@@ -27,7 +27,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) gd
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl ftp
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl ftp \
+    && pecl install pcov \
+    && docker-php-ext-enable pcov
 
 # Clear APT cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
