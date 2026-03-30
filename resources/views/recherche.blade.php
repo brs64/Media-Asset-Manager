@@ -86,7 +86,7 @@
 
                                 {{-- Infos --}}
                                 <div class="mt-3">
-                                    <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 leading-tight">
+                                    <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 leading-tight truncate" title="{{ $media->mtd_tech_titre }}">
                                         {{ $media->mtd_tech_titre }}
                                     </h3>
                                     @if($media->description)

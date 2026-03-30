@@ -25,7 +25,7 @@
                             <div class='miniature relative overflow-hidden rounded-lg shadow-md transition-transform transform group-hover:scale-105'>
                                 <img loading="lazy" src="{{ route('thumbnails.show', $media->id) }}" alt='Miniature de la vidéo' class='imageMiniature w-full h-auto object-cover aspect-video' onerror="this.onerror=null;this.src='{{ asset('images/placeholder-miniature.webp') }}'"/>
                             </div>
-                            <h3 class="mt-2 text-lg font-semibold text-gray-800 group-hover:text-blue-600">{{ $media->mtd_tech_titre }}</h3>
+                            <h3 class="mt-2 text-lg font-semibold text-gray-800 group-hover:text-blue-600 truncate" title="{{ $media->mtd_tech_titre }}">{{ $media->mtd_tech_titre }}</h3>
                         </a>
                     </div>
                 @endforeach
