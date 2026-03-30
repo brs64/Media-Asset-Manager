@@ -55,8 +55,8 @@ class MediaController extends Controller
     public function create()
     {
         $projets = \App\Models\Projet::orderBy('libelle')->get();
-        $professeurs = \App\Models\Professeur::orderBy('nom', 'prenom')->get();
-        $eleves = \App\Models\Eleve::orderBy('nom', 'prenom')->get();
+        $professeurs = \App\Models\Professeur::orderBy('nom')->orderBy('prenom')->get();
+        $eleves = \App\Models\Eleve::orderBy('nom')->orderBy('prenom')->get();
         $roles = \App\Models\Role::orderBy('libelle')->get();
 
         return view('formulaireMetadonnees', compact('projets', 'professeurs', 'eleves', 'roles'));
