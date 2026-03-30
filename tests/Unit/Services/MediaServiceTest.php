@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class MediaServiceTest extends TestCase
 {
@@ -206,8 +207,8 @@ class MediaServiceTest extends TestCase
      */
     public function searchMedia_finds_by_title()
     {
-        Media::factory()->create(['mtd_tech_titre' => 'Video Test 123']);
-        Media::factory()->create(['mtd_tech_titre' => 'Another Video']);
+        Media::factory()->create(['mtd_tech_titre' => 'Video Test 123', 'chemin_local' => '/local/test.mp4']);
+        Media::factory()->create(['mtd_tech_titre' => 'Another Video', 'chemin_local' => '/local/other.mp4']);
 
         $results = $this->service->searchMedia(['keyword' => 'Test']);
 
@@ -223,12 +224,13 @@ class MediaServiceTest extends TestCase
      */
     public function searchMedia_finds_by_description()
     {
-        Media::factory()->create(['description' => 'Ceci est une description test']);
-        Media::factory()->create(['description' => 'Autre description']);
+        Media::factory()->create(['description' => 'Ceci est une description test', 'chemin_local' => '/local/test.mp4']);
+        Media::factory()->create(['description' => 'Autre description', 'chemin_local' => '/local/other.mp4']);
 
         $results = $this->service->searchMedia(['keyword' => 'description test']);
 
         $this->assertCount(1, $results);
+        $this->assertStringContainsString('description test', $results->first()->description);
     }
 
     /**
@@ -239,8 +241,8 @@ class MediaServiceTest extends TestCase
      */
     public function searchMedia_finds_by_theme()
     {
-        Media::factory()->create(['theme' => 'Documentaire']);
-        Media::factory()->create(['theme' => 'Fiction']);
+        Media::factory()->create(['theme' => 'Documentaire', 'chemin_local' => '/local/doc.mp4']);
+        Media::factory()->create(['theme' => 'Fiction', 'chemin_local' => '/local/fic.mp4']);
 
         $results = $this->service->searchMedia(['keyword' => 'Documentaire']);
 
@@ -262,101 +264,103 @@ class MediaServiceTest extends TestCase
             'nom' => 'Dupont',
             'prenom' => 'Jean',
         ]);
-        Media::factory()->create(['professeur_id' => $prof->id]);
-        Media::factory()->create();
+        Media::factory()->create(['professeur_id' => $prof->id, 'chemin_local' => '/local/prof.mp4']);
+        Media::factory()->create(['chemin_local' => '/local/other.mp4']);
 
         $results = $this->service->searchMedia(['keyword' => 'Dupont']);
 
         $this->assertCount(1, $results);
+        $this->assertEquals($prof->id, $results->first()->professeur_id);
     }
 
     /**
      * @test
      * GIVEN : un projet associé à un seul média parmi deux en base
-     * WHEN : on filtre par projet_id sans mot-clé
-     * THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas)
-     * NOTE: Currently filters without keyword don't work due to early return at line 244
-     * This test validates current behavior (returns all media)
+     * WHEN : on filtre par projet sans mot-clé
+     * THEN : seul le média du projet est retourné
      */
     public function searchMedia_filters_by_project_id()
     {
         $projet = Projet::factory()->create();
-        $media1 = Media::factory()->create();
-        $media2 = Media::factory()->create();
+        $media1 = Media::factory()->create(['chemin_local' => '/local/a.mp4']);
+        $media2 = Media::factory()->create(['chemin_local' => '/local/b.mp4']);
 
         $media1->projets()->attach($projet->id);
 
-        $results = $this->service->searchMedia(['projet_id' => $projet->id]);
+        $results = $this->service->searchMedia(['projet' => $projet->id]);
 
-        // Current behavior: returns all media (bug in searchMedia line 244)
-        $this->assertCount(2, $results);
+        $this->assertCount(1, $results);
+        $this->assertEquals($media1->id, $results->first()->id);
     }
 
     /**
      * @test
-     * GIVEN : un média associé à un professeur et un autre sans professeur
-     * WHEN : on filtre par professeur_id sans mot-clé
-     * THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas)
-     * NOTE: Currently filters without keyword don't work due to early return at line 244
+     * GIVEN : un média associé au professeur 'Lemaire' et un autre sans professeur
+     * WHEN : on recherche avec le mot-clé 'Lemaire'
+     * THEN : seul le média du professeur est retourné
      */
-    public function searchMedia_filters_by_professor_id()
+    public function searchMedia_filters_by_professor_name_via_keyword()
     {
         $user = User::factory()->create();
-        $prof = Professeur::factory()->create(['user_id' => $user->id]);
-        Media::factory()->create(['professeur_id' => $prof->id]);
-        Media::factory()->create();
+        $prof = Professeur::factory()->create(['user_id' => $user->id, 'nom' => 'Lemaire', 'prenom' => 'Paul']);
+        Media::factory()->create(['professeur_id' => $prof->id, 'chemin_local' => '/local/a.mp4']);
+        Media::factory()->create(['chemin_local' => '/local/b.mp4']);
 
-        $results = $this->service->searchMedia(['professeur_id' => $prof->id]);
+        $results = $this->service->searchMedia(['keyword' => 'Lemaire']);
 
-        // Current behavior: returns all media
-        $this->assertCount(2, $results);
+        $this->assertCount(1, $results);
+        $this->assertEquals($prof->id, $results->first()->professeur_id);
     }
 
     /**
      * @test
      * GIVEN : deux médias avec des promotions différentes ('2024' et '2023')
      * WHEN : on filtre par promotion '2024' sans mot-clé
-     * THEN : tous les médias sont retournés (bug connu : le filtre seul ne fonctionne pas)
-     * NOTE: Currently filters without keyword don't work due to early return at line 244
+     * THEN : seul le média de la promotion 2024 est retourné
      */
     public function searchMedia_filters_by_promotion()
     {
-        Media::factory()->create(['promotion' => '2024']);
-        Media::factory()->create(['promotion' => '2023']);
+        Media::factory()->create(['promotion' => '2024', 'chemin_local' => '/local/a.mp4']);
+        Media::factory()->create(['promotion' => '2023', 'chemin_local' => '/local/b.mp4']);
 
         $results = $this->service->searchMedia(['promotion' => '2024']);
 
-        // Current behavior: returns all media
-        $this->assertCount(2, $results);
+        $this->assertCount(1, $results);
+        $this->assertEquals('2024', $results->first()->promotion);
     }
 
     /**
      * @test
-     * GIVEN : deux médias avec des professeurs, promotions et types différents
-     * WHEN : on combine plusieurs filtres sans mot-clé
-     * THEN : tous les médias sont retournés (bug connu : les filtres seuls ne fonctionnent pas)
-     * NOTE: Currently filters without keyword don't work due to early return at line 244
+     * GIVEN : trois médias avec différentes promotions et thèmes
+     * WHEN : on combine le mot-clé 'Documentaire' avec le filtre promotion '2024'
+     * THEN : seul le média Documentaire de 2024 est retourné
      */
-    public function searchMedia_combines_multiple_filters()
+    public function searchMedia_combines_promotion_and_keyword()
     {
-        $user = User::factory()->create();
-        $prof = Professeur::factory()->create(['user_id' => $user->id]);
-
         Media::factory()->create([
-            'professeur_id' => $prof->id,
             'promotion' => '2024',
-            'type' => 'Court-métrage',
+            'theme' => 'Documentaire',
+            'chemin_local' => '/local/a.mp4',
         ]);
-        Media::factory()->create(['promotion' => '2024', 'type' => 'Documentaire']);
+        Media::factory()->create([
+            'promotion' => '2024',
+            'theme' => 'Fiction',
+            'chemin_local' => '/local/b.mp4',
+        ]);
+        Media::factory()->create([
+            'promotion' => '2023',
+            'theme' => 'Documentaire',
+            'chemin_local' => '/local/c.mp4',
+        ]);
 
         $results = $this->service->searchMedia([
-            'professeur_id' => $prof->id,
+            'keyword' => 'Documentaire',
             'promotion' => '2024',
-            'type' => 'Court',
         ]);
 
-        // Current behavior: returns all media
-        $this->assertCount(2, $results);
+        $this->assertCount(1, $results);
+        $this->assertEquals('Documentaire', $results->first()->theme);
+        $this->assertEquals('2024', $results->first()->promotion);
     }
 
     /**
@@ -633,7 +637,9 @@ class MediaServiceTest extends TestCase
 
         $results = $this->service->getRecentMedia(10);
 
+        $this->assertCount(2, $results);
         $this->assertEquals($recent->id, $results[0]['id']);
+        $this->assertEquals($old->id, $results[1]['id']);
     }
 
     /**
@@ -686,5 +692,163 @@ class MediaServiceTest extends TestCase
         $this->assertEquals('1 MB', $method->invoke($this->service, 1048576));
         $this->assertEquals('1.46 MB', $method->invoke($this->service, 1536000));
         $this->assertEquals('500 B', $method->invoke($this->service, 500));
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec un chemin local défini
+     * WHEN : on appelle clearLocalFiles
+     * THEN : les fichiers vidéo et miniature sont supprimés et true est retourné
+     */
+    public function clearLocalFiles_deletes_video_and_thumbnail()
+    {
+        Storage::fake('local');
+
+        $media = Media::factory()->create(['chemin_local' => 'videos/test.mp4']);
+
+        $result = $this->service->clearLocalFiles($media->id);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média sans chemin local
+     * WHEN : on appelle clearLocalFiles
+     * THEN : true est retourné sans tenter de suppression
+     */
+    public function clearLocalFiles_returns_true_when_no_local_path()
+    {
+        $media = Media::factory()->create(['chemin_local' => null]);
+
+        $result = $this->service->clearLocalFiles($media->id);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test
+     * GIVEN : un identifiant de média inexistant
+     * WHEN : on appelle clearLocalFiles
+     * THEN : false est retourné
+     */
+    public function clearLocalFiles_returns_false_on_error()
+    {
+        $result = $this->service->clearLocalFiles(999999);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média complet avec professeur, projets et participations
+     * WHEN : on appelle getMediaInfo
+     * THEN : les rôles sont formatés en tableau associatif [role => "noms"]
+     */
+    public function getMediaInfo_formats_participations_by_role()
+    {
+        $user = User::factory()->create();
+        $prof = Professeur::factory()->create(['user_id' => $user->id, 'nom' => 'Dupont', 'prenom' => 'Jean']);
+        $media = Media::factory()->create([
+            'mtd_tech_titre' => 'TestVideo.mp4',
+            'professeur_id' => $prof->id,
+        ]);
+
+        $role = Role::factory()->create(['libelle' => 'Réalisateur']);
+        $eleve1 = Eleve::factory()->create(['nom' => 'Martin', 'prenom' => 'Sophie']);
+        $eleve2 = Eleve::factory()->create(['nom' => 'Durand', 'prenom' => 'Pierre']);
+
+        Participation::create(['media_id' => $media->id, 'eleve_id' => $eleve1->id, 'role_id' => $role->id]);
+        Participation::create(['media_id' => $media->id, 'eleve_id' => $eleve2->id, 'role_id' => $role->id]);
+
+        $info = $this->service->getMediaInfo($media->id);
+
+        $this->assertArrayHasKey('mtdRoles', $info);
+        $this->assertArrayHasKey('Réalisateur', $info['mtdRoles']);
+        $this->assertStringContainsString('Martin', $info['mtdRoles']['Réalisateur']);
+        $this->assertStringContainsString('Durand', $info['mtdRoles']['Réalisateur']);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec des propriétés personnalisées JSON
+     * WHEN : on appelle getMediaInfo
+     * THEN : les propriétés sont retournées dans mtdCustom avec label et value nettoyés
+     */
+    public function getMediaInfo_returns_custom_properties()
+    {
+        $media = Media::factory()->create([
+            'mtd_tech_titre' => 'TestCustom.mp4',
+            'properties' => ['camera' => 'Sony A7', 'lieu' => "Paris\nFrance"],
+        ]);
+
+        $info = $this->service->getMediaInfo($media->id);
+
+        $this->assertArrayHasKey('mtdCustom', $info);
+        $this->assertCount(2, $info['mtdCustom']);
+
+        $labels = collect($info['mtdCustom'])->pluck('label')->all();
+        $this->assertContains('camera', $labels);
+        $this->assertContains('lieu', $labels);
+
+        $lieuProp = collect($info['mtdCustom'])->firstWhere('label', 'lieu');
+        $this->assertStringNotContainsString("\n", $lieuProp['value']);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec chemin local, ARCH et PAD
+     * WHEN : on appelle getMediaInfo
+     * THEN : la source vidéo est 'local' (priorité la plus haute)
+     */
+    public function getMediaInfo_prioritizes_local_source()
+    {
+        $media = Media::factory()->create([
+            'mtd_tech_titre' => 'Multi.mp4',
+            'chemin_local' => '/local/video.mp4',
+            'URI_NAS_ARCH' => '/arch/video.mp4',
+            'URI_NAS_PAD' => '/pad/video.mp4',
+        ]);
+
+        $info = $this->service->getMediaInfo($media->id);
+        $this->assertEquals('local', $info['sourceVideo']);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec seulement un chemin ARCH
+     * WHEN : on appelle getMediaInfo
+     * THEN : la source vidéo est 'arch'
+     */
+    public function getMediaInfo_falls_back_to_arch()
+    {
+        $media = Media::factory()->create([
+            'mtd_tech_titre' => 'ArchOnly.mp4',
+            'chemin_local' => null,
+            'URI_NAS_ARCH' => '/arch/video.mp4',
+            'URI_NAS_PAD' => null,
+        ]);
+
+        $info = $this->service->getMediaInfo($media->id);
+        $this->assertEquals('arch', $info['sourceVideo']);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média sans aucun chemin
+     * WHEN : on appelle getMediaInfo
+     * THEN : la source vidéo est null
+     */
+    public function getMediaInfo_returns_null_source_when_no_paths()
+    {
+        $media = Media::factory()->create([
+            'mtd_tech_titre' => 'NoPaths.mp4',
+            'chemin_local' => null,
+            'URI_NAS_ARCH' => null,
+            'URI_NAS_PAD' => null,
+        ]);
+
+        $info = $this->service->getMediaInfo($media->id);
+        $this->assertNull($info['sourceVideo']);
     }
 }

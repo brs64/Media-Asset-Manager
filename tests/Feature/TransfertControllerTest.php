@@ -19,6 +19,10 @@ class TransfertControllerTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->create();
         config()->set('btsplay.process.workflow_id', 'test-workflow');
+        config()->set('btsplay.uris.nas_pad', '/nas/pad');
+        config()->set('btsplay.uris.nas_arch', '/nas/arch');
+        config()->set('btsplay.uris.nas_arch_win', '\\\\NAS\\arch');
+        config()->set('btsplay.uris.nas_pad_win', '\\\\NAS\\pad');
     }
 
     /**
@@ -40,76 +44,64 @@ class TransfertControllerTest extends TestCase
      * @test
      * GIVEN : des médias sur NAS sans chemin local et un média avec chemin local
      * WHEN : on récupère la liste des transferts
-     * THEN : seuls les médias sans chemin local sont retournés
+     * THEN : seuls les médias sans chemin local et non terminés sont retournés
      */
     public function list_returns_media_without_local_paths()
     {
-        // Create media with NAS paths but no local path
-        $mediaWithArch = Media::factory()->create([
+        Media::factory()->create([
             'URI_NAS_ARCH' => '/nas/arch/video1.mp4',
             'URI_NAS_PAD' => null,
             'chemin_local' => null,
+            'transcode_status' => 'disponible',
         ]);
 
-        $mediaWithPad = Media::factory()->create([
+        Media::factory()->create([
             'URI_NAS_ARCH' => null,
             'URI_NAS_PAD' => '/nas/pad/video2.mxf',
             'chemin_local' => null,
+            'transcode_status' => 'disponible',
         ]);
 
-        // Create media with local path (should be excluded)
+        // Exclu : a un chemin local
         Media::factory()->create([
             'URI_NAS_ARCH' => '/nas/arch/video3.mp4',
             'chemin_local' => '/local/video3.mp4',
         ]);
 
-        $this->mock(FfastransService::class)
-            ->shouldReceive('getFullStatusList')
-            ->once()
-            ->andReturn([]);
+        // Exclu : transcodage terminé
+        Media::factory()->create([
+            'URI_NAS_ARCH' => '/nas/arch/video4.mp4',
+            'chemin_local' => null,
+            'transcode_status' => 'termine',
+        ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'status',
-            'count',
             'results' => [
-                '*' => ['id', 'filename', 'path', 'disk', 'source', 'job_id', 'status', 'progress', 'finished']
+                '*' => ['id', 'filename', 'path', 'disk', 'available_paths', 'job_id', 'status', 'progress', 'finished', 'is_queued']
             ]
         ]);
 
         $json = $response->json();
-        $this->assertEquals(2, $json['count']);
+        $this->assertCount(2, $json['results']);
     }
 
     /**
      * @test
-     * GIVEN : un média sans chemin local et un job FFAStrans actif correspondant
+     * GIVEN : un média en cours de transcodage en BD
      * WHEN : on récupère la liste des transferts
-     * THEN : le média est associé aux informations du job en cours
+     * THEN : le statut et l'état du transcodage proviennent de la BD
      */
-    public function list_matches_active_jobs_with_media()
+    public function list_shows_db_transcode_status()
     {
         $media = Media::factory()->create([
-            'mtd_tech_titre' => 'TestVideo.mp4',
             'URI_NAS_ARCH' => '/nas/arch/TestVideo.mp4',
             'chemin_local' => null,
+            'transcode_status' => 'en_cours',
+            'transcode_job_id' => 'job-123',
         ]);
-
-        $this->mock(FfastransService::class)
-            ->shouldReceive('getFullStatusList')
-            ->once()
-            ->andReturn([
-                [
-                    'id' => 'job-123',
-                    'filename' => 'TestVideo.mp4',
-                    'status' => 'En cours',
-                    'progress' => 50,
-                    'is_finished' => false,
-                    'date' => '2024-01-15 10:00:00',
-                ]
-            ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
@@ -117,56 +109,48 @@ class TransfertControllerTest extends TestCase
         $result = collect($json['results'])->firstWhere('id', $media->id);
 
         $this->assertEquals('job-123', $result['job_id']);
-        $this->assertEquals('En cours', $result['status']);
-        $this->assertEquals(50, $result['progress']);
+        $this->assertEquals('Démarrage...', $result['status']);
         $this->assertFalse($result['finished']);
     }
 
     /**
      * @test
-     * GIVEN : un média sans chemin local et une erreur de connexion FFAStrans
+     * GIVEN : un média en file d'attente
      * WHEN : on récupère la liste des transferts
-     * THEN : les résultats sont retournés avec le statut 'En attente'
+     * THEN : le statut indique la file d'attente et is_queued est true
      */
-    public function list_handles_ffastrans_error_gracefully()
+    public function list_shows_queued_status()
     {
-        Media::factory()->create([
+        $media = Media::factory()->create([
             'URI_NAS_ARCH' => '/nas/arch/video.mp4',
             'chemin_local' => null,
+            'transcode_status' => 'en_attente',
         ]);
-
-        $this->mock(FfastransService::class)
-            ->shouldReceive('getFullStatusList')
-            ->once()
-            ->andThrow(new \Exception('FFAStrans connection error'));
 
         $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
-        $response->assertStatus(200);
         $json = $response->json();
+        $result = collect($json['results'])->firstWhere('id', $media->id);
 
-        // Should still return results but without active job info
-        $this->assertArrayHasKey('results', $json);
-        $this->assertEquals('En attente', $json['results'][0]['status']);
+        $this->assertEquals("En file d'attente", $result['status']);
+        $this->assertTrue($result['is_queued']);
+        $this->assertFalse($result['finished']);
     }
 
     /**
      * @test
      * GIVEN : un média avec à la fois un chemin NAS_ARCH et NAS_PAD
      * WHEN : on récupère la liste des transferts
-     * THEN : le disque NAS_ARCH est utilisé en priorité
+     * THEN : le disque NAS_ARCH est utilisé en priorité et les deux chemins sont disponibles
      */
     public function list_prioritizes_arch_over_pad()
     {
-        $media = Media::factory()->create([
+        Media::factory()->create([
             'URI_NAS_ARCH' => '/nas/arch/video.mp4',
             'URI_NAS_PAD' => '/nas/pad/video.mxf',
             'chemin_local' => null,
+            'transcode_status' => 'disponible',
         ]);
-
-        $this->mock(FfastransService::class)
-            ->shouldReceive('getFullStatusList')
-            ->andReturn([]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
@@ -174,8 +158,8 @@ class TransfertControllerTest extends TestCase
         $result = $json['results'][0];
 
         $this->assertEquals('nas_arch', $result['disk']);
-        $this->assertEquals('NAS_ARCH', $result['source']);
         $this->assertStringEndsWith('.mp4', $result['filename']);
+        $this->assertCount(2, $result['available_paths']);
     }
 
     /**
@@ -186,15 +170,12 @@ class TransfertControllerTest extends TestCase
      */
     public function list_uses_pad_when_arch_not_available()
     {
-        $media = Media::factory()->create([
+        Media::factory()->create([
             'URI_NAS_ARCH' => null,
             'URI_NAS_PAD' => '/nas/pad/video.mxf',
             'chemin_local' => null,
+            'transcode_status' => 'disponible',
         ]);
-
-        $this->mock(FfastransService::class)
-            ->shouldReceive('getFullStatusList')
-            ->andReturn([]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transferts.list'));
 
@@ -202,90 +183,103 @@ class TransfertControllerTest extends TestCase
         $result = $json['results'][0];
 
         $this->assertEquals('ftp_pad', $result['disk']);
-        $this->assertEquals('NAS_PAD', $result['source']);
         $this->assertStringEndsWith('.mxf', $result['filename']);
+        $this->assertCount(1, $result['available_paths']);
     }
 
     /**
      * @test
-     * GIVEN : un service FFAStrans mocké prêt à accepter un job
-     * WHEN : on soumet un job de transfert avec un chemin et un disque
-     * THEN : le job est créé et l'identifiant est retourné
+     * GIVEN : un média existant sur NAS et un service FFAStrans mocké
+     * WHEN : on lance un transcodage direct (sans action queue)
+     * THEN : le job FFAStrans est soumis et le job_id est retourné
      */
     public function startJob_submits_job_to_ffastrans()
     {
+        $media = Media::factory()->create([
+            'URI_NAS_ARCH' => '/nas/arch/video.mp4',
+            'chemin_local' => null,
+            'transcode_status' => 'disponible',
+        ]);
+
         $this->mock(FfastransService::class)
             ->shouldReceive('submitJob')
             ->once()
             ->andReturn(['job_id' => 'job-456']);
 
         $response = $this->actingAs($this->user)->postJson(route('admin.transferts.start'), [
-            'path' => '/nas/arch/video.mp4',
-            'disk' => 'nas_arch',
+            'id' => $media->id,
         ]);
 
         $response->assertStatus(200);
-        $response->assertJson([
-            'success' => true,
-            'job_id' => 'job-456',
-        ]);
+        $response->assertJson(['success' => true, 'job_id' => 'job-456']);
+
+        $media->refresh();
+        $this->assertEquals('en_cours', $media->transcode_status);
+        $this->assertEquals('job-456', $media->transcode_job_id);
     }
 
     /**
      * @test
      * GIVEN : un service FFAStrans mocké qui lève une exception
      * WHEN : on tente de soumettre un job de transfert
-     * THEN : une erreur 500 est retournée avec le message d'erreur
+     * THEN : une erreur 500 est retournée et le statut passe à 'echoue'
      */
     public function startJob_handles_ffastrans_error()
     {
+        $media = Media::factory()->create([
+            'URI_NAS_ARCH' => '/nas/arch/video.mp4',
+            'chemin_local' => null,
+            'transcode_status' => 'disponible',
+        ]);
+
         $this->mock(FfastransService::class)
             ->shouldReceive('submitJob')
             ->once()
-            ->andThrow(new \Exception('Failed to submit job'));
+            ->andThrow(new \Exception('FFAStrans error'));
 
         $response = $this->actingAs($this->user)->postJson(route('admin.transferts.start'), [
-            'path' => '/nas/arch/video.mp4',
-            'disk' => 'nas_arch',
+            'id' => $media->id,
         ]);
 
         $response->assertStatus(500);
-        $response->assertJson([
-            'success' => false,
-            'message' => 'Failed to submit job',
-        ]);
+        $response->assertJson(['success' => false]);
+
+        $media->refresh();
+        $this->assertEquals('echoue', $media->transcode_status);
     }
 
     /**
      * @test
-     * GIVEN : un job FFAStrans en cours de traitement à 75%
+     * GIVEN : un job FFAStrans actif en cours de traitement
      * WHEN : on vérifie le statut du job
-     * THEN : la progression et le statut 'En cours' sont retournés
+     * THEN : la progression et le label de traitement sont retournés
      */
-    public function checkStatus_returns_job_progress()
+    public function checkStatus_returns_active_job_progress()
     {
         $this->mock(FfastransService::class)
             ->shouldReceive('getJobStatus')
             ->once()
             ->with('job-123')
             ->andReturn([
+                'source' => 'active',
                 'state' => 'processing',
                 'progress' => 75,
+                'steps' => '2/4',
+                'proc' => 'Encoding H264',
             ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
         $response->assertStatus(200);
-        $response->assertJson([
-            'progress' => 75,
-            'label' => 'En cours',
-            'finished' => false,
-        ]);
+        $json = $response->json();
+        $this->assertEquals(75, $json['progress']);
+        $this->assertEquals('Node 2/4: Encoding H264', $json['label']);
+        $this->assertFalse($json['finished']);
     }
 
     /**
      * @test
-     * GIVEN : un job FFAStrans terminé avec succès
+     * GIVEN : un job FFAStrans terminé dans l'historique
      * WHEN : on vérifie le statut du job
      * THEN : le statut 'Terminé' est retourné avec finished à true
      */
@@ -295,7 +289,8 @@ class TransfertControllerTest extends TestCase
             ->shouldReceive('getJobStatus')
             ->once()
             ->andReturn([
-                'state' => 'Success',
+                'source' => 'history',
+                'state' => 'success',
                 'progress' => 100,
             ]);
 
@@ -320,8 +315,9 @@ class TransfertControllerTest extends TestCase
             ->shouldReceive('getJobStatus')
             ->once()
             ->andReturn([
-                'state' => 'Error',
-                'progress' => 50,
+                'source' => 'history',
+                'state' => 'error',
+                'progress' => 100,
             ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
@@ -344,8 +340,9 @@ class TransfertControllerTest extends TestCase
             ->shouldReceive('getJobStatus')
             ->once()
             ->andReturn([
-                'state' => 'Cancelled',
-                'progress' => 25,
+                'source' => 'history',
+                'state' => 'aborted',
+                'progress' => 0,
             ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
@@ -358,36 +355,34 @@ class TransfertControllerTest extends TestCase
 
     /**
      * @test
-     * GIVEN : un job FFAStrans avec la progression dans les variables
+     * GIVEN : un job en attente d'ingestion par l'API FFAStrans
      * WHEN : on vérifie le statut du job
-     * THEN : la progression est extraite des variables du job
+     * THEN : un statut de synchronisation est retourné sans bloquer le polling
      */
-    public function checkStatus_extracts_progress_from_variables()
+    public function checkStatus_handles_pending_state()
     {
         $this->mock(FfastransService::class)
             ->shouldReceive('getJobStatus')
             ->once()
             ->andReturn([
-                'state' => 'processing',
-                'progress' => 0,
-                'variables' => [
-                    ['name' => 'progress', 'data' => 80],
-                    ['name' => 'status', 'data' => 'encoding'],
-                ],
+                'source' => 'pending',
+                'state' => 'Initializing',
             ]);
 
         $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
-        $response->assertJson([
-            'progress' => 80,
-        ]);
+        $response->assertStatus(200);
+        $json = $response->json();
+        $this->assertNull($json['progress']);
+        $this->assertFalse($json['finished']);
+        $this->assertTrue($json['is_pending']);
     }
 
     /**
      * @test
      * GIVEN : un service FFAStrans qui lève une exception de connexion
      * WHEN : on vérifie le statut d'un job
-     * THEN : une erreur 500 avec le message 'Erreur de connexion' est retournée
+     * THEN : une réponse 200 de reconnexion est retournée pour ne pas casser le polling JS
      */
     public function checkStatus_handles_connection_error()
     {
@@ -398,20 +393,27 @@ class TransfertControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)->get(route('admin.transfers.status', 'job-123'));
 
-        $response->assertStatus(500);
+        $response->assertStatus(200);
         $response->assertJson([
-            'error' => 'Erreur de connexion',
+            'progress' => null,
+            'label' => 'Reconnexion...',
+            'finished' => false,
         ]);
     }
 
     /**
      * @test
-     * GIVEN : un service FFAStrans prêt à annuler un job
+     * GIVEN : un service FFAStrans prêt à annuler un job actif
      * WHEN : on annule le job
-     * THEN : une redirection avec un message de succès est retournée
+     * THEN : le job est annulé et le statut en BD est mis à jour
      */
-    public function cancel_cancels_job_successfully()
+    public function cancel_cancels_ffastrans_job_successfully()
     {
+        $media = Media::factory()->create([
+            'transcode_job_id' => 'job-123',
+            'transcode_status' => 'en_cours',
+        ]);
+
         $this->mock(FfastransService::class)
             ->shouldReceive('cancelJob')
             ->once()
@@ -420,15 +422,41 @@ class TransfertControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)->post(route('admin.transfers.cancel', 'job-123'));
 
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $media->refresh();
+        $this->assertEquals('annule', $media->transcode_status);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média en file d'attente avec un ID préfixé 'queue-'
+     * WHEN : on annule le job de la file
+     * THEN : le statut en BD est mis à jour sans appeler FFAStrans
+     */
+    public function cancel_cancels_queued_job()
+    {
+        $media = Media::factory()->create([
+            'transcode_status' => 'en_attente',
+        ]);
+
+        // Pas de mock FFAStrans nécessaire — le cancel en file ne l'appelle pas
+        $response = $this->actingAs($this->user)->post(route('admin.transfers.cancel', 'queue-' . $media->id));
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $media->refresh();
+        $this->assertEquals('annule', $media->transcode_status);
+        $this->assertNull($media->transcode_job_id);
     }
 
     /**
      * @test
      * GIVEN : un service FFAStrans qui échoue à annuler un job
      * WHEN : on tente d'annuler le job
-     * THEN : une redirection avec un message d'erreur est retournée
+     * THEN : une erreur 500 est retournée
      */
     public function cancel_handles_failure()
     {
@@ -440,7 +468,126 @@ class TransfertControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)->post(route('admin.transfers.cancel', 'job-123'));
 
-        $response->assertRedirect();
-        $response->assertSessionHas('error');
+        $response->assertStatus(500);
+        $response->assertJson(['success' => false]);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média en cours de transcodage en BD
+     * WHEN : on demande le statut BD de ce média
+     * THEN : le job_id et le statut traduit sont retournés
+     */
+    public function getDbStatus_returns_status_for_existing_media()
+    {
+        $media = Media::factory()->create([
+            'transcode_status' => 'en_cours',
+            'transcode_job_id' => 'job-789',
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson(route('admin.transferts.dbStatus', $media->id));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'job_id' => 'job-789',
+            'status' => 'Démarrage...',
+            'is_finished' => false,
+        ]);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média dont le transcodage est terminé
+     * WHEN : on demande le statut BD
+     * THEN : is_finished est true et le statut est 'Terminé'
+     */
+    public function getDbStatus_returns_finished_for_completed_media()
+    {
+        $media = Media::factory()->create([
+            'transcode_status' => 'termine',
+            'transcode_job_id' => 'job-done',
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson(route('admin.transferts.dbStatus', $media->id));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'job_id' => 'job-done',
+            'status' => 'Terminé',
+            'is_finished' => true,
+        ]);
+    }
+
+    /**
+     * @test
+     * GIVEN : aucun média avec l'identifiant donné
+     * WHEN : on demande le statut BD
+     * THEN : un statut 'Disponible' est retourné avec job_id null
+     */
+    public function getDbStatus_returns_default_for_nonexistent_media()
+    {
+        $response = $this->actingAs($this->user)->getJson(route('admin.transferts.dbStatus', 999999));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'job_id' => null,
+            'status' => 'Disponible',
+        ]);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec le statut 'echoue'
+     * WHEN : on demande le statut BD
+     * THEN : le statut est 'Echoué' et is_finished est true
+     */
+    public function getDbStatus_returns_echoue_status()
+    {
+        $media = Media::factory()->create([
+            'transcode_status' => 'echoue',
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson(route('admin.transferts.dbStatus', $media->id));
+
+        $response->assertJson([
+            'status' => 'Echoué',
+            'is_finished' => true,
+        ]);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec le statut 'annule'
+     * WHEN : on demande le statut BD
+     * THEN : le statut est 'Annulé' et is_finished est true
+     */
+    public function getDbStatus_returns_annule_status()
+    {
+        $media = Media::factory()->create([
+            'transcode_status' => 'annule',
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson(route('admin.transferts.dbStatus', $media->id));
+
+        $response->assertJson([
+            'status' => 'Annulé',
+            'is_finished' => true,
+        ]);
+    }
+
+    /**
+     * @test
+     * GIVEN : un identifiant de média inexistant
+     * WHEN : on tente de lancer un job
+     * THEN : une erreur 404 est retournée
+     */
+    public function startJob_returns_404_for_nonexistent_media()
+    {
+        $response = $this->actingAs($this->user)->postJson(route('admin.transferts.start'), [
+            'id' => 999999,
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['success' => false, 'message' => 'Media introuvable']);
     }
 }

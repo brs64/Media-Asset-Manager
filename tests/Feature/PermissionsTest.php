@@ -24,7 +24,7 @@ class PermissionsTest extends TestCase
      * WHEN : il accède à la page des réglages admin
      * THEN : l'accès est autorisé (statut 200)
      */
-    public function un_professeur_peut_acceder_a_ladmin_mais_pas_aux_reglages()
+    public function un_professeur_peut_acceder_aux_reglages_admin()
     {
         $user = User::factory()->create();
         $user->assignRole('professeur');

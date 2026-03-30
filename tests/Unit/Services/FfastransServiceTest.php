@@ -313,15 +313,19 @@ class FfastransServiceTest extends TestCase
     {
         Http::fake([
             'ffastrans.local/api/json/v2/jobs/job-123' => Http::response([
-                'job_id' => 'job-123',
-                'state' => 'Processing',
-                'progress' => 75,
+                'jobs' => [
+                    [
+                        'job_id' => 'job-123',
+                        'state' => 'Processing',
+                        'progress' => 75,
+                    ],
+                ],
             ], 200),
         ]);
 
         $result = $this->service->getJobStatus('job-123');
 
-        $this->assertArrayHasKey('state', $result);
+        $this->assertEquals('active', $result['source']);
         $this->assertEquals('Processing', $result['state']);
         $this->assertEquals(75, $result['progress']);
     }
@@ -335,19 +339,23 @@ class FfastransServiceTest extends TestCase
     public function getJobStatus_falls_back_to_history_if_not_active()
     {
         Http::fake([
-            'ffastrans.local/api/json/v2/jobs/job-123' => Http::response([], 404),
+            'ffastrans.local/api/json/v2/jobs/job-123' => Http::response(['jobs' => []], 200),
             'ffastrans.local/api/json/v2/history/job-123' => Http::response([
-                'job_id' => 'job-123',
-                'result' => 'Success',
-                'msg' => 'Job completed successfully',
+                'history' => [
+                    [
+                        'job_id' => 'job-123',
+                        'result' => 'Success',
+                        'state' => 1,
+                    ],
+                ],
             ], 200),
         ]);
 
         $result = $this->service->getJobStatus('job-123');
 
-        $this->assertEquals('Success', $result['state']);
+        $this->assertEquals('history', $result['source']);
+        $this->assertEquals('success', $result['state']);
         $this->assertEquals(100, $result['progress']);
-        $this->assertEquals('Job completed successfully', $result['message']);
     }
 
     /**
@@ -356,7 +364,7 @@ class FfastransServiceTest extends TestCase
      * WHEN : on appelle getJobStatus avec son identifiant
      * THEN : un statut d'erreur 'Job not found' est retourné
      */
-    public function getJobStatus_returns_error_when_job_not_found()
+    public function getJobStatus_returns_pending_when_job_not_found()
     {
         Http::fake([
             'ffastrans.local/api/json/v2/jobs/job-999' => Http::response([], 404),
@@ -365,8 +373,8 @@ class FfastransServiceTest extends TestCase
 
         $result = $this->service->getJobStatus('job-999');
 
-        $this->assertEquals('Error', $result['state']);
-        $this->assertEquals('Job not found', $result['msg']);
+        $this->assertEquals('pending', $result['source']);
+        $this->assertEquals('Initializing', $result['state']);
     }
 
     /**

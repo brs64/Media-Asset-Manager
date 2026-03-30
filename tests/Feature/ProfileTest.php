@@ -70,7 +70,7 @@ public function test_user_can_delete_their_account(): void
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
 
     /**

@@ -31,6 +31,7 @@ class SearchMediaTest extends TestCase
             'mtd_tech_titre' => 'Le tutoriel Laravel',
             'type' => 'video',
             'promotion' => '2026',
+            'chemin_local' => '/local/tutoriel.mp4',
         ]);
 
         $this->logTest("Action : GET /recherche?description=tutoriel");
@@ -50,12 +51,13 @@ class SearchMediaTest extends TestCase
         $media = Media::create([
             'mtd_tech_titre' => 'Video Projet A',
             'type' => 'video',
-            'promotion' => '2026'
+            'promotion' => '2026',
+            'chemin_local' => '/local/projetA.mp4',
         ]);
         $media->projets()->attach($projet->id);
         $this->logTest("Média lié au projet ID: " . $projet->id);
 
-        Media::create(['mtd_tech_titre' => 'Video Hors Projet', 'type' => 'video', 'promotion' => '2026']);
+        Media::create(['mtd_tech_titre' => 'Video Hors Projet', 'type' => 'video', 'promotion' => '2026', 'chemin_local' => '/local/hors.mp4']);
 
         $this->logTest("Action : GET /recherche?projet=" . $projet->id);
         $response = $this->get(route('search', ['projet' => $projet->id]));
@@ -81,7 +83,8 @@ public function devrait_trouver_un_media_en_tapant_le_nom_du_prof_dans_la_barre_
         'mtd_tech_titre' => 'Video de Sophie',
         'professeur_id' => $prof->id,
         'type' => 'video',
-        'promotion' => '2026'
+        'promotion' => '2026',
+        'chemin_local' => '/local/sophie.mp4',
     ]);
 
     $this->logTest("Action : GET /recherche?description=Martin");
@@ -92,30 +95,39 @@ public function devrait_trouver_un_media_en_tapant_le_nom_du_prof_dans_la_barre_
     $this->logTest("Succès : Le média a été trouvé via le nom du prof dans le mot-clé.");
 }
     #[Test]
-    public function devrait_filtrer_les_medias_par_id_professeur()
+    public function devrait_trouver_un_media_en_cherchant_le_nom_du_professeur()
     {
-        $this->logTest("Début test : Filtrage par Professeur");
+        $this->logTest("Début test : Recherche par nom de professeur via mot-clé");
 
         $user = User::factory()->create();
         $prof = Professeur::create([
-            'nom' => 'Dupont', 
+            'nom' => 'Dupont',
             'prenom' => 'Jean',
-            'user_id' => $user->id 
+            'user_id' => $user->id
         ]);
-        
+
         Media::create([
             'mtd_tech_titre' => 'Cours de Montage',
             'professeur_id' => $prof->id,
             'type' => 'video',
-            'promotion' => '2026'
+            'promotion' => '2026',
+            'chemin_local' => '/local/montage.mp4',
         ]);
 
-        $this->logTest("Action : GET /recherche?professeur=" . $prof->id);
-        $response = $this->get(route('search', ['professeur' => $prof->id]));
+        Media::create([
+            'mtd_tech_titre' => 'Autre Video',
+            'type' => 'video',
+            'promotion' => '2026',
+            'chemin_local' => '/local/autre.mp4',
+        ]);
+
+        $this->logTest("Action : GET /recherche?description=Dupont");
+        $response = $this->get(route('search', ['description' => 'Dupont']));
 
         $response->assertStatus(200);
         $response->assertSee('Cours de Montage');
-        $this->logTest("Succès : Filtrage professeur OK.");
+        $response->assertDontSee('Autre Video');
+        $this->logTest("Succès : Recherche par nom de professeur OK.");
     }
 
     #[Test]
@@ -123,8 +135,8 @@ public function devrait_trouver_un_media_en_tapant_le_nom_du_prof_dans_la_barre_
     {
         $this->logTest("Début test : Filtrage par Promotion");
 
-        Media::create(['mtd_tech_titre' => 'Film 2024', 'promotion' => '2024', 'type' => 'video']);
-        Media::create(['mtd_tech_titre' => 'Film 2026', 'promotion' => '2026', 'type' => 'video']);
+        Media::create(['mtd_tech_titre' => 'Film 2024', 'promotion' => '2024', 'type' => 'video', 'chemin_local' => '/local/2024.mp4']);
+        Media::create(['mtd_tech_titre' => 'Film 2026', 'promotion' => '2026', 'type' => 'video', 'chemin_local' => '/local/2026.mp4']);
 
         $this->logTest("Action : GET /recherche?promotion=2024");
         $response = $this->get(route('search', ['promotion' => '2024']));

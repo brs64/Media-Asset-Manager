@@ -37,8 +37,8 @@ class SearchControllerTest extends TestCase
      */
     public function index_searches_with_description_parameter()
     {
-        $media = Media::factory()->create(['description' => 'Test description unique']);
-        Media::factory()->count(3)->create();
+        $media = Media::factory()->create(['description' => 'Test description unique', 'chemin_local' => '/local/unique.mp4']);
+        Media::factory()->count(3)->create(['chemin_local' => '/local/other.mp4']);
 
         $response = $this->get(route('search', ['description' => 'unique']));
 
@@ -58,8 +58,8 @@ class SearchControllerTest extends TestCase
      */
     public function index_searches_with_motCle_parameter()
     {
-        $media = Media::factory()->create(['mtd_tech_titre' => 'VideoTest123']);
-        Media::factory()->count(3)->create();
+        $media = Media::factory()->create(['mtd_tech_titre' => 'VideoTest123', 'chemin_local' => '/local/test.mp4']);
+        Media::factory()->count(3)->create(['chemin_local' => '/local/other.mp4']);
 
         $response = $this->get(route('search', ['motCle' => 'VideoTest123']));
 
@@ -78,15 +78,20 @@ class SearchControllerTest extends TestCase
      */
     public function index_prioritizes_description_over_motCle()
     {
-        $media = Media::factory()->create(['description' => 'SearchTerm']);
+        $media = Media::factory()->create(['description' => 'SearchTerm', 'chemin_local' => '/local/test.mp4']);
 
         $response = $this->get(route('search', [
             'description' => 'SearchTerm',
             'motCle' => 'OtherTerm',
         ]));
 
+        $response->assertStatus(200);
         $description = $response->viewData('description');
         $this->assertEquals('SearchTerm', $description);
+
+        $medias = $response->viewData('medias');
+        $this->assertEquals(1, $medias->total());
+        $this->assertEquals($media->id, $medias->first()->id);
     }
 
     /**
@@ -119,7 +124,7 @@ class SearchControllerTest extends TestCase
      */
     public function index_paginates_results()
     {
-        Media::factory()->count(25)->create(['description' => 'Common description']);
+        Media::factory()->count(25)->create(['description' => 'Common description', 'chemin_local' => '/local/common.mp4']);
 
         $response = $this->get(route('search', ['description' => 'Common']));
 
@@ -135,7 +140,7 @@ class SearchControllerTest extends TestCase
      */
     public function index_appends_query_parameters_to_pagination()
     {
-        Media::factory()->count(25)->create(['description' => 'Test']);
+        Media::factory()->count(25)->create(['description' => 'Test', 'chemin_local' => '/local/test.mp4']);
 
         $response = $this->get(route('search', ['description' => 'Test']));
 
@@ -263,7 +268,7 @@ class SearchControllerTest extends TestCase
         $mockService = $this->mock(MediaService::class);
         $mockService->shouldReceive('searchMedia')
             ->once()
-            ->with(['keyword' => 'ServiceTest'])
+            ->with(\Mockery::on(fn($arg) => is_array($arg) && ($arg['keyword'] ?? null) === 'ServiceTest'))
             ->andReturn(new \Illuminate\Pagination\LengthAwarePaginator(
                 [$media],
                 1,
@@ -283,7 +288,7 @@ class SearchControllerTest extends TestCase
      */
     public function index_returns_all_medias_when_no_search_term()
     {
-        Media::factory()->count(10)->create();
+        Media::factory()->count(10)->create(['chemin_local' => '/local/video.mp4']);
 
         $response = $this->get(route('search'));
 

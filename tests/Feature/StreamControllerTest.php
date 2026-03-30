@@ -196,6 +196,7 @@ class StreamControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/vnd.apple.mpegurl');
+        $this->assertStringContainsString('#EXTM3U', $response->getContent());
     }
 
     /**
@@ -233,6 +234,101 @@ class StreamControllerTest extends TestCase
         ]);
 
         $response = $this->get("/stream/{$media->id}/segment/missing.ts");
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec un chemin local et un fichier vidéo de 5000 octets
+     * WHEN : on envoie une requête Range sur le fichier local
+     * THEN : la réponse retourne un statut 206 avec le bon Content-Range
+     */
+    public function it_supports_range_requests_on_local_video()
+    {
+        $media = Media::factory()->create([
+            'chemin_local' => 'rangevideo.mp4',
+        ]);
+
+        Storage::disk('external_local')->put('rangevideo.mp4', str_repeat('B', 5000));
+
+        $response = $this->withHeaders([
+            'Range' => 'bytes=100-200'
+        ])->get("/stream/{$media->id}");
+
+        $response->assertStatus(206);
+        $response->assertHeader('Accept-Ranges', 'bytes');
+        $this->assertStringContainsString('bytes 100-200/5000', $response->headers->get('Content-Range'));
+    }
+
+    /**
+     * @test
+     * GIVEN : un média sans chemin vidéo et aucun FTP configuré
+     * WHEN : on tente de streamer le segment d'un média sans chemin
+     * THEN : une erreur 404 est retournée
+     */
+    public function segment_returns_404_when_media_has_no_path()
+    {
+        $media = Media::factory()->create([
+            'chemin_local' => null,
+            'URI_NAS_ARCH' => null,
+            'URI_NAS_PAD' => null,
+        ]);
+
+        $response = $this->get("/stream/{$media->id}/segment/segment1.ts");
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec un chemin PAD et un segment présent
+     * WHEN : on demande le segment via FTP PAD
+     * THEN : le segment est retourné avec le Content-Type mp2t
+     */
+    public function segment_uses_ftp_pad_when_arch_not_available()
+    {
+        $media = Media::factory()->create([
+            'chemin_local' => null,
+            'URI_NAS_ARCH' => null,
+            'URI_NAS_PAD' => 'videos/playlist.m3u8',
+        ]);
+
+        Storage::disk('ftp_pad')->put('videos/segment1.ts', 'segmentdata');
+
+        $response = $this->get("/stream/{$media->id}/segment/segment1.ts");
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'video/mp2t');
+    }
+
+    /**
+     * @test
+     * GIVEN : un média avec un chemin HLS inexistant sur le disque
+     * WHEN : on demande le streaming de la playlist HLS
+     * THEN : une erreur 404 est retournée
+     */
+    public function it_returns_404_when_hls_playlist_is_missing()
+    {
+        $media = Media::factory()->create([
+            'chemin_local' => null,
+            'URI_NAS_ARCH' => 'videos/missing_playlist.m3u8',
+        ]);
+
+        $response = $this->get("/stream/{$media->id}");
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     * GIVEN : un média inexistant
+     * WHEN : on demande un segment pour ce média
+     * THEN : une erreur 404 est retournée
+     */
+    public function segment_returns_404_for_nonexistent_media()
+    {
+        $response = $this->get("/stream/999999/segment/segment1.ts");
 
         $response->assertStatus(404);
     }
